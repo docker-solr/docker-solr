@@ -73,4 +73,5 @@ for version in "${versions[@]}"; do
 	)
 done
 
-rm "$upstream_versions"
+if [ -f KEYS ]; then rm KEYS; fi
+if [ -f "$upstream_versions" ]; then rm "$upstream_versions"; fi
