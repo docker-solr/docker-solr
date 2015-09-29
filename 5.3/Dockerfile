@@ -19,6 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
   rm /opt/$SOLR.tgz && \
   mkdir -p /opt/$SOLR/server/solr/lib && \
   ln -s /opt/$SOLR /opt/solr
+RUN sed --in-place -e 's/^    "$JAVA" "${SOLR_START_OPTS\[@\]}" $SOLR_ADDL_ARGS -jar start.jar "${SOLR_JETTY_CONFIG\[@\]}"/    exec "$JAVA" "${SOLR_START_OPTS[@]}" $SOLR_ADDL_ARGS -jar start.jar "${SOLR_JETTY_CONFIG[@]}"/' /opt/$SOLR/bin/solr
 RUN groupadd -r $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr /opt/$SOLR
