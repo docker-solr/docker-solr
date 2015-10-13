@@ -6,11 +6,15 @@ RUN apt-get update && \
   apt-get -y install lsof && \
   rm -rf /var/lib/apt/lists/*
 
+ENV SOLR_USER solr
+ENV SOLR_UID 8983
+
+RUN groupadd -r $SOLR_USER && \
+  useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
+
 ENV SOLR_VERSION 0.0.0
 ENV SOLR_SHA256 "checksum-goes-here"
 ENV SOLR solr-$SOLR_VERSION
-ENV SOLR_USER solr
-ENV SOLR_UID 8983
 
 RUN mkdir -p /opt && \
   wget -nv --output-document=/opt/$SOLR.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/$SOLR.tgz && \
@@ -18,9 +22,7 @@ RUN mkdir -p /opt && \
   tar -C /opt --extract --file /opt/$SOLR.tgz && \
   rm /opt/$SOLR.tgz && \
   mkdir -p /opt/$SOLR/server/solr/lib && \
-  ln -s /opt/$SOLR /opt/solr
-RUN groupadd -r $SOLR_USER && \
-  useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER && \
+  ln -s /opt/$SOLR /opt/solr && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr /opt/$SOLR
 
 EXPOSE 8983
