@@ -16,14 +16,13 @@ ENV SOLR_VERSION 0.0.0
 ENV SOLR_SHA256 "checksum-goes-here"
 ENV SOLR solr-$SOLR_VERSION
 
-RUN mkdir -p /opt && \
+RUN mkdir -p /opt/solr && \
   wget -nv --output-document=/opt/$SOLR.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/$SOLR.tgz && \
   echo "$SOLR_SHA256 *$SOLR.tgz" | (cd /opt; sha256sum -c -) && \
-  tar -C /opt --extract --file /opt/$SOLR.tgz && \
+  tar -C /opt/solr --extract --file /opt/$SOLR.tgz --strip-components=1 && \
   rm /opt/$SOLR.tgz && \
-  mkdir -p /opt/$SOLR/server/solr/lib && \
-  ln -s /opt/$SOLR /opt/solr && \
-  chown -R $SOLR_USER:$SOLR_USER /opt/solr /opt/$SOLR
+  mkdir -p /opt/solr/server/solr/lib && \
+  chown -R $SOLR_USER:$SOLR_USER /opt/solr
 
 EXPOSE 8983
 WORKDIR /opt/solr
