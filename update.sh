@@ -43,11 +43,13 @@ for version in "${versions[@]}"; do
 		gpg --import KEYS
 
 		# and for some extra verification we check the key on the keyserver too:
-		KEY=$(gpg --verify solr-$fullVersion.tgz.asc 2>&1 | grep 'Signature made' | sed 's/^.*key ID '//)
+		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
 		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY"
 
 		# verify the signature matches our content
 		gpg --verify solr-$fullVersion.tgz.asc
+		# get the full fingerprint (since we only get the "long id" if it was BADSIG before)
+		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
 
 		# The Solr release process publish MD5 and SHA1 checksum files. Check those for good measure
 		if [ ! -f solr-$fullVersion.tgz.sha1 ]; then
@@ -70,6 +72,7 @@ for version in "${versions[@]}"; do
 		cp $template "$short_version/Dockerfile"
 		sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$fullVersion"'/' "$short_version/Dockerfile"
 		sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$short_version/Dockerfile"
+		sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$short_version/Dockerfile"
 	)
 done
 
