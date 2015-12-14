@@ -184,6 +184,6 @@ git commit -m "Update Solr to 5.4.0" solr/README.md
 git push
 ```
 
-The create a Pull Request on https://github.com/docker-library/docs/compare/master...docker-solr:docs?expand=1
+Then create a Pull Request on https://github.com/docker-library/docs/compare/master...docker-solr:docs?expand=1
 
 That's it!
