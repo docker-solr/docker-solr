@@ -19,10 +19,9 @@ for version in $buildable ; do
   fi
   echo "BUILDING $dockerfile"
   fullVersion="$(grep -m1 'ENV SOLR_VERSION' "$version/Dockerfile" | cut -d' ' -f3)"
-  tags=("$TAG_BASE:$version")
+  echo "Building: docker build --pull --rm=true --tag="$TAG_BASE:$version" - < $dockerfile"
+  docker build --pull --rm=true --tag="$TAG_BASE:$version" - < $dockerfile
   if [ "$version" = "$latest" ]; then
-    tags+=("$TAG_BASE:latest")
+    docker tag "$TAG_BASE:$version" "$TAG_BASE:latest"
   fi
-  tag_args=("${tags[*]/#/--tag=}")
-  docker build --pull --rm=true $tag_args - < $dockerfile
 done
