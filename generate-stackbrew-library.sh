@@ -13,6 +13,7 @@ versions=( "${versions[@]%/}" )
 url='git://github.com/docker-solr/docker-solr'
 
 echo '# maintainer: Martijn Koster <mak-github@greenhills.co.uk> (@makuk66)'
+echo '# maintainer: Shalin Mangar <shalin@apache.org> (@shalinmangar)'
 
 for version in "${versions[@]}"; do
 	commit="$(git log -1 --format='format:%H' -- "$version")"
