@@ -11,6 +11,7 @@ I like to use a docker container that we use for internal builds, that has pre-r
 
 ```
 docker run --name docker-solr-builder -d -P lucidworks/fusion-builder:openjdk-8
+
 ssh -A -l jenkins -p $(docker port docker-solr-builder 22/tcp | sed 's/.*://') localhost
 ```
 
@@ -18,6 +19,7 @@ First, get the repository:
 
 ```
 git clone git@github.com:docker-solr/docker-solr.git
+
 cd docker-solr
 ```
 
@@ -25,6 +27,7 @@ Run the script that creates a directory for the new version, downloads solr to c
 
 ```
 bash update.sh 5.4.0
+
 ls 5.4
 ```
 
@@ -34,6 +37,7 @@ To test the Dockerfile locally I configure my environment to point to a Docker h
 
 ```
 export DOCKER_HOST=tcp://cylon.lan:2375
+
 ./build-all.sh
 ```
 
