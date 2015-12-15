@@ -90,12 +90,6 @@ aliases=(
 )
 ```
 
-Then run it, and save the output:
-
-```
-bash generate-stackbrew-library.sh | tee ../new-versions
-```
-
 ## Commit changes to our fork
 
 Now we can commit the changes to our repository.
@@ -104,7 +98,8 @@ First identify myself:
 
 ```
 git config --global user.email "mak-github@greenhills.co.uk"
-git config --global user.name "Martijn Koster"
+git config --global user.name "Martijn Koster
+git config --global push.default simple
 ```	
 
 Check in the changes:
@@ -117,6 +112,13 @@ git rev-parse HEAD
 ```
 
 Make note of that git SHA.
+
+Now that this has been comitted, we can run the `generate-stackbrew-library.sh`, and save the output:
+
+```
+bash generate-stackbrew-library.sh | tee ../new-versions
+```
+
 
 ## Update our README
 
@@ -131,7 +133,21 @@ added, and click on the Dockerfile. Now copy the URL form the url-bar. It should
 https://github.com/docker-solr/docker-solr/blob/cf53b9b7cd6d7221f9c569f2eef68350dce0d633/5.3/Dockerfile
 The commit sha there should match the one we committed earlier.
 
-Commit and push that change.
+The versions should be such that the 'latest' tag points to the latest version, the '5.4' tag points
+to the latest 5.4, in this case 5.4.0, and the `5` tag points to the latest 5, in thise case also 5.4.0.
+For example:
+
+```
+-       [`5.4.0`, `5.4`, `5`, `latest` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/3e61ef877ca9d04e7f005cd40ba726abd1f74259/5.4/Dockerfile)
+-	[`5.3.1`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/80ee84f565414c4f1218d39417049049d9f2c0d1/5.3/Dockerfile)
+```
+
+Then commit and push that change:
+
+```
+git commit -m "Update Solr to 5.4.0" README.md
+git push
+```
 
 That is our repository updated.
 
@@ -144,7 +160,7 @@ We'll use the output provided by `generate-stackbrew-library.sh` earlier:
 
 ```
 cd
-git clone https://github.com/docker-solr/official-images
+git clone git@github.com:docker-solr/official-images
 cd official-images/
 cat ../new-versions > library/solr 
 git diff
@@ -154,11 +170,11 @@ If that all looks plausible, push to master on our fork:
 
 ```
 git commit -m "Update Solr to 5.4.0" library/solr
+git push
 ```
 
-TODO: is it desirable to include more detail like the release highlights from the announcement email on http://mail-archives.apache.org/mod_mbox/lucene-solr-user/?
-
 Now you can create a Pull Request at https://github.com/docker-library/official-images/compare/master...docker-solr:master?expand=1
+In the comment section add a link to the announcement email from the archives http://mail-archives.apache.org/mod_mbox/www-announce/
 
 ## Update the docs repository
 
@@ -168,7 +184,7 @@ Here is how to do it. First get the repo:
 
 ```
 cd
-git clone https://github.com/docker-solr/docs
+git clone git@github.com:docker-solr/docs
 cd docs
 ls solr
 ```
@@ -188,6 +204,6 @@ git commit -m "Update Solr to 5.4.0" solr/README.md
 git push
 ```
 
-Then create a Pull Request on https://github.com/docker-library/docs/compare/master...docker-solr:docs?expand=1
+Then create a Pull Request on https://github.com/docker-library/docs/compare/master...docker-solr:master?expand=1
 
 That's it!
