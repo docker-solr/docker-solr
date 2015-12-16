@@ -142,6 +142,8 @@ For example:
 -	[`5.3.1`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/80ee84f565414c4f1218d39417049049d9f2c0d1/5.3/Dockerfile)
 ```
 
+Remove any versions that are end-of-life.
+
 Then commit and push that change:
 
 ```
