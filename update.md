@@ -176,34 +176,9 @@ git push
 Now you can create a Pull Request at https://github.com/docker-library/official-images/compare/master...docker-solr:master?expand=1
 In the comment section add a link to the announcement email from the archives http://mail-archives.apache.org/mod_mbox/www-announce/
 
-## Update the docs repository
+## The docs repository
 
-The Docker library team maintains documentation at https://github.com/docker-solr/docs/tree/master/solr that includes tags, which will need updating.
-TODO: I'm not sure if we're supposed to create a PR to update the tags, or if this happens in an automated fashion after the official-images change above.
-Here is how to do it. First get the repo:
-
-```
-cd
-git clone git@github.com:docker-solr/docs
-cd docs
-ls solr
-```
-
-You'll see there are various components that can be used to generate the `README.md`.
-To update:
-
-```
-bash update.sh solr
-git diff
-```
-
-This should show the required changes.
-
-```
-git commit -m "Update Solr to 5.4.0" solr/README.md
-git push
-```
-
-Then create a Pull Request on https://github.com/docker-library/docs/compare/master...docker-solr:master?expand=1
+The Docker library team maintains documentation at https://github.com/docker-solr/docs/tree/master/solr that includes current tags.
+These tags will be updated automatically after our PR is merged, so there is no need for us to do anything there.
 
 That's it!
