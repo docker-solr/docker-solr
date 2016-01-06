@@ -8,10 +8,23 @@ How do I persist Solr data and config?
 
 Your data is persisted already, in your container's filesystem.
 If you `docker run`, add data to Solr, then `docker stop` and later
-`docker start`, then your data is still there.
+`docker start`, then your data is still there. The same is true for
+changes to configuration files.
 
 Equally, if you `docker commit` your container, you can later create a new
 container from that image, and that will have your data in it.
+
+For some use-cases it is convenient to provide a modified `solr.in.sh` file to Solr.
+For example to point Solr to a ZooKeeper host:
+
+```
+docker create --name my-solr -P solr
+docker cp my-solr:/opt/solr/bin/solr.in.sh .
+sed -i -e 's/#ZK_HOST=.*/ZK_HOST=cylon.lan:2181/' solr.in.sh
+docker cp solr.in.sh my-solr:/opt/solr/bin/solr.in.sh
+docker start my-solr
+# With a browser go to http://cylon.lan:32873/solr/#/ and confirm "-DzkHost=cylon.lan:2181" in the JVM Args section.
+```
 
 But usually when people ask this question, what they are after is a way
 to store Solr data and config in a separate [Docker Volume](https://docs.docker.com/userguide/dockervolumes/).
