@@ -26,6 +26,7 @@ RUN mkdir -p /opt/solr && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   mkdir -p /opt/solr/server/solr/lib && \
+  sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr
 
 EXPOSE 8983
