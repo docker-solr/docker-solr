@@ -38,7 +38,7 @@ In the web UI if you click on "Core Admin" you should now see the "gettingstarte
 If you want to load some example data:
 
 ```console
-$ docker exec -it --user=solr my_solr bin/post -c gettingstarted example/exampledocs/manufacturers.xml
+$ docker exec -it --user=solr my_solr bin/post -c gettingstarted /opt/solr/example/exampledocs/manufacturers.xml
 ```
 
 In the UI, find the "Core selector" popup menu and select the "gettingstarted" core, then select the "Query" menu item. This gives you a default search for "*:*" which returns all docs. Hit the "Execute Query" button, and you should see a few docs with data. Congratulations!
