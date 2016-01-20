@@ -69,6 +69,7 @@ configsets  gettingstarted  README.txt  solr.xml  zoo.cfg
 
 Note that if you add or modify files in that directory from the host, you must `chown 999:999` them.
 
+
 How can I use a Data Volume Container?
 --------------------------------------
 
@@ -118,3 +119,31 @@ docker exec -it --user=solr $SOLR_CONTAINER ls server/solr/gettingstarted
 # check the config modification is still there:
 docker exec -it --user=solr $SOLR_CONTAINER curl http://localhost:8983/solr/gettingstarted/config/overlay?omitHeader=true
 ```
+
+
+Can I run ZooKeeper and Solr clusters under Docker?
+---------------------------------------------------
+
+At the network level the ZooKeeper nodes need to be able to talk to eachother,
+and the Solr nodes need to be able to talk to the ZooKeeper nodes and to each other.
+At the application level, different nodes need to be able to identify and locate each other.
+In ZooKeeper that is done with a configuration file that lists hostnames or IP addresses for each node.
+In Solr that is done with a parameter that specifies a host or IP address, which is then stored in ZooKeeper.
+
+In typical clusters, those hostnames/IP addresses are pre-defined and remain static through the lifetime of the cluster.
+In Docker, inter-container communication and multi-host networking can be facilitated by [Docker Networks](https://docs.docker.com/engine/userguide/networking/).
+But, crucially, Docker does not normally guarantee that IP addresses of containers remain static during the lifetime of a container.
+In non-networked Docker, the IP address seems to change everytime you stop/start.
+In a networked Docker, containers can lose their IP address in certain sequences of starting/stopping, unless you take steps to prevent that.
+
+IP changes causes problems:
+
+- If you use hardcoded IP addresses in configuration, and the addresses of your containers change after a stops/start, then your cluster will stop working and may corrupt itself.
+- If you use hostnames in configuration, and the addresses of your containers change, then you might run into problems with cached hostname lookups.
+- And if you use hostnames there is another problem: the names are not defined until the respective container is running,
+So when for example the first ZooKeeper node starts up, it will attempt a hostname lookup for the other nodes, and that will fail.
+This is especially a problem for ZooKeeper 3.4.6; future versions are better at recovering.
+
+Docker 1.10 has a new `--ip` configuration option that allows you to specify an IP address for a container.
+It also has a `--ip-range` option that allows you to specify the range that other containers get addresses from.
+Used together, you can implement static addresses. See [this example](docker-networking.md).
