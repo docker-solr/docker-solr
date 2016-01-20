@@ -147,3 +147,42 @@ This is especially a problem for ZooKeeper 3.4.6; future versions are better at 
 Docker 1.10 has a new `--ip` configuration option that allows you to specify an IP address for a container.
 It also has a `--ip-range` option that allows you to specify the range that other containers get addresses from.
 Used together, you can implement static addresses. See [this example](docs/docker-networking.md).
+
+
+Can I run ZooKeeper and Solr with Docker Links?
+-----------------------------------------------
+
+Docker's [Legacy container links](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) provide a way to 
+pass connection configuration between containers. It only works on a single machine, on the default bridge.
+It provides no facilities for static IPs.
+Note: this feature is expected to be deprecated and removed in a future release. 
+So really, see the "Can I run ZooKeeper and Solr clusters under Docker?" option above instead.
+
+But for some use-cases, such as quick demos or one-shot automated testing, it can be convenient.
+
+Run ZooKeeper, and define a name so we can link to it:
+
+```console
+$ docker run --name zookeeper -d -p 2181:2181 -p 2888:2888 -p 3888:3888 jplock/zookeeper
+```
+
+Run two Solr nodes, linked to the zookeeper container:
+
+```console
+$ docker run --name solr1 --link zookeeper:ZK -d -p 8983:8983 \
+      solr \
+      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
+
+$ docker run --name solr2 --link zookeeper:ZK -d -p 8984:8983 \
+      solr \
+      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
+```
+
+Create a collection:
+
+```console
+$ docker exec -i -t solr1 /opt/solr/bin/solr create_collection \
+        -c collection1 -shards 2 -p 8983
+```
+
+Then go to `http://localhost:8983/solr/#/~cloud` (adjust the hostname for your docker host) to see the two shards and Solr nodes.

@@ -47,34 +47,13 @@ To learn more about Solr, see the [Apache Solr Reference Guide](https://cwiki.ap
 
 ## Distributed Solr
 
-You can also run a distributed Solr configuration, with Solr nodes in separate containers, sharing a single ZooKeeper server:
+You can also run a distributed Solr configuration.
 
-Run ZooKeeper, and define a name so we can link to it:
+The recommended and most flexible way to do that is to use Docker networking.
+See the [Can I run ZooKeeper and Solr clusters under Docker](https://github.com/docker-solr/docker-solr/blob/master/Docker-FAQ.md#can-i-run-zookeeper-and-solr-clusters-under-docker) FAQ,
+and [this example](docs/docker-networking.md).
 
-```console
-$ docker run --name zookeeper -d -p 2181:2181 -p 2888:2888 -p 3888:3888 jplock/zookeeper
-```
-
-Run two Solr nodes, linked to the zookeeper container:
-
-```console
-$ docker run --name solr1 --link zookeeper:ZK -d -p 8983:8983 \
-      solr \
-      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
-
-$ docker run --name solr2 --link zookeeper:ZK -d -p 8984:8983 \
-      solr \
-      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
-```
-
-Create a collection:
-
-```console
-$ docker exec -i -t solr1 /opt/solr/bin/solr create_collection \
-        -c collection1 -shards 2 -p 8983
-```
-
-Then go to `http://localhost:8983/solr/#/~cloud` (adjust the hostname for your docker host) to see the two shards and Solr nodes.
+You can also use legacy links, see the [Can I run ZooKeeper and Solr with Docker Links](Docker-FAQ.md#can-i-run-zookeeper-and-solr-clusters-under-docker) FAQ.
 
 # About this repository
 
