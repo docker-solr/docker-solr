@@ -55,13 +55,20 @@ Now for each of the resulting images, start a container to test:
 docker run --name solr-test -d -P docker-solr/docker-solr:5.4
 ```
 
+Check the logs for startup messages:
+
+```
+docker logs solr-test
+```
+
 Get the URL of the Solr running on it:
 
 ```
 echo "http://$(echo $DOCKER_HOST | sed -e 's,tcp://,,' -e 's,:.*,,'):$(docker port solr-test 8983/tcp| sed 's/^.*://')/"
 ```
 
-and check that URL in your browser, paying particular attention to the `solr-impl` in the administration interface, which lists the Solr version, and check for errors under "Logging".
+and check that URL in your browser, paying particular attention to the `solr-impl` in the administration interface, which lists the Solr version.
+Check for errors under "Logging".
 
 If that looks in order, then clean up the container:
 
