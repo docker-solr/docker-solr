@@ -12,11 +12,11 @@ ENV SOLR_UID 8983
 RUN groupadd -r $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_KEY 25C13C58807E90004AB8597AE48025ED13E57FFC
+ENV SOLR_KEY E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
 RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$SOLR_KEY"
 
-ENV SOLR_VERSION 5.4.0
-ENV SOLR_SHA256 84c0f04a23047946f54618a092d4510d88d7205a756b948208de9e5afb42f7cd
+ENV SOLR_VERSION 5.4.1
+ENV SOLR_SHA256 3e4b4ec7bd728b49b2ebc3dbe8f3d1ef89fded4ab86b9e2f856bedd58c99f28b
 
 RUN mkdir -p /opt/solr && \
   wget -nv --output-document=/opt/solr.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz && \
