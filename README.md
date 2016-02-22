@@ -1,7 +1,8 @@
 # Supported tags and respective `Dockerfile` links
 
--       [`5.4.1`, `5.4`, `5`, `latest` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5d6039fb7019b08d420b7bb90f76e8958dc32548/5.4/Dockerfile)
--	[`5.3.2`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5d6039fb7019b08d420b7bb90f76e8958dc32548/5.3/Dockerfile)
+-       [`5.5.0`, `5.5`, `5`, `latest` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/d107847c742c790ba22982300c9415e06d020298/5.5/Dockerfile)
+-       [`5.4.1`, `5.4` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/d107847c742c790ba22982300c9415e06d02029/5.4/Dockerfile)
+-	[`5.3.2`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/d107847c742c790ba22982300c9415e06d02029/5.3/Dockerfile)
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 
