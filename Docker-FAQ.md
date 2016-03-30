@@ -44,14 +44,15 @@ that are part of the Solr distribution.
 Now, if we mounted volumes for each core individually, then that would
 interfere with Solr trying to create those directories. If instead we make
 the whole directory a volume, then we need to provide those configuration files
-in our volume. For example:
+in our volume, which we can do by copying them from a temporary container.
+For example:
 
 ```
 # create a directory to store the server/solr directory
 $ mkdir /home/docker-volumes/mysolr1
 
 # make sure its host owner matches the container's solr user
-$ sudo chown 999:999 /home/docker-volumes/mysolr1
+$ sudo chown 8983:8983 /home/docker-volumes/mysolr1
 
 # copy the solr directory from a temporary container to the volume
 $ docker run -it --rm -v /home/docker-volumes/mysolr1:/target solr cp -r server/solr /target/
