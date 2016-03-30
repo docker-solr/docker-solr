@@ -9,7 +9,7 @@ RUN apt-get update && \
 ENV SOLR_USER solr
 ENV SOLR_UID 8983
 
-RUN groupadd -r $SOLR_USER && \
+RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
 ENV SOLR_KEY 2C72EB1397733A551DDB60CCF119941F6E68DA61
