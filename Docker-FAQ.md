@@ -68,7 +68,7 @@ $ ls /home/docker-volumes/mysolr1/solr/
 configsets  gettingstarted  README.txt  solr.xml  zoo.cfg
 ```
 
-Note that if you add or modify files in that directory from the host, you must `chown 999:999` them.
+Note that if you add or modify files in that directory from the host, you must `chown 8983:8983` them.
 
 
 How can I use a Data Volume Container?
