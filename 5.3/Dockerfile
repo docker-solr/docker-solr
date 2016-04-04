@@ -19,8 +19,8 @@ ENV SOLR_VERSION 5.3.2
 ENV SOLR_SHA256 7c26601229ed712c639d00882f35304d87e0032028be4754d098a9b694877f48
 
 RUN mkdir -p /opt/solr && \
-  wget -nv --output-document=/opt/solr.tgz http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz && \
-  wget -nv --output-document=/opt/solr.tgz.asc http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz.asc && \
+  wget -nv http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz -O /opt/solr.tgz && \
+  wget -nv http://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz.asc -O /opt/solr.tgz.asc && \
   gpg --verify /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
