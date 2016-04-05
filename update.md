@@ -97,7 +97,7 @@ aliases=(
 )
 ```
 
-## Commit changes to our fork
+## Commit changes to our local repository
 
 Now we can commit the changes to our repository.
 
@@ -159,6 +159,11 @@ git push
 ```
 
 That is our repository updated.
+
+## Check the automated build
+
+The check-in will trigger an automated build on https://travis-ci.org/docker-solr/docker-solr.
+Verify that that succeeds.
 
 ## Update the official-images repository
 
