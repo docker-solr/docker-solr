@@ -11,6 +11,7 @@ set -e
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 template=Dockerfile.template
+alpine_template=Dockerfile-alpine.template
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
 	echo "Usage: bash update.sh [version ...]"
@@ -73,6 +74,14 @@ for version in "${versions[@]}"; do
 		sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$fullVersion"'/' "$short_version/Dockerfile"
 		sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$short_version/Dockerfile"
 		sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$short_version/Dockerfile"
+
+		# create the alpine variant
+		alpine_dir="$short_version/alpine"
+		mkdir -p "$alpine_dir"
+		cp $alpine_template "$alpine_dir/Dockerfile"
+		sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$fullVersion"'/' "$alpine_dir/Dockerfile"
+		sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$alpine_dir/Dockerfile"
+		sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$alpine_dir/Dockerfile"
 	)
 done
 
