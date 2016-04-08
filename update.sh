@@ -32,7 +32,22 @@ for version in "${versions[@]}"; do
 		if [ ! -f solr-$fullVersion.tgz ]; then
 			wget -nv --output-document=solr-$fullVersion.tgz $packagesUrl/$fullVersion/solr-$fullVersion.tgz
 		fi
-		# get the signature
+
+		# The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
+		# early failure for incomplete downloads, and avoid scary-sounding PGP mismatches
+		if [ ! -f solr-$fullVersion.tgz.sha1 ]; then
+			wget -nv --output-document=solr-$fullVersion.tgz.sha1 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.sha1
+		fi
+		sha1sum -c solr-$fullVersion.tgz.sha1
+		if [ ! -f solr-$fullVersion.tgz.md5 ]; then
+			wget -nv --output-document=solr-$fullVersion.tgz.md5 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.md5
+		fi
+		md5sum -c solr-$fullVersion.tgz.md5
+
+		# We'll record a stronger SHA256
+		SHA256=$(sha256sum solr-$fullVersion.tgz | awk '{print $1}')
+
+		# get the PGP signature
 		if [ ! -f solr-$fullVersion.tgz.asc ]; then
 			wget -nv --output-document=solr-$fullVersion.tgz.asc $packagesUrl/$fullVersion/solr-$fullVersion.tgz.asc
 		fi
@@ -51,19 +66,6 @@ for version in "${versions[@]}"; do
 		gpg --verify solr-$fullVersion.tgz.asc
 		# get the full fingerprint (since we only get the "long id" if it was BADSIG before)
 		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
-
-		# The Solr release process publish MD5 and SHA1 checksum files. Check those for good measure
-		if [ ! -f solr-$fullVersion.tgz.sha1 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.sha1 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.sha1
-		fi
-		sha1sum -c solr-$fullVersion.tgz.sha1
-		if [ ! -f solr-$fullVersion.tgz.md5 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.md5 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.md5
-		fi
-		md5sum -c solr-$fullVersion.tgz.md5
-
-		# We'll record a stronger SHA256
-		SHA256=$(sha256sum solr-$fullVersion.tgz | awk '{print $1}')
 
 		rm solr-$fullVersion.tgz.asc solr-$fullVersion.tgz.sha1 solr-$fullVersion.tgz.md5 solr-$fullVersion.tgz
 
