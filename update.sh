@@ -19,9 +19,17 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-packagesUrl='https://archive.apache.org/dist/lucene/solr'
+# Download solr from a mirror.
+# You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
+mirrorUrl=${mirrorUrl:-'http://www-us.apache.org/dist/lucene/solr'}
+# Download the checksums/keys from the archive (temporarily isabled because the archive is down for the next 3 days)
+# You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
+#archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
+archiveUrl=${archiveUrl:-'http://www-us.apache.org/dist/lucene/solr'}
+# Note that the Dockerfile templates have their own defaults and override mechanism. See update.sh.
+
 upstream_versions='upstream-versions'
-curl -sSL $packagesUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
+curl -sSL $archiveUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
 for version in "${versions[@]}"; do
 	fullVersion="$(grep "^$version" "$upstream_versions" | tail -n 1)"
@@ -30,17 +38,17 @@ for version in "${versions[@]}"; do
 
 		# get the tgz, so we can checksum it, and verify the signature
 		if [ ! -f solr-$fullVersion.tgz ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz $packagesUrl/$fullVersion/solr-$fullVersion.tgz
+			wget -nv --output-document=solr-$fullVersion.tgz $mirrorUrl/$fullVersion/solr-$fullVersion.tgz
 		fi
 
 		# The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
 		# early failure for incomplete downloads, and avoid scary-sounding PGP mismatches
 		if [ ! -f solr-$fullVersion.tgz.sha1 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.sha1 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.sha1
+			wget -nv --output-document=solr-$fullVersion.tgz.sha1 $archiveUrl/$fullVersion/solr-$fullVersion.tgz.sha1
 		fi
 		sha1sum -c solr-$fullVersion.tgz.sha1
 		if [ ! -f solr-$fullVersion.tgz.md5 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.md5 $packagesUrl/$fullVersion/solr-$fullVersion.tgz.md5
+			wget -nv --output-document=solr-$fullVersion.tgz.md5 $archiveUrl/$fullVersion/solr-$fullVersion.tgz.md5
 		fi
 		md5sum -c solr-$fullVersion.tgz.md5
 
@@ -49,7 +57,7 @@ for version in "${versions[@]}"; do
 
 		# get the PGP signature
 		if [ ! -f solr-$fullVersion.tgz.asc ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.asc $packagesUrl/$fullVersion/solr-$fullVersion.tgz.asc
+			wget -nv --output-document=solr-$fullVersion.tgz.asc $archiveUrl/$fullVersion/solr-$fullVersion.tgz.asc
 		fi
 
 		# Get the code signing keys
