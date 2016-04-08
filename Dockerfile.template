@@ -26,16 +26,25 @@ ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-http://www-us.apache.org/dist/lucene/solr}/
 RUN mkdir -p /opt/solr && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
   wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
-  gpg --verify /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
+  (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
+  gpg --verify /opt/solr.tgz.asc && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   mkdir -p /opt/solr/server/solr/lib && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_USER /opt/solr
+  chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
+  mkdir /docker-entrypoint-initdb.d /opt/docker-solr/
+
+COPY docker-entrypoint.sh /
+COPY scripts /opt/docker-solr/scripts
+RUN chmod -R a+x /docker-entrypoint.sh
+RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
 
 EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
-CMD ["/opt/solr/bin/solr", "-f"]
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["solr"]

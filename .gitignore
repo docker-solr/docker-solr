@@ -2,3 +2,4 @@ solr-*.tgz
 solr-*.tgz.asc
 solr-*.tgz.md5
 solr-*.tgz.sha1
+mycores
