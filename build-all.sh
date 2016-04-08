@@ -6,6 +6,8 @@
 set -e
 
 TAG_BASE=docker-solr/docker-solr
+# Override with e.g.: export SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr
+SOLR_DOWNLOAD_SERVER=${SOLR_DOWNLOAD_SERVER:-'http://www-us.apache.org/dist/lucene/solr'}
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -20,7 +22,7 @@ for version in $buildable ; do
     echo "BUILDING $dockerfile"
     fullVersion="$(grep -m1 'ENV SOLR_VERSION' "$dockerfile" | cut -d' ' -f3)"
     echo "Building: docker build --pull --rm=true --tag="$dockertag" - < $dockerfile"
-    docker build --pull --rm=true --tag="$dockertag" - < $dockerfile
+    docker build --pull --rm=true --tag="$dockertag" --build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER - < $dockerfile
     if [ "$version" = "$latest" ]; then
       docker tag "$dockertag" "$TAG_BASE:latest"
     fi
@@ -34,6 +36,6 @@ for version in $buildable ; do
     echo "BUILDING $alpine_dockerfile"
     fullVersion="$(grep -m1 'ENV SOLR_VERSION' "$alpine_dockerfile" | cut -d' ' -f3)"
     echo "Building: docker build --pull --rm=true --tag="$alpine_dockertag" - < $alpine_dockerfile"
-    docker build --pull --rm=true --tag="$alpine_dockertag" - < $alpine_dockerfile
+    docker build --pull --rm=true --tag="$alpine_dockertag" --build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER - < $alpine_dockerfile
   fi
 done
