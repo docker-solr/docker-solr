@@ -10,14 +10,32 @@ set -e
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-template=Dockerfile.template
-alpine_template=Dockerfile-alpine.template
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
 	echo "Usage: bash update.sh [version ...]"
 	exit 1
 fi
 versions=( "${versions[@]%/}" )
+
+function write_files {
+    local full_version=$1
+    local variant=$2
+
+    short_version=$(echo $full_version | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
+    if [[ -z $variant ]]; then
+        target_dir="$short_version"
+        template=Dockerfile.template
+    else
+        target_dir="$short_version/$variant"
+        template=Dockerfile-$variant.template
+    fi
+
+    mkdir -p "$target_dir"
+    cp $template "$target_dir/Dockerfile"
+    sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
+    sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
+    sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
+}
 
 # Download solr from a mirror.
 # You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
@@ -32,8 +50,8 @@ upstream_versions='upstream-versions'
 curl -sSL $archiveUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
 for version in "${versions[@]}"; do
-	fullVersion="$(grep "^$version" "$upstream_versions" | tail -n 1)"
-	if [[ -z $fullVersion ]]; then
+	full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
+	if [[ -z $full_version ]]; then
 		echo "Cannot find $version in $archiveUrl"
 		exit 1
 	fi
@@ -41,66 +59,53 @@ for version in "${versions[@]}"; do
 		set -x
 
 		# get the tgz, so we can checksum it, and verify the signature
-		if [ ! -f solr-$fullVersion.tgz ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz $mirrorUrl/$fullVersion/solr-$fullVersion.tgz
+		if [ ! -f solr-$full_version.tgz ]; then
+			wget -nv --output-document=solr-$full_version.tgz $mirrorUrl/$full_version/solr-$full_version.tgz
 		fi
 
 		# The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
 		# early failure for incomplete downloads, and avoid scary-sounding PGP mismatches
-		if [ ! -f solr-$fullVersion.tgz.sha1 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.sha1 $archiveUrl/$fullVersion/solr-$fullVersion.tgz.sha1
+		if [ ! -f solr-$full_version.tgz.sha1 ]; then
+			wget -nv --output-document=solr-$full_version.tgz.sha1 $archiveUrl/$full_version/solr-$full_version.tgz.sha1
 		fi
-		sha1sum -c solr-$fullVersion.tgz.sha1
-		if [ ! -f solr-$fullVersion.tgz.md5 ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.md5 $archiveUrl/$fullVersion/solr-$fullVersion.tgz.md5
+		sha1sum -c solr-$full_version.tgz.sha1
+		if [ ! -f solr-$full_version.tgz.md5 ]; then
+			wget -nv --output-document=solr-$full_version.tgz.md5 $archiveUrl/$full_version/solr-$full_version.tgz.md5
 		fi
-		md5sum -c solr-$fullVersion.tgz.md5
+		md5sum -c solr-$full_version.tgz.md5
 
 		# We will record a stronger SHA256
-		SHA256=$(sha256sum solr-$fullVersion.tgz | awk '{print $1}')
+		SHA256=$(sha256sum solr-$full_version.tgz | awk '{print $1}')
 
 		# get the PGP signature
-		if [ ! -f solr-$fullVersion.tgz.asc ]; then
-			wget -nv --output-document=solr-$fullVersion.tgz.asc $archiveUrl/$fullVersion/solr-$fullVersion.tgz.asc
+		if [ ! -f solr-$full_version.tgz.asc ]; then
+			wget -nv --output-document=solr-$full_version.tgz.asc $archiveUrl/$full_version/solr-$full_version.tgz.asc
 		fi
 
 		# Get the code signing keys
 		# Per http://www.apache.org/dyn/closer.html and a message from Hoss on
 		# http://stackoverflow.com/questions/32539810/apache-lucene-5-3-0-release-keys-missing-key-3fcfdb3e
-		wget -nv --output-document KEYS https://www.apache.org/dist/lucene/java/$fullVersion/KEYS
+		wget -nv --output-document KEYS https://www.apache.org/dist/lucene/java/$full_version/KEYS
 		gpg --import KEYS
 
 		# and for some extra verification we check the key on the keyserver too:
-		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
+		KEY=$(gpg --status-fd 1 --verify solr-$full_version.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
 		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY"
 
 		# verify the signature matches our content
-		gpg --verify solr-$fullVersion.tgz.asc
+		gpg --verify solr-$full_version.tgz.asc
 		# get the full fingerprint (since we only get the "long id" if it was BADSIG before)
-		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
+		KEY=$(gpg --status-fd 1 --verify solr-$full_version.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
 
 		if [ -z "$KEEP_ALL_ARTIFACTS" ]; then
-			rm solr-$fullVersion.tgz.asc solr-$fullVersion.tgz.sha1 solr-$fullVersion.tgz.md5
+			rm solr-$full_version.tgz.asc solr-$full_version.tgz.sha1 solr-$full_version.tgz.md5
 			if [ -z "$KEEP_SOLR_ARTIFACT" ]; then
-				rm solr-$fullVersion.tgz
+				rm solr-$full_version.tgz
 			fi
 		fi
 
-		# write the Dockerfile in a directory named after the major.minor portion of the version number
-		short_version=$(echo $fullVersion | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
-		mkdir -p "$short_version"
-		cp $template "$short_version/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$fullVersion"'/' "$short_version/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$short_version/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$short_version/Dockerfile"
-
-		# create the alpine variant
-		alpine_dir="$short_version/alpine"
-		mkdir -p "$alpine_dir"
-		cp $alpine_template "$alpine_dir/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$fullVersion"'/' "$alpine_dir/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$alpine_dir/Dockerfile"
-		sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$alpine_dir/Dockerfile"
+		write_files $full_version
+		write_files $full_version 'alpine'
 	)
 done
 
