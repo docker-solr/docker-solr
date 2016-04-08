@@ -33,6 +33,10 @@ curl -sSL $archiveUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/"
 
 for version in "${versions[@]}"; do
 	fullVersion="$(grep "^$version" "$upstream_versions" | tail -n 1)"
+	if [[ -z $fullVersion ]]; then
+		echo "Cannot find $version in $archiveUrl"
+		exit 1
+	fi
 	(
 		set -x
 
