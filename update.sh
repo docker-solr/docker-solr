@@ -75,7 +75,12 @@ for version in "${versions[@]}"; do
 		# get the full fingerprint (since we only get the "long id" if it was BADSIG before)
 		KEY=$(gpg --status-fd 1 --verify solr-$fullVersion.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
 
-		rm solr-$fullVersion.tgz.asc solr-$fullVersion.tgz.sha1 solr-$fullVersion.tgz.md5 solr-$fullVersion.tgz
+		if [ -z "$KEEP_ALL_ARTIFACTS" ]; then
+			rm solr-$fullVersion.tgz.asc solr-$fullVersion.tgz.sha1 solr-$fullVersion.tgz.md5
+			if [ -z "$KEEP_SOLR_ARTIFACT" ]; then
+				rm solr-$fullVersion.tgz
+			fi
+		fi
 
 		# write the Dockerfile in a directory named after the major.minor portion of the version number
 		short_version=$(echo $fullVersion | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
