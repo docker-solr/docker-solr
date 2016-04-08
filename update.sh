@@ -2,10 +2,10 @@
 #
 # Usage: bash update.sh x.y.z
 #
-# This script runs to create a Dockerfile for a new solr version.
+# This script runs to create a Dockerfile for a new Solr version.
 # If you specify a partial version, like '5' or '5.3', it will determine the most recent sub version like 5.3.0.
 # We record a checksum in the Dockerfile, for verification at docker build time.
-# We verifies the content's GPG signature here. Note that this imports keys to your keychain.
+# We verify the content's GPG signature here. Note that this imports keys to your keychain.
 set -e
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -52,7 +52,7 @@ for version in "${versions[@]}"; do
 		fi
 		md5sum -c solr-$fullVersion.tgz.md5
 
-		# We'll record a stronger SHA256
+		# We will record a stronger SHA256
 		SHA256=$(sha256sum solr-$fullVersion.tgz | awk '{print $1}')
 
 		# get the PGP signature
@@ -61,7 +61,7 @@ for version in "${versions[@]}"; do
 		fi
 
 		# Get the code signing keys
-		# Per http://www.apache.org/dyn/closer.html and Hoss's message on
+		# Per http://www.apache.org/dyn/closer.html and a message from Hoss on
 		# http://stackoverflow.com/questions/32539810/apache-lucene-5-3-0-release-keys-missing-key-3fcfdb3e
 		wget -nv --output-document KEYS https://www.apache.org/dist/lucene/java/$fullVersion/KEYS
 		gpg --import KEYS
