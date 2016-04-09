@@ -23,6 +23,14 @@ git clone git@github.com:docker-solr/docker-solr.git
 cd docker-solr
 ```
 
+If you're in Europe, you can override the download file locations for much faster downloads:
+
+```
+export SOLR_DOWNLOAD_SERVER="http://www-eu.apache.org/dist/lucene/solr"
+export archiveUrl="https://www-eu.apache.org/dist/lucene/solr"
+export mirrorUrl="http://www-eu.apache.org/dist/lucene/solr"
+```
+
 Run the script that creates a directory for the new version, downloads solr to checksum, and creates a Dockerfile:
 
 ```
