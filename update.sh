@@ -32,6 +32,7 @@ function write_files {
 
     mkdir -p "$target_dir"
     cp $template "$target_dir/Dockerfile"
+    cp -r docker-entrypoint.sh scripts "$target_dir"
     sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
@@ -40,14 +41,13 @@ function write_files {
 # Download solr from a mirror.
 # You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
 mirrorUrl=${mirrorUrl:-'http://www-us.apache.org/dist/lucene/solr'}
-# Download the checksums/keys from the archive (temporarily isabled because the archive is down for the next 3 days)
+# Download the checksums/keys from the archive
 # You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
-#archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
-archiveUrl=${archiveUrl:-'http://www-us.apache.org/dist/lucene/solr'}
+archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
 # Note that the Dockerfile templates have their own defaults and override mechanism. See update.sh.
 
 upstream_versions='upstream-versions'
-curl -sSL $archiveUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
+curl -sSL $mirrorUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
 for version in "${versions[@]}"; do
 	full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
@@ -90,7 +90,10 @@ for version in "${versions[@]}"; do
 
 		# and for some extra verification we check the key on the keyserver too:
 		KEY=$(gpg --status-fd 1 --verify solr-$full_version.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
-		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY"
+		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY" || {
+                    echo "Failed to get the key from the key server"
+                    exit 1
+                }
 
 		# verify the signature matches our content
 		gpg --verify solr-$full_version.tgz.asc
