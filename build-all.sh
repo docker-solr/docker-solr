@@ -126,6 +126,9 @@ function push {
 }
 
 function push_all {
+  if [[ -z "$DOCKER_EMAIL" ]]; then echo "DOCKER_EMAIL not set"; exit 1; fi
+  if [[ -z "$DOCKER_USERNAME" ]]; then echo "DOCKER_USERNAME not set"; exit 1; fi
+  if [[ -z "$DOCKER_PASSWORD" ]]; then echo "DOCKER_PASSWORD not set"; exit 1; fi
   docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   for version in $buildable ; do
     push "$version"
