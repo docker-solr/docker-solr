@@ -5,7 +5,7 @@ if [ "${1:0:1}" = '-' ]; then
     set -- solr "$@"
 fi
 
-if [[ "$VERBOSE" -eq "yes" ]]; then
+if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
