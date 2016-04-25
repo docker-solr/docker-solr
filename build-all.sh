@@ -7,6 +7,12 @@ set -e
 
 TAG_BASE=docker-solr/docker-solr
 
+# The organisation on hub.docker.com is "dockersolr".
+# It should really have been "docker-solr" for consistency with the organisation
+# on github but currently dashes are not allowed, see https://github.com/docker/hub-feedback/issues/373
+# The hub user is "dockersolrbuilder".
+TAG_PUSH_BASE=dockersolr/docker-solr
+
 VARIANTS="alpine"
 
 # Override with e.g.: export SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr
@@ -111,6 +117,22 @@ function test_latest {
   test_simple "$TAG_BASE:latest"
 }
 
+function push {
+  version=$1
+  docker tag $TAG_BASE:$version $TAG_PUSH_BASE:$version
+  docker push $TAG_PUSH_BASE:$version
+}
+
+function push_all {
+  docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  for version in $buildable ; do
+    push "$version"
+    for variant in $VARIANTS; do
+      push "$version-$variant"
+    done
+  done
+}
+
 if [[ $# -eq 0 ]] ; then
   args="build_all"
 else
@@ -129,6 +151,9 @@ for arg in $args; do
       ;;
     test_latest)
       test_latest
+      ;;
+    push_all)
+      push_all
       ;;
     *)
       echo "Unknown option $arg"
