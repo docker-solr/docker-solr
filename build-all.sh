@@ -120,7 +120,9 @@ function test_latest {
 function push {
   version=$1
   docker tag $TAG_BASE:$version $TAG_PUSH_BASE:$version
+  echo "Pushing $TAG_PUSH_BASE:$version"
   docker push $TAG_PUSH_BASE:$version
+  echo "Pushed $TAG_PUSH_BASE:$version"
 }
 
 function push_all {
