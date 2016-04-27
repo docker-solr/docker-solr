@@ -6,12 +6,11 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN apk add --update \
+RUN apk add --no-cache \
         lsof \
         gnupg \
         tar \
-        bash \
-    && rm -rf /var/cache/apk/*
+        bash
 
 ENV SOLR_USER solr
 ENV SOLR_UID 8983
