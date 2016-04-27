@@ -60,11 +60,17 @@ elif [[ "$1" = 'solr-create' ]]; then
     #      mkdir mycores; chown 8983:8983
     #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-create -c mycore
     echo "Executing $1 command"
-    initial_solr_begin
-    echo "Creating core with: ${@:2}"
-    /opt/solr/bin/solr create "${@:2}"
-    echo "Created core with: ${@:2}"
-    initial_solr_end
+    sentinel=/opt/docker-solr/core_created
+    if [ -f $sentinel ]; then
+        echo "skipping core creation"
+    else
+        initial_solr_begin
+        echo "Creating core with: ${@:2}"
+        /opt/solr/bin/solr create "${@:2}"
+        echo "Created core with: ${@:2}"
+        initial_solr_end
+        touch $sentinel
+    fi
     set -- solr -f
 elif [[ "$1" = 'solr-precreate' ]]; then
     # arguments are: corename configdir
@@ -92,18 +98,24 @@ elif [[ "$1" = 'solr-precreate' ]]; then
 elif [[ "$1" = 'solr-demo' ]]; then
     # for example: docker run -P -d solr solr-demo
     echo "Executing $1 command"
-    CORE=demo
-    initial_solr_begin
-    echo "Creating $CORE"
-    /opt/solr/bin/solr create -c "$CORE"
-    echo "Created $CORE"
-    echo "Loading example data"
-    /opt/solr/bin/post -c $CORE example/exampledocs/manufacturers.xml
-    /opt/solr/bin/post -c $CORE example/exampledocs/*.xml
-    /opt/solr/bin/post -c $CORE example/exampledocs/books.json
-    /opt/solr/bin/post -c $CORE example/exampledocs/books.csv
-    echo "Loaded example data"
-    initial_solr_end
+    sentinel=/opt/docker-solr/demo_created
+    if [ -f $sentinel ]; then
+    echo "skipping demo creation"
+    else
+        CORE=demo
+        initial_solr_begin
+        echo "Creating $CORE"
+        /opt/solr/bin/solr create -c "$CORE"
+        echo "Created $CORE"
+        echo "Loading example data"
+        /opt/solr/bin/post -c $CORE example/exampledocs/manufacturers.xml
+        /opt/solr/bin/post -c $CORE example/exampledocs/*.xml
+        /opt/solr/bin/post -c $CORE example/exampledocs/books.json
+        /opt/solr/bin/post -c $CORE example/exampledocs/books.csv
+        echo "Loaded example data"
+        initial_solr_end
+        touch $sentinel
+    fi
     set -- solr -f
 fi
 
