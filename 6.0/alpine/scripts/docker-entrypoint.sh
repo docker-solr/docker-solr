@@ -11,11 +11,6 @@ fi
 
 INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
-function run_solr {
-    echo "Running Solr"
-    exec /opt/solr/bin/solr -f
-}
-
 if [[ "$1" = 'solr' ]]; then
     # execute files in /docker-entrypoint-initdb.d before starting solr
     # for an example see docs/print-status.sh
@@ -28,7 +23,7 @@ if [[ "$1" = 'solr' ]]; then
         echo
     done
 
-    run_solr
+    shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
     # arguments are passed to "solr create"
     # To simply create a core:
@@ -45,7 +40,7 @@ elif [[ "$1" = 'solr-create' ]]; then
         /opt/solr/bin/solr create "${@:2}"
         echo "created core with: ${@:2}"
     } </dev/null >$INIT_LOG 2>&1 &
-    run_solr
+    set -- solr -f
 elif [[ "$1" = 'solr-precreate' ]]; then
     # arguments are: corename configdir
     # To simply create a core:
@@ -68,7 +63,7 @@ elif [[ "$1" = 'solr-precreate' ]]; then
     else
         echo "core $CORE already exists"
     fi
-    run_solr
+    set -- solr -f
 elif [[ "$1" = 'solr-demo' ]]; then
     # for example: docker run -P -d solr solr-demo
     echo "Executing $1 command; logging to $INIT_LOG"
@@ -85,7 +80,7 @@ elif [[ "$1" = 'solr-demo' ]]; then
         /opt/solr/bin/post -c $CORE example/exampledocs/books.csv
         echo "loaded example data"
     } </dev/null >$INIT_LOG 2>&1 &
-    run_solr
+    set -- solr -f
 fi
 
 exec "$@"

@@ -40,9 +40,7 @@ RUN mkdir -p /opt/solr && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
   mkdir /docker-entrypoint-initdb.d /opt/docker-solr/
 
-COPY docker-entrypoint.sh /
 COPY scripts /opt/docker-solr/scripts
-RUN chmod -R a+x /docker-entrypoint.sh
 RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
@@ -51,5 +49,5 @@ EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["solr"]

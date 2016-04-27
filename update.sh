@@ -32,7 +32,7 @@ function write_files {
 
     mkdir -p "$target_dir"
     cp $template "$target_dir/Dockerfile"
-    cp -r docker-entrypoint.sh scripts "$target_dir"
+    cp -r scripts "$target_dir"
     sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
