@@ -42,6 +42,8 @@ COPY scripts /opt/docker-solr/scripts
 RUN chmod -R a+x /docker-entrypoint.sh
 RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
 
+ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
+
 EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
