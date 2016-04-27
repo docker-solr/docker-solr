@@ -65,7 +65,14 @@ If you run:
 $ docker run -d -P solr solr-create -c mycore
 ```
 
-the container will run Solr, wait for it to start, and then run the "solr create" command with the arguments you passed.
+the container will:
+
+- run Solr in the background, on the loopback interface
+- wait for it to start
+- run the "solr create" command with the arguments you passed
+- stop the background Solr
+- start Solr in the foreground
+
 You can combine this with mounted volumes to pass in core configuration from your host:
 
 ```console
@@ -76,8 +83,7 @@ When using the `solr-create` command, Solr will log to the standard docker log (
 and the collection creation will happen in the background and log to `/opt/docker-solr/init.log`.
 
 This first way closely mirrors the manual core creation steps and uses Solr's own tools to create the core,
-so should be reliable. But because the core creation happens in the background it is harder to spot failures,
-and there is a window where Solr is ready but the core has not yet been created.
+so should be reliable.
 
 The second way of creating a core at start time is using the `solr-precreate` command. This will create the core
 in the filesystem before running Solr. You should pass it the core name, and optionally the directory to copy the
@@ -106,40 +112,29 @@ The third way of creating a core at startup is to use the image extension mechan
 The docker-solr image has an extension mechanism. At run time, before starting Solr, the container will execute scripts
 in the `/docker-entrypoint-initdb.d/` directory. You can add your own scripts there either by using mounted volumes
 or by using a custom Dockerfile. These scripts can for example copy a core directory with pre-loaded data for continuous
-integration testing. Or they can put themselves in the background, wait for Solr to start, create a core, and then run
-a sequence of REST commands for testing.
+integration testing, or modify the Solr configuration.
 
-Here is a simple example. With a `print-status.sh` script like:
+Here is a simple example. With a `set-heap.sh` script like:
 
 ```console
-OUTPUT=/opt/docker-solr/status.log
-echo "starting $0; logging to $OUTPUT"
-{
-    /opt/docker-solr/scripts/wait-for-solr.sh
-    /opt/solr/bin/solr status > /opt/docker-solr/status
-
-} </dev/null >$OUTPUT 2>&1 &
+#!/bin/bash
+set -e
+cp /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig
+sed -e 's/SOLR_HEAP=".*"/SOLR_HEAP="1024m"/' </opt/solr/bin/solr.in.sh.orig >/opt/solr/bin/solr.in.sh
+grep '^SOLR_HEAP=' /opt/solr/bin/solr.in.sh
 ```
+
 you can run:
 
 ```console
-$ docker run --name solr_status1 -d -P -v $PWD/docs/print-status.sh:/docker-entrypoint-initdb.d/print-status.sh solr
+$ docker run --name solr_heap1 -d -P -v $PWD/docs/set-heap.sh:/docker-entrypoint-initdb.d/set-heap.sh solr
 $ sleep 5
-$ docker exec solr_status1 cat /opt/docker-solr/status
-```
+$ docker logs solr_heap1 | head
+/opt/docker-solr/scripts/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/set-heap.sh
+SOLR_HEAP="1024m"
 
-and get:
 
-```console
-Found 1 Solr nodes:
-
-Solr process 1 running on port 8983
-{
-  "solr_home":"/opt/solr/server/solr",
-  "version":"6.0.0 48c80f91b8e5cd9b3a9b48e6184bd53e7619e7e3 - nknize - 2016-04-01 14:41:49",
-  "startTime":"2016-04-11T08:32:03.657Z",
-  "uptime":"0 days, 0 hours, 0 minutes, 5 seconds",
-  "memory":"34.6 MB (%7.1) of 490.7 MB"}
+Starting Solr on port 8983 from /opt/solr/server
 ```
 
 With this extension mechanism it can be useful to see the shell commands that are being executed by the `docker-entrypoint.sh`

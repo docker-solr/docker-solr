@@ -47,13 +47,13 @@ function test_simple {
   echo "Test $tag"
   container_name='test_'$(echo $tag|tr ':/-' '_')
   echo "Running $container_name"
-  docker run --name $container_name -d -v $PWD/docs/print-status.sh:/docker-entrypoint-initdb.d/print-status.sh $tag
+  docker run --name $container_name -d $tag
   SLEEP_SECS=10
   echo "Sleeping $SLEEP_SECS seconds..."
   sleep $SLEEP_SECS
-  echo "Checking Status"
-  status=$(docker exec $container_name cat /opt/docker-solr/status)
-  if ! egrep 'Solr process .* running on port 8983' <<<$status; then
+  echo "Checking Solr is running"
+  status=$(docker exec $container_name /opt/docker-solr/scripts/wait-for-solr.sh)
+  if ! egrep 'solr is running' <<<$status; then
     echo "Test test_simple $tag failed; solr did not start"
     exit 1
   fi
