@@ -89,16 +89,16 @@ for version in "${versions[@]}"; do
 		gpg --import KEYS
 
 		# and for some extra verification we check the key on the keyserver too:
-		KEY=$(gpg --status-fd 1 --verify solr-$full_version.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
+		KEY=$(gpg --status-fd 1 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
 		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY" || {
                     echo "Failed to get the key from the key server"
                     exit 1
                 }
 
 		# verify the signature matches our content
-		gpg --verify solr-$full_version.tgz.asc
+		gpg --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz
 		# get the full fingerprint (since we only get the "long id" if it was BADSIG before)
-		KEY=$(gpg --status-fd 1 --verify solr-$full_version.tgz.asc 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
+		KEY=$(gpg --status-fd 1 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
 
 		if [ -z "$KEEP_ALL_ARTIFACTS" ]; then
 			rm solr-$full_version.tgz.asc solr-$full_version.tgz.sha1 solr-$full_version.tgz.md5

@@ -31,7 +31,7 @@ RUN mkdir -p /opt/solr && \
   wget $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
   (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
-  gpg --verify /opt/solr.tgz.asc && \
+  gpg --batch --verify /opt/solr.tgz.asc /opt/solr.tgz && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   mkdir -p /opt/solr/server/solr/lib && \
