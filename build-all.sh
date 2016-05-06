@@ -117,10 +117,20 @@ function test_latest {
 
 function push {
   version=$1
+  # pushing to the docker registry sometimes fails, so retry
+  local max_try=3
+  local wait_seconds=15
   docker tag $TAG_BASE:$version $TAG_PUSH_BASE:$version
-  echo "Pushing $TAG_PUSH_BASE:$version"
-  docker push $TAG_PUSH_BASE:$version
-  echo "Pushed $TAG_PUSH_BASE:$version"
+  for (( i=1; i<=$max_try; i++ )); do
+    echo "Pushing $TAG_PUSH_BASE:$version (attempt $i)"
+    if docker push $TAG_PUSH_BASE:$version; then
+      echo "Pushed $TAG_PUSH_BASE:$version"
+      return
+    else
+      echo "Push $TAG_PUSH_BASE:$version failed; retrying in $wait_seconds seconds"
+      sleep $wait_seconds
+    fi
+  done
 }
 
 function push_all {
