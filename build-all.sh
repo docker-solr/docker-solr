@@ -79,8 +79,6 @@ function test_simple {
 buildable=$(ls | grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
 latest=$(echo "$buildable" | tail -n 1)
 
-docker info
-
 function tag_latest {
   local version=$1
   if [ "$version" = "$latest" ]; then

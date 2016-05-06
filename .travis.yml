@@ -6,6 +6,7 @@ services:
 - docker
 
 before_install:
+- docker info
 - docker pull java:openjdk-8-jre
 - docker pull java:openjdk-8-jre-alpine
 
