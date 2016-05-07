@@ -121,15 +121,23 @@ function push {
   local max_try=3
   local wait_seconds=15
   docker tag $TAG_BASE:$version $TAG_PUSH_BASE:$version
-  for (( i=1; i<=$max_try; i++ )); do
+  let i=1
+  while true; do
     echo "Pushing $TAG_PUSH_BASE:$version (attempt $i)"
     if docker push $TAG_PUSH_BASE:$version; then
       echo "Pushed $TAG_PUSH_BASE:$version"
       return
     else
-      echo "Push $TAG_PUSH_BASE:$version failed; retrying in $wait_seconds seconds"
-      sleep $wait_seconds
+      echo "Push $TAG_PUSH_BASE:$version attempt $i failed"
+      if (( $i == $max_try )); then
+        echo "Failed to push $TAG_PUSH_BASE:$version in $max_try attempts; giving up"
+        exit 1
+      else
+        echo "retrying in $wait_seconds seconds"
+        sleep $wait_seconds
+      fi
     fi
+    let "i++"
   done
 }
 
