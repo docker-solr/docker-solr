@@ -24,8 +24,13 @@ SOLR_DOWNLOAD_SERVER=${SOLR_DOWNLOAD_SERVER:-'http://www-us.apache.org/dist/luce
 
 versions=()
 latest=''
+
+# map full version including variant to the build dir
 declare -A dir_for_version
+# map full version including variant to the tags
 declare -A tags_for_version
+# map minimum version to the full_version
+declare -A min_versions
 
 function get_versions {
   x_y_dirs=$(ls | grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
@@ -35,9 +40,9 @@ function get_versions {
     full_version="$(grep 'ENV SOLR_VERSION' $build_dir/Dockerfile|awk '{print $3}')"
     versions+=($full_version)
     min_version=$(echo $full_version | sed -e 's/\..*//')
-    tags=($full_version $x_y_dir $min_version)
+    min_versions["$min_version"]=$full_version
+    tags=($full_version $x_y_dir)
     if [[ $x_y_dir = $latest_dir ]]; then
-      tags+=('latest')
       latest=$full_version
     fi
     dir_for_version["$full_version"]=$build_dir
@@ -47,12 +52,18 @@ function get_versions {
       build_dir="./$x_y_dir/$variant"
       full_version="$(grep 'ENV SOLR_VERSION' $build_dir/Dockerfile|awk '{print $3}')"
       min_version=$(echo $full_version | sed -e 's/\..*//')
+      min_versions["$min_version-$variant"]="$full_version-$variant"
       versions+=("$full_version-$variant")
-      tags=("$full_version-$variant" "$x_y_dir-$variant" "$min_version-$variant")
+      tags=("$full_version-$variant" "$x_y_dir-$variant")
       dir_for_version["$full_version-$variant"]=$build_dir
       tags_for_version["$full_version-$variant"]="${tags[@]}"
     done
   done
+  for v in "${!min_versions[@]}"; do
+    full_version="${min_versions[$v]}"
+    tags_for_version["$full_version"]="${tags_for_version["$full_version"]} $v"
+  done
+  tags_for_version["$latest"]="${tags_for_version["$full_version"]} latest"
 }
 
 function print_versions {
