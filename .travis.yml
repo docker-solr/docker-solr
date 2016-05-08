@@ -11,4 +11,4 @@ before_install:
 - docker pull java:openjdk-8-jre-alpine
 
 script:
-- bash build-all.sh build_all test_all push_all
+- bash build-all.sh versions build_all test_all push_all
