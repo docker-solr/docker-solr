@@ -46,6 +46,8 @@ mirrorUrl=${mirrorUrl:-'http://www-us.apache.org/dist/lucene/solr'}
 archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
 # Note that the Dockerfile templates have their own defaults and override mechanism. See update.sh.
 
+DOWNLOADS=downloads
+
 upstream_versions='upstream-versions'
 curl -sSL $mirrorUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
@@ -57,6 +59,9 @@ for version in "${versions[@]}"; do
 	fi
 	(
 		set -x
+
+                mkdir -p $DOWNLOADS
+                cd $DOWNLOADS
 
 		# get the tgz, so we can checksum it, and verify the signature
 		if [ ! -f solr-$full_version.tgz ]; then
@@ -107,10 +112,12 @@ for version in "${versions[@]}"; do
 			fi
 		fi
 
-		write_files $full_version
-		write_files $full_version 'alpine'
+                cd ..
+
+	        write_files $full_version
+	        write_files $full_version 'alpine'
 	)
 done
 
-if [ -f KEYS ]; then rm KEYS; fi
+if [ -f $DOWNLOADS/KEYS ]; then rm $DOWNLOADS/KEYS; fi
 if [ -f "$upstream_versions" ]; then rm "$upstream_versions"; fi
