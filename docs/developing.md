@@ -12,7 +12,7 @@ Setup environment variables to point to my local mirrors:
 ```console
 export SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr
 export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
-export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
+export archiveUrl='http://www-eu.apache.org/dist/lucene/solr'
 export KEEP_ALL_ARTIFACTS=yes
 ```
 

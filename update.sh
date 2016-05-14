@@ -42,7 +42,7 @@ function write_files {
 # You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
 mirrorUrl=${mirrorUrl:-'http://www-us.apache.org/dist/lucene/solr'}
 # Download the checksums/keys from the archive
-# You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
+# You can override this by e.g.: export archiveUrl='http://www-eu.apache.org/dist/lucene/solr'
 archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
 # Note that the Dockerfile templates have their own defaults and override mechanism. See update.sh.
 
