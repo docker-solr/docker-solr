@@ -67,6 +67,14 @@ elif [[ "$1" = 'solr-create' ]]; then
         initial_solr_begin
         echo "Creating core with: ${@:2}"
         /opt/solr/bin/solr create "${@:2}"
+
+        # See https://github.com/docker-solr/docker-solr/issues/27
+        echo "Checking core"
+        if ! wget -O - 'http://localhost:8983/solr/admin/cores?action=STATUS' | grep -q instanceDir; then
+          echo "Could not find any cores"
+          exit 1
+        fi
+
         echo "Created core with: ${@:2}"
         initial_solr_end
         touch $sentinel
