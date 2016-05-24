@@ -18,7 +18,9 @@ function initial_solr_begin {
     echo "SOLR_OPTS=-Djetty.host=127.0.0.1" >> /opt/solr/bin/solr.in.sh
     echo "Running solr in the background. Logs are in /opt/solr/server/logs"
     /opt/solr/bin/solr start
-    if ! /opt/docker-solr/scripts/wait-for-solr.sh; then
+    max_try=${MAX_TRY:-12}
+    wait_seconds=${WAIT_SECONDS:-5}
+    if ! /opt/docker-solr/scripts/wait-for-solr.sh "$max_try" "$wait_seconds"; then
         echo "Could not start Solr."
         if [ -f /opt/solr/server/logs/solr.log ]; then
             echo "Here is the log:"
