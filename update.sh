@@ -19,7 +19,8 @@ versions=( "${versions[@]%/}" )
 
 function write_files {
     local full_version=$1
-    local variant=$2
+    local download_server=$2
+    local variant=$3
 
     short_version=$(echo $full_version | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
     if [[ -z $variant ]]; then
@@ -36,6 +37,9 @@ function write_files {
     sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
+    if [ ! -z "$download_server" ]; then
+        sed -r -i -e 's,^(ENV SOLR_URL) .*,\1 ${SOLR_DOWNLOAD_SERVER:-'"$download_server"'}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz,' "$target_dir/Dockerfile"
+    fi
 }
 
 # Download solr from a mirror.
@@ -49,8 +53,9 @@ archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
 DOWNLOADS=downloads
 
 upstream_versions='upstream-versions'
-curl -sSL $mirrorUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
+curl -sSL $archiveUrl | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
+mkdir -p $DOWNLOADS
 for version in "${versions[@]}"; do
 	full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
 	if [[ -z $full_version ]]; then
@@ -60,12 +65,24 @@ for version in "${versions[@]}"; do
 	(
 		set -x
 
-                mkdir -p $DOWNLOADS
                 cd $DOWNLOADS
 
 		# get the tgz, so we can checksum it, and verify the signature
+		download_server_used=""
+		output=solr-$full_version.tgz
+		partial_url=$full_version/solr-$full_version.tgz
 		if [ ! -f solr-$full_version.tgz ]; then
-			wget -nv --output-document=solr-$full_version.tgz $mirrorUrl/$full_version/solr-$full_version.tgz
+			if wget -nv --output-document=$output $mirrorUrl/$partial_url; then
+				download_server_used=$mirrorUrl
+                        else
+				echo "Could not fetch $mirrorUrl/$partial_url"
+				if wget -nv --output-document=$output $archiveUrl/$partial_url; then
+					download_server_used=$archiveUrl
+				else
+					echo "Could not fetch $archiveUrl/$partial_url either"
+					exit 1
+				fi
+			fi
 		fi
 
 		# The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
@@ -90,7 +107,7 @@ for version in "${versions[@]}"; do
 		# Get the code signing keys
 		# Per http://www.apache.org/dyn/closer.html and a message from Hoss on
 		# http://stackoverflow.com/questions/32539810/apache-lucene-5-3-0-release-keys-missing-key-3fcfdb3e
-		wget -nv --output-document KEYS https://www.apache.org/dist/lucene/java/$full_version/KEYS
+		wget -nv --output-document KEYS $archiveUrl/$full_version/KEYS
 		gpg --import KEYS
 
 		# and for some extra verification we check the key on the keyserver too:
@@ -114,8 +131,8 @@ for version in "${versions[@]}"; do
 
                 cd ..
 
-	        write_files $full_version
-	        write_files $full_version 'alpine'
+	        write_files $full_version $download_server_used
+	        write_files $full_version $download_server_used 'alpine'
 	)
 done
 
