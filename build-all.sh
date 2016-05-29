@@ -84,6 +84,7 @@ function build {
   # and apply the other tags after.
   cat > $build_dir/build.sh <<EOM
 #!/bin/bash
+set -e
 cmd="docker build --pull --rm=true --build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER --tag $tag ."
 echo "running: \$cmd"
 \$cmd
