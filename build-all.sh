@@ -19,9 +19,6 @@ TAG_PUSH_BASE=dockersolr/docker-solr
 
 VARIANTS="alpine"
 
-# Override with e.g.: export SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr
-SOLR_DOWNLOAD_SERVER=${SOLR_DOWNLOAD_SERVER:-'http://www-us.apache.org/dist/lucene/solr'}
-
 versions=()
 latest=''
 
@@ -85,7 +82,10 @@ function build {
   cat > $build_dir/build.sh <<EOM
 #!/bin/bash
 set -e
-cmd="docker build --pull --rm=true --build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER --tag $tag ."
+if [ ! -z "$SOLR_DOWNLOAD_SERVER" ]; then
+  build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"
+fi
+cmd="docker build --pull --rm=true $build_arg --tag $tag ."
 echo "running: \$cmd"
 \$cmd
 for t in $tags; do
