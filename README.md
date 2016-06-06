@@ -107,6 +107,30 @@ But, because it makes assumptions about Solr's "basic_configs", future upstream 
 
 The third way of creating a core at startup is to use the image extension mechanism explained in the next section.
 
+## Using Docker Compose
+
+With Docker Compose you can create a Solr container with the index stored in a named data volume.
+Create a `docker-compose.yml` like:
+
+```
+version: '2'
+services:
+  solr:
+    image: solr
+    ports:
+     - "8983:8983"
+    volumes:
+      - data:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - mycore
+volumes:
+  data:
+```
+
+and just run `docker-compose up`.
+
 ## Extending the image
 
 The docker-solr image has an extension mechanism. At run time, before starting Solr, the container will execute scripts
