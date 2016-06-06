@@ -31,7 +31,7 @@ RUN mkdir -p /opt/solr && \
   gpg --batch --verify /opt/solr.tgz.asc /opt/solr.tgz && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
-  mkdir -p /opt/solr/server/solr/lib && \
+  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
