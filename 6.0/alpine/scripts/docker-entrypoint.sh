@@ -57,7 +57,7 @@ elif [[ "$1" = 'solr-create' ]]; then
     # To simply create a core:
     #      docker run -P -d solr solr-create -c mycore
     # To create a core from mounted config:
-    #      docker run -P -d -c $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
+    #      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
     # To create a core in a mounted directory:
     #      mkdir mycores; chown 8983:8983
     #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-create -c mycore
