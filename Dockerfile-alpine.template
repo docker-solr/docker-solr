@@ -11,6 +11,9 @@ RUN apk add --no-cache \
         gnupg \
         tar \
         bash
+RUN apk update && \
+        apk add ca-certificates && \
+        update-ca-certificates
 
 ENV SOLR_USER solr
 ENV SOLR_UID 8983
