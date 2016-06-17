@@ -10,6 +10,8 @@ set -e
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
+GPG_KEYSERVER=${GPG_KEYSERVER:-hkp://pool.sks-keyservers.net}
+
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
 	echo "Usage: bash update.sh [version ...]"
@@ -112,7 +114,7 @@ for version in "${versions[@]}"; do
 
 		# and for some extra verification we check the key on the keyserver too:
 		KEY=$(gpg --status-fd 1 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
-		gpg --keyserver pgpkeys.mit.edu --recv-key "$KEY" || {
+		gpg --keyserver "$GPG_KEYSERVER" --recv-key "$KEY" || {
                     echo "Failed to get the key from the key server"
                     exit 1
                 }
