@@ -26,7 +26,7 @@ RUN gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$SOLR_KEY"
 
 ENV SOLR_VERSION 5.3.2
 ENV SOLR_SHA256 7c26601229ed712c639d00882f35304d87e0032028be4754d098a9b694877f48
-ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-http://www-us.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
+ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
