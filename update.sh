@@ -37,7 +37,7 @@ function write_files {
     sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
-    if [ ! -z "$download_server" ]; then
+    if [ "$download_server" != "default" ]; then
         sed -r -i -e 's,^(ENV SOLR_URL) .*,\1 ${SOLR_DOWNLOAD_SERVER:-'"$download_server"'}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz,' "$target_dir/Dockerfile"
     fi
 }
@@ -68,7 +68,7 @@ for version in "${versions[@]}"; do
                 cd $DOWNLOADS
 
 		# get the tgz, so we can checksum it, and verify the signature
-		download_server_used=""
+		download_server_used="default"
 		output=solr-$full_version.tgz
 		partial_url=$full_version/solr-$full_version.tgz
 		if [ ! -f solr-$full_version.tgz ]; then
