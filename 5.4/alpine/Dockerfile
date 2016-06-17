@@ -16,7 +16,7 @@ RUN apk add --no-cache \
         tar \
         bash
 RUN apk update && \
-        apk add ca-certificates && \
+        apk add ca-certificates wget && \
         update-ca-certificates
 
 ENV SOLR_USER solr
