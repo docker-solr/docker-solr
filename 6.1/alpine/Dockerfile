@@ -15,8 +15,7 @@ RUN apk add --no-cache \
         gnupg \
         tar \
         bash
-RUN apk update && \
-        apk add ca-certificates wget && \
+RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
 
 ENV SOLR_USER solr
