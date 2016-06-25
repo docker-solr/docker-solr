@@ -2,7 +2,7 @@
 
 -       [`6.1.0`, `6.1`, `6`, `latest` (*6.1/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/43af88ba395a263785177ad04d75a5e8f0ec6401/6.1/Dockerfile)
 -       [`6.0.0`, `6.0` (*6.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/43af88ba395a263785177ad04d75a5e8f0ec6401/6.0/Dockerfile)
--       [`5.5.1`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/43af88ba395a263785177ad04d75a5e8f0ec6401/5.5/Dockerfile)
+-       [`5.5.2`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/a0da4f3103dc01bc99ca8fca29535f2964a3a294/5.5/Dockerfile)
 -       [`5.4.1`, `5.4` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/43af88ba395a263785177ad04d75a5e8f0ec6401/5.4/Dockerfile)
 -       [`5.3.2`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/43af88ba395a263785177ad04d75a5e8f0ec6401/5.3/Dockerfile)
 
