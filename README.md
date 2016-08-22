@@ -24,6 +24,8 @@ Learn more on [Apache Solr homepage](http://lucene.apache.org/solr/) and in the 
 
 # How to use this Docker image
 
+## Run Solr and index example data
+
 To run a single Solr server:
 
 ```console
@@ -40,7 +42,7 @@ $ docker exec -it --user=solr my_solr bin/solr create_core -c gettingstarted
 
 In the web UI if you click on "Core Admin" you should now see the "gettingstarted" core.
 
-If you want to load some example data:
+If you want to load some of the example data that is included in the container:
 
 ```console
 $ docker exec -it --user=solr my_solr bin/post -c gettingstarted example/exampledocs/manufacturers.xml
@@ -48,10 +50,29 @@ $ docker exec -it --user=solr my_solr bin/post -c gettingstarted example/example
 
 In the UI, find the "Core selector" popup menu and select the "gettingstarted" core, then select the "Query" menu item. This gives you a default search for `*:*` which returns all docs. Hit the "Execute Query" button, and you should see a few docs with data. Congratulations!
 
+## Single-command demo
+
 For convenience, there is a single command that starts Solr, creates a collection called "demo", and loads sample data into it:
 
 ```console
 $ docker run --name solr_demo -d -P solr solr-demo
+```
+
+## Loading your own data
+
+If you want load your own data, you'll have to make it available to the container, for example by copying it into the container:
+
+```console
+$ docker cp $HOME/mydata/mydata.xml my_solr:/opt/solr/mydata.xml
+$ docker exec -it --user=solr my_solr bin/post -c gettingstarted mydata.xml
+```
+
+or by using Docker host volumes:
+
+```console
+$ docker run --name my_solr -d -p 8983:8983 -t -v $HOME/mydata:/opt/solr/mydata solr
+$ docker exec -it --user=solr my_solr bin/solr create_core -c gettingstarted
+$ docker exec -it --user=solr my_solr bin/post -c gettingstarted mydata/mydata.xml
 ```
 
 To learn more about Solr, see the [Apache Solr Reference Guide](https://cwiki.apache.org/confluence/display/solr/Apache+Solr+Reference+Guide).
