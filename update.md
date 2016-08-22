@@ -1,19 +1,12 @@
 # Adding a new version to docker-solr
 
-To add a new version to https://github.com/docker-solr you need to make several changes.
-See the https://github.com/docker-solr/official-images documentation for some high-level overview.
+To add a new version to [the docker-solr repository](https://github.com/docker-solr) you need to make several changes.
+See the [official-images](https://github.com/docker-solr/official-images) documentation for some high-level overview.
 
 ## Updating the docker-solr repository
 
 First, we need to modify our https://github.com/docker-solr/docker-solr repository for the new version.
-To do that, you need a linux host that runs Docker.
-I like to use a docker container that we use for internal builds, that has pre-requisites pre-installed and is known to work, and our developers have locally already. But any Linux should work.
-
-```
-docker run --name docker-solr-builder -d -P lucidworks/fusion-builder:openjdk-8
-
-ssh -A -l jenkins -p $(docker port docker-solr-builder 22/tcp | sed 's/.*://') localhost
-```
+To do that, you need a Linux host that runs Docker, and has `git`, `wget` and `gpg` installed.
 
 First, get the repository:
 
@@ -34,9 +27,8 @@ export mirrorUrl="http://www-eu.apache.org/dist/lucene/solr"
 Run the script that creates a directory for the new version, downloads solr to checksum, and creates a Dockerfile:
 
 ```
-bash update.sh 5.4.0
-
-ls 5.4
+bash update.sh [0-9]\.[0-9]
+git status
 ```
 
 ## Test the new Dockerfile
@@ -57,10 +49,16 @@ This will have created the images:
 docker images | grep docker-solr
 ```
 
-Now for each of the resulting images, start a container to test:
+To run simple automated tests against those images:
 
 ```
-docker run --name solr-test -d -P docker-solr/docker-solr:5.4
+./build-all.sh test_all
+```
+
+To manually test a container:
+
+```
+docker run --name solr-test -d -P docker-solr/docker-solr:latest solr-demo
 ```
 
 Check the logs for startup messages:
@@ -113,14 +111,16 @@ First identify myself:
 
 ```
 git config --global user.email "mak-github@greenhills.co.uk"
-git config --global user.name "Martijn Koster
+git config --global user.name "Martijn Koster"
 git config --global push.default simple
 ```	
 
 Check in the changes:
 
 ```
+git status
 git add 5.4/Dockerfile generate-stackbrew-library.sh
+# add whatever else needs adding
 git commit -m "Add Solr 5.4.0" 
 git push
 git rev-parse HEAD
