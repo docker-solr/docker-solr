@@ -21,8 +21,7 @@ versions=( "${versions[@]%/}" )
 
 function write_files {
     local full_version=$1
-    local download_server=$2
-    local variant=$3
+    local variant=$2
 
     short_version=$(echo $full_version | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
     if [[ -z $variant ]]; then
@@ -39,14 +38,8 @@ function write_files {
     sed -r -i -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' "$target_dir/Dockerfile"
     sed -r -i -e 's/^(ENV SOLR_KEY) .*/\1 '"$KEY"'/' "$target_dir/Dockerfile"
-    if [ "$download_server" != "default" ]; then
-        sed -r -i -e 's,^(ENV SOLR_URL) .*,\1 ${SOLR_DOWNLOAD_SERVER:-'"$download_server"'}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz,' "$target_dir/Dockerfile"
-    fi
 }
 
-# Download solr from a mirror.
-# You can override this by e.g.: export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
-mirrorUrl=${mirrorUrl:-'http://www-us.apache.org/dist/lucene/solr'}
 # Download the checksums/keys from the archive
 # You can override this by e.g.: export archiveUrl='http://www-eu.apache.org/dist/lucene/solr'
 archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
@@ -70,20 +63,12 @@ for version in "${versions[@]}"; do
                 cd $DOWNLOADS
 
 		# get the tgz, so we can checksum it, and verify the signature
-		download_server_used="default"
 		output=solr-$full_version.tgz
 		partial_url=$full_version/solr-$full_version.tgz
 		if [ ! -f solr-$full_version.tgz ]; then
-			if wget -nv --output-document=$output $mirrorUrl/$partial_url; then
-				download_server_used=$mirrorUrl
-                        else
-				echo "Could not fetch $mirrorUrl/$partial_url"
-				if wget -nv --output-document=$output $archiveUrl/$partial_url; then
-					download_server_used=$archiveUrl
-				else
-					echo "Could not fetch $archiveUrl/$partial_url either"
-					exit 1
-				fi
+			if ! wget -nv --output-document=$output $archiveUrl/$partial_url; then
+				echo "Could not fetch $archiveUrl/$partial_url"
+				exit 1
 			fi
 		fi
 
@@ -133,8 +118,8 @@ for version in "${versions[@]}"; do
 
                 cd ..
 
-	        write_files $full_version $download_server_used
-	        write_files $full_version $download_server_used 'alpine'
+	        write_files $full_version
+	        write_files $full_version 'alpine'
 	)
 done
 

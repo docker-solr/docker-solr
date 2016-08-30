@@ -7,12 +7,10 @@ the typical flow for adding a new version of Solr and publishing it as an
 official image.
 But if you want to develop docker-solr, here is the workflow I use:
 
-Setup environment variables to point to my local mirrors:
-
-```console
-export SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr
-export mirrorUrl='http://www-eu.apache.org/dist/lucene/solr'
-export archiveUrl='http://www-eu.apache.org/dist/lucene/solr'
+Set an environment variable to keep the downloads in the ./downloads
+directory so they do not need to be downloaded again on future
+invocations:
+```
 export KEEP_ALL_ARTIFACTS=yes
 ```
 
