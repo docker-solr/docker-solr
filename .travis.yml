@@ -11,5 +11,4 @@ before_install:
 - docker pull java:openjdk-8-jre-alpine
 
 script:
-- bash -c "export | grep SOLR_DOWNLOAD_SERVER"
 - bash build-all.sh versions build_all test_all push_all
