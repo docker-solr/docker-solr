@@ -210,7 +210,7 @@ function push {
 
 function push_all {
   if [[ $TRAVIS = 'true' ]]; then
-    if [[ $TRAVIS_PULL_REQUEST = 'true' ]]; then
+    if [[ $TRAVIS_PULL_REQUEST != 'false' ]]; then
       echo "Not pushing because this is a pull request"
       return
     elif [[ $TRAVIS_BRANCH != 'master' ]]; then
