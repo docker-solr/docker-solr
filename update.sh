@@ -65,11 +65,21 @@ for version in "${versions[@]}"; do
         # get the tgz, so we can checksum it, and verify the signature
         output=solr-$full_version.tgz
         partial_url=$full_version/solr-$full_version.tgz
-        if [ ! -f solr-$full_version.tgz ]; then
-            if ! wget -nv --output-document=$output $archiveUrl/$partial_url; then
-                echo "Could not fetch $archiveUrl/$partial_url"
-                exit 1
+        download_urls=()
+        if [[ ! -z "$SOLR_DOWNLOAD_SERVER" ]]; then
+            download_urls+=("$SOLR_DOWNLOAD_SERVER/$partial_url")
+        fi
+        download_urls+=("$archiveUrl/$partial_url")
+        for download_url in $download_urls; do
+            echo "Fetching $download_url"
+            if wget -nv --output-document=$output $download_url; then
+                download_url_used=$download_url
+            else
+                echo "Could not fetch $download_url"
             fi
+        done
+        if [[ -z "$download_url_used" ]]; then
+            exit 1
         fi
 
         # The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
