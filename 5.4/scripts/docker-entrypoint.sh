@@ -11,6 +11,27 @@ fi
 
 INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
+# let environment variables override solr.in.sh
+function patch_solr_config_from_env {
+    overrides_file=/opt/solr/bin/solr.in.sh.overrides
+    if [ -f $overrides_file ]; then
+        return
+    fi
+    cp /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.dist
+    vars_from_solr_in=$(egrep '^[A-Z0-9_]+=' /opt/solr/bin/solr.in.sh | sed 's/=.*//')
+    for v in $vars_from_solr_in; do
+        if [ ! -z ${!v+x} ]; then
+            printf "%q=%q\n" $v ${!v} >> $overrides_file
+        fi
+    done
+    if [ -s $overrides_file ]; then
+        echo "overrides from Docker:"
+        cat $overrides_file
+        printf "\n# overrides from Docker\n" >> /opt/solr/bin/solr.in.sh
+        cat $overrides_file >> /opt/solr/bin/solr.in.sh
+    fi
+}
+
 # configure Solr to run on the local interface, and start it running in the background
 function initial_solr_begin {
     echo "Configuring Solr to bind to 127.0.0.1"
@@ -51,6 +72,8 @@ if [[ "$1" = 'solr' ]]; then
         echo
     done
 
+    patch_solr_config_from_env
+
     shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
     # arguments are passed to "solr create"
@@ -81,6 +104,9 @@ elif [[ "$1" = 'solr-create' ]]; then
         initial_solr_end
         touch $sentinel
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 elif [[ "$1" = 'solr-precreate' ]]; then
     # arguments are: corename configdir
@@ -104,6 +130,9 @@ elif [[ "$1" = 'solr-precreate' ]]; then
     else
         echo "core $CORE already exists"
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 elif [[ "$1" = 'solr-demo' ]]; then
     # for example: docker run -P -d solr solr-demo
@@ -126,6 +155,9 @@ elif [[ "$1" = 'solr-demo' ]]; then
         initial_solr_end
         touch $sentinel
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 fi
 
