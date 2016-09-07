@@ -13,23 +13,22 @@ INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
 # let environment variables override solr.in.sh
 function patch_solr_config_from_env {
-    overrides_file=/opt/solr/bin/solr.in.sh.overrides
-    if [ -f $overrides_file ]; then
+    header='## Overrides from Docker:'
+    if egrep -q '^'"$header"'$' /opt/solr/bin/solr.in.sh; then
+        sed -n '/^'"$header"'$/,$ p' /opt/solr/bin/solr.in.sh
         return
     fi
-    cp /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.dist
     vars_from_solr_in=$(egrep '^[A-Z0-9_]+=' /opt/solr/bin/solr.in.sh | sed 's/=.*//')
     for v in $vars_from_solr_in; do
         if [ ! -z ${!v+x} ]; then
-            printf "%q=%q\n" $v ${!v} >> $overrides_file
+            if [ -z $header_done ]; then
+                echo $header >> /opt/solr/bin/solr.in.sh
+                header_done="true"
+            fi
+            printf "%s=\"%b\"\n" $v "${!v}" >> /opt/solr/bin/solr.in.sh
         fi
     done
-    if [ -s $overrides_file ]; then
-        echo "overrides from Docker:"
-        cat $overrides_file
-        printf "\n# overrides from Docker\n" >> /opt/solr/bin/solr.in.sh
-        cat $overrides_file >> /opt/solr/bin/solr.in.sh
-    fi
+    sed -n '/^'"$header"'$/,$ p' /opt/solr/bin/solr.in.sh
 }
 
 # configure Solr to run on the local interface, and start it running in the background
