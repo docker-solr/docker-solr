@@ -34,8 +34,10 @@ ENV SOLR_SHA256 3e4b4ec7bd728b49b2ebc3dbe8f3d1ef89fded4ab86b9e2f856bedd58c99f28b
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
-  wget $SOLR_URL -O /opt/solr.tgz && \
-  wget $SOLR_URL.asc -O /opt/solr.tgz.asc && \
+  echo "downloading $SOLR_URL" && \
+  wget -q $SOLR_URL -O /opt/solr.tgz && \
+  echo "downloading $SOLR_URL.asc" && \
+  wget -q $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
   (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
   gpg --batch --verify /opt/solr.tgz.asc /opt/solr.tgz && \
