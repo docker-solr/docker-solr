@@ -13,6 +13,10 @@ INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
 # let environment variables override solr.in.sh
 function patch_solr_config_from_env {
+    if [ ! -f /opt/solr/bin/solr.in.sh ]; then
+        echo "No solr.in.sh to patch; investigate a new alternative"
+        exit 1
+    fi
     header='## Overrides from Docker:'
     if egrep -q '^'"$header"'$' /opt/solr/bin/solr.in.sh; then
         sed -n '/^'"$header"'$/,$ p' /opt/solr/bin/solr.in.sh
