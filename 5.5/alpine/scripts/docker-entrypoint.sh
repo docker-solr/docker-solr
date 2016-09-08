@@ -12,27 +12,30 @@ fi
 INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
 # let environment variables override solr.in.sh
+# Hopefully this will no longer be needed after https://issues.apache.org/jira/browse/SOLR-7850
 function patch_solr_config_from_env {
-    if [ ! -f /opt/solr/bin/solr.in.sh ]; then
+    # If NO_SOLR_IN_SH is set, remove all the solr.in.sh contents;
+    # you'll have to set all the values yourself
+    if [ ! -z ${NO_SOLR_IN_SH+x} ]; then
+        : > bin/solr.in.sh
+        return
+    fi
+    if [ ! -f bin/solr.in.sh ]; then
         echo "No solr.in.sh to patch; investigate a new alternative"
         exit 1
     fi
-    header='## Overrides from Docker:'
-    if egrep -q '^'"$header"'$' /opt/solr/bin/solr.in.sh; then
-        sed -n '/^'"$header"'$/,$ p' /opt/solr/bin/solr.in.sh
-        return
-    fi
-    vars_from_solr_in=$(egrep '^[A-Z0-9_]+=' /opt/solr/bin/solr.in.sh | sed 's/=.*//')
-    for v in $vars_from_solr_in; do
-        if [ ! -z ${!v+x} ]; then
-            if [ -z $header_done ]; then
-                echo $header >> /opt/solr/bin/solr.in.sh
-                header_done="true"
-            fi
-            printf "%s=\"%b\"\n" $v "${!v}" >> /opt/solr/bin/solr.in.sh
+
+    cp bin/solr.in.sh bin/solr.in.sh.old
+
+    # special-case SOLR_JAVA_MEM to comment-out SOLR_HEAP
+    if [[ ! -z ${SOLR_JAVA_MEM+x} ]]; then
+        if grep -q '^SOLR_HEAP=' bin/solr.in.sh; then
+            sed -i -E 's/^(SOLR_HEAP=.*)/#\1/' bin/solr.in.sh
         fi
-    done
-    sed -n '/^'"$header"'$/,$ p' /opt/solr/bin/solr.in.sh
+    fi
+
+    # Change all assignments to only apply if the variable is not already set.
+    sed -i -E 's/^([A-Z0-9_]+)=/test -z "${\1+x}" \&\& \1=/' bin/solr.in.sh
 }
 
 # configure Solr to run on the local interface, and start it running in the background
