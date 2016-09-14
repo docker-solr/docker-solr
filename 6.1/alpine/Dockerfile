@@ -13,6 +13,7 @@ ARG GPG_KEYSERVER
 RUN apk add --no-cache \
         lsof \
         gnupg \
+        procps \
         tar \
         bash
 RUN apk add --no-cache ca-certificates wget && \
