@@ -118,7 +118,6 @@ elif [[ "$1" = 'solr-demo' ]]; then
         /opt/solr/bin/solr create -c "$CORE"
         echo "Created $CORE"
         echo "Loading example data"
-        /opt/solr/bin/post -c $CORE example/exampledocs/manufacturers.xml
         /opt/solr/bin/post -c $CORE example/exampledocs/*.xml
         /opt/solr/bin/post -c $CORE example/exampledocs/books.json
         /opt/solr/bin/post -c $CORE example/exampledocs/books.csv
