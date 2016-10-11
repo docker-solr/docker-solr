@@ -11,6 +11,33 @@ fi
 
 INIT_LOG=${INIT_LOG:-/opt/docker-solr/init.log}
 
+# let environment variables override solr.in.sh
+# Hopefully this will no longer be needed after https://issues.apache.org/jira/browse/SOLR-7850
+function patch_solr_config_from_env {
+    # If NO_SOLR_IN_SH is set, remove all the solr.in.sh contents;
+    # you'll have to set all the values yourself
+    if [ ! -z ${NO_SOLR_IN_SH+x} ]; then
+        : > bin/solr.in.sh
+        return
+    fi
+    if [ ! -f bin/solr.in.sh ]; then
+        echo "No solr.in.sh to patch; investigate a new alternative"
+        exit 1
+    fi
+
+    cp bin/solr.in.sh bin/solr.in.sh.old
+
+    # special-case SOLR_JAVA_MEM to comment-out SOLR_HEAP
+    if [[ ! -z ${SOLR_JAVA_MEM+x} ]]; then
+        if grep -q '^SOLR_HEAP=' bin/solr.in.sh; then
+            sed -i -E 's/^(SOLR_HEAP=.*)/#\1/' bin/solr.in.sh
+        fi
+    fi
+
+    # Change all assignments to only apply if the variable is not already set.
+    sed -i -E 's/^([A-Z0-9_]+)=/test -z "${\1+x}" \&\& \1=/' bin/solr.in.sh
+}
+
 # configure Solr to run on the local interface, and start it running in the background
 function initial_solr_begin {
     echo "Configuring Solr to bind to 127.0.0.1"
@@ -51,6 +78,8 @@ if [[ "$1" = 'solr' ]]; then
         echo
     done
 
+    patch_solr_config_from_env
+
     shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
     # arguments are passed to "solr create"
@@ -81,6 +110,9 @@ elif [[ "$1" = 'solr-create' ]]; then
         initial_solr_end
         touch $sentinel
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 elif [[ "$1" = 'solr-precreate' ]]; then
     # arguments are: corename configdir
@@ -104,6 +136,9 @@ elif [[ "$1" = 'solr-precreate' ]]; then
     else
         echo "core $CORE already exists"
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 elif [[ "$1" = 'solr-demo' ]]; then
     # for example: docker run -P -d solr solr-demo
@@ -125,6 +160,9 @@ elif [[ "$1" = 'solr-demo' ]]; then
         initial_solr_end
         touch $sentinel
     fi
+
+    patch_solr_config_from_env
+
     set -- solr -f
 fi
 
