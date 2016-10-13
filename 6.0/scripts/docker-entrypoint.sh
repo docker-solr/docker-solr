@@ -2,7 +2,7 @@
 set -e
 
 if [ "${1:0:1}" = '-' ]; then
-    set -- solr "$@"
+    set -- solr-foreground "$@"
 fi
 
 if [[ "$VERBOSE" = "yes" ]]; then
@@ -39,7 +39,7 @@ function initial_solr_end {
     echo "Running Solr in the foreground"
 }
 
-if [[ "$1" = 'solr' ]]; then
+if [[ "$1" = 'solr-foreground' ]]; then
     # execute files in /docker-entrypoint-initdb.d before starting solr
     # for an example see docs/set-heap.sh
     shopt -s nullglob
