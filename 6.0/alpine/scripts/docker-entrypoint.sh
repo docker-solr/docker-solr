@@ -39,7 +39,7 @@ function initial_solr_end {
     echo "Running Solr in the foreground"
 }
 
-if [[ "$1" = 'solr-foreground' ]]; then
+function init_actions {
     # execute files in /docker-entrypoint-initdb.d before starting solr
     # for an example see docs/set-heap.sh
     shopt -s nullglob
@@ -50,7 +50,10 @@ if [[ "$1" = 'solr-foreground' ]]; then
         esac
         echo
     done
+}
 
+if [[ "$1" = 'solr-foreground' ]]; then
+    init_actions
     shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
     # arguments are passed to "solr create"
@@ -62,6 +65,7 @@ elif [[ "$1" = 'solr-create' ]]; then
     #      mkdir mycores; chown 8983:8983
     #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-create -c mycore
     echo "Executing $1 command"
+    init_actions
     sentinel=/opt/docker-solr/core_created
     if [ -f $sentinel ]; then
         echo "skipping core creation"
@@ -92,6 +96,7 @@ elif [[ "$1" = 'solr-precreate' ]]; then
     #      mkdir mycores; chown 8983:8983
     #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precreate mycore
     echo "Executing $1 command"
+    init_actions
     CORE=${2:-gettingstarted}
     CONFIG_SOURCE=${3:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
     coresdir="/opt/solr/server/solr/mycores"
@@ -108,6 +113,7 @@ elif [[ "$1" = 'solr-precreate' ]]; then
 elif [[ "$1" = 'solr-demo' ]]; then
     # for example: docker run -P -d solr solr-demo
     echo "Executing $1 command"
+    init_actions
     sentinel=/opt/docker-solr/demo_created
     if [ -f $sentinel ]; then
     echo "skipping demo creation"
