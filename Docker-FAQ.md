@@ -18,11 +18,11 @@ For some use-cases it is convenient to provide a modified `solr.in.sh` file to S
 For example to point Solr to a ZooKeeper host:
 
 ```
-docker create --name my-solr -P solr
-docker cp my-solr:/opt/solr/bin/solr.in.sh .
+docker create --name my_solr -P solr
+docker cp my_solr:/opt/solr/bin/solr.in.sh .
 sed -i -e 's/#ZK_HOST=.*/ZK_HOST=cylon.lan:2181/' solr.in.sh
-docker cp solr.in.sh my-solr:/opt/solr/bin/solr.in.sh
-docker start my-solr
+docker cp solr.in.sh my_solr:/opt/solr/bin/solr.in.sh
+docker start my_solr
 # With a browser go to http://cylon.lan:32873/solr/#/ and confirm "-DzkHost=cylon.lan:2181" in the JVM Args section.
 ```
 
@@ -61,7 +61,7 @@ $ docker run -it --rm -v /home/docker-volumes/mysolr1:/target solr cp -r server/
 $ SOLR_CONTAINER=$(docker run -d -P -v /home/docker-volumes/mysolr1/solr:/opt/solr/server/solr solr)
 
 # create a new core
-$ docker exec -it --user=solr $SOLR_CONTAINER bin/solr create_core -c gettingstarted
+$ docker exec -it --user=solr $SOLR_CONTAINER solr create_core -c gettingstarted
 
 # check the volume on the host:
 $ ls /home/docker-volumes/mysolr1/solr/
@@ -98,7 +98,7 @@ docker create -v /opt/solr/server/solr --name mysolr1data solr /bin/true
 SOLR_CONTAINER=$(docker run -d -P --volumes-from=mysolr1data solr)
 
 # create a new core
-$ docker exec -it --user=solr $SOLR_CONTAINER bin/solr create_core -c gettingstarted
+$ docker exec -it --user=solr $SOLR_CONTAINER solr create_core -c gettingstarted
 
 # make a change to the config, using the config API
 docker exec -it --user=solr $SOLR_CONTAINER curl http://localhost:8983/solr/gettingstarted/config -H 'Content-type:application/json' -d'{
@@ -172,18 +172,83 @@ Run two Solr nodes, linked to the zookeeper container:
 ```console
 $ docker run --name solr1 --link zookeeper:ZK -d -p 8983:8983 \
       solr \
-      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
+      bash -c 'solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
 
 $ docker run --name solr2 --link zookeeper:ZK -d -p 8984:8983 \
       solr \
-      bash -c '/opt/solr/bin/solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
+      bash -c 'solr start -f -z $ZK_PORT_2181_TCP_ADDR:$ZK_PORT_2181_TCP_PORT'
 ```
 
 Create a collection:
 
 ```console
-$ docker exec -i -t solr1 /opt/solr/bin/solr create_collection \
-        -c collection1 -shards 2 -p 8983
+$ docker exec -i -t solr1 solr create_collection \
+        -c gettingstarted -shards 2 -p 8983
 ```
 
 Then go to `http://localhost:8983/solr/#/~cloud` (adjust the hostname for your docker host) to see the two shards and Solr nodes.
+
+
+I'm confused about the different invocations of solr -- help?
+-------------------------------------------------------------
+
+The different invocations of the docker-solr image can looks confusing, because the name of the
+image is "solr" and the Solr command is also "solr", and the image interprets various arguments in
+special ways. I'll illustrate the various invocations:
+
+
+To run an arbitrary command in the image:
+
+```
+docker run -it solr date
+```
+
+here "solr" is the name of the image, and "date" is the command.
+This does not invoke any solr functionality.
+
+
+To run the Solr server:
+
+```
+docker run -it solr
+```
+
+Here "solr" is the name of the image, and there is no specific command,
+so the image defaults to run the "solr" command with "-f" to run it in the foreground.
+
+
+To run the Solr server with extra arguments:
+
+```
+docker run -it solr -h myhostname
+```
+
+This is is the same as the previous one, but an additional argument is passed.
+The image will run the "solr" command with "-f -h myhostname"
+
+To run solr as an arbitrary command:
+
+```
+docker run -it solr solr zk --help
+```
+
+here the first "solr" is the image name, and the second "solr"
+is the "solr" command. The image runs the command exactly as specified;
+no "-f" is implicitly added. The container will print help text, and exit.
+
+If you find this visually confusing, it might be helpful to use more specific image tags,
+and specific command paths. For example:
+
+```
+docker run -it solr:6 bin/solr -f -h myhostname
+```
+
+Finally, the docker-solr image offers several commands that do some work before
+then invoking the Solr server, like "solr-precreate" and "solr-demo".
+See the README.md for usage.
+These are implemented by the `docker-entrypoint.sh` script, and must be passed
+as the first argument to the image. For example:
+
+```
+docker run -it solr:6 solr-demo
+```
