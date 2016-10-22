@@ -252,3 +252,38 @@ as the first argument to the image. For example:
 ```
 docker run -it solr:6 solr-demo
 ```
+
+It's important to understand an implementation detail here. The Dockerfile uses
+`solr-foreground` as the `CMD`, and the `docker-entrypoint.sh` implements
+that by by running "solr -f". So these two are equivalent:
+
+```
+docker run -it solr:6
+docker run -it solr:6 solr-foreground
+```
+
+whereas:
+
+```
+docker run -it solr:6 solr -f
+```
+
+is slightly different: the "solr" there is a generic command, not treated in any
+special way by `docker-entrypoint.sh`. In particular, this means that the
+`docker-entrypoint-initdb.d` mechanism is not applied.
+So, if you want to use `docker-entrypoint-initdb.d`, then you must use one
+of the other two invocations.
+You also need to keep that in mind when you want to invoke solr from the bash
+command. For example, this does NOT run `docker-entrypoint-initdb.d` scripts:
+
+```
+docker run -it -v $PWD/set-heap.sh:/docker-entrypoint-initdb.d/set-heap.sh \
+    solr:6 bash -c "echo hello; solr -f"
+```
+
+but this does:
+
+```
+docker run -it $PWD/set-heap.sh:/docker-entrypoint-initdb.d/set-heap.sh \
+    solr:6 bash -c "echo hello; /opt/docker-solr/scripts/docker-entrypoint.sh solr-foreground"
+```
