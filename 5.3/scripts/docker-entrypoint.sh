@@ -40,6 +40,9 @@ function initial_solr_end {
 }
 
 function init_actions {
+    # init script for handling a custom SOLR_HOME
+    /opt/docker-solr/scripts/init-solr-home.sh
+
     # execute files in /docker-entrypoint-initdb.d before starting solr
     # for an example see docs/set-heap.sh
     shopt -s nullglob
