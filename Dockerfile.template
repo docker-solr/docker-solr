@@ -48,6 +48,8 @@ RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
 
+VOLUME /opt/solr/server/solr/
+
 EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
