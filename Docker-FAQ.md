@@ -143,6 +143,9 @@ sudo chown 8983:8983 mysolrhome
 docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
 ```
 
+Note: If SOLR_HOME is set, the "solr-precreate" command will put the created core in the SOLR_HOME directory
+rather than the "mycores" directory.
+
 
 Can I run ZooKeeper and Solr clusters under Docker?
 ---------------------------------------------------
