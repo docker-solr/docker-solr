@@ -122,6 +122,28 @@ docker exec -it --user=solr $SOLR_CONTAINER curl http://localhost:8983/solr/gett
 ```
 
 
+Can I override the whole SOLR_HOME?
+-----------------------------------
+
+Solr supports a SOLR_HOME environment variable to point to a non-standard location of the Solr home directory.
+You can use this in docker-solr, in combination with volumes:
+
+```
+docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+```
+
+This does need a pre-configured directory at that location.
+
+To make this easier, docker-solr supports a INIT_SOLR_HOME setting, which copies the contents
+from the default directory in the image to the SOLR_HOME (if it is empty).
+
+```
+mkdir mysolrhome
+sudo chown 8983:8983 mysolrhome
+docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
+```
+
+
 Can I run ZooKeeper and Solr clusters under Docker?
 ---------------------------------------------------
 
