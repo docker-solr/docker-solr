@@ -122,8 +122,8 @@ docker exec -it --user=solr $SOLR_CONTAINER curl http://localhost:8983/solr/gett
 ```
 
 
-Can I override the whole SOLR_HOME?
------------------------------------
+Can I use volumes with SOLR_HOME?
+---------------------------------
 
 Solr supports a SOLR_HOME environment variable to point to a non-standard location of the Solr home directory.
 You can use this in docker-solr, in combination with volumes:
