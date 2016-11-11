@@ -5,7 +5,7 @@
 #
 #    mkdir mysolrhome
 #    sudo chown 8983:8983 mysolrhome
-#    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+#    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
 #
 
 if [[ "$VERBOSE" = "yes" ]]; then
