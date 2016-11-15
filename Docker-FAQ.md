@@ -125,27 +125,26 @@ docker exec -it --user=solr $SOLR_CONTAINER curl http://localhost:8983/solr/gett
 Can I use volumes with SOLR_HOME?
 ---------------------------------
 
-Outside docker-solr, it is common to use the SOLR_HOME environment variable to point to a different volume for
-storing data. You can do that in docker-solr too. Like in plain Solr, you have to provide a `solr.xml` in that
-location, and in most cases the configsets too. In docker-solr it's easy to copy the defaults in place:
+Solr supports a SOLR_HOME environment variable to point to a non-standard location of the Solr home directory.
+You can use this in docker-solr, in combination with volumes:
+
+```
+docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+```
+
+This does need a pre-configured directory at that location.
+
+To make this easier, docker-solr supports a INIT_SOLR_HOME setting, which copies the contents
+from the default directory in the image to the SOLR_HOME (if it is empty).
 
 ```
 mkdir mysolrhome
 sudo chown 8983:8983 mysolrhome
-docker run -it -v $PWD/mysolrhome:/mysolrhome solr \
-    bash -c "cp -R /opt/solr/server/solr/* /mysolrhome"
-docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
 ```
 
-Or if you want to do it in a single command (perhaps for Docker Compose):
-
-```
-docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr \
-    bash -c "cp -R /opt/solr/server/solr/* /mysolrhome && exec solr -f"
-```
-
-Personally I'm not a fan of this approach; I prefer to keep the Solr home in its
-default location, and if necessary mount a prepared volume at that location.
+Note: If SOLR_HOME is set, the "solr-precreate" command will put the created core in the SOLR_HOME directory
+rather than the "mycores" directory.
 
 
 Can I run ZooKeeper and Solr clusters under Docker?

@@ -128,7 +128,7 @@ $ docker run -d -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precr
 This second way is quicker, easier to monitor because it logs to the docker log, and can fail immediately if something is wrong.
 But, because it makes assumptions about Solr's "data_driven_schema_configs", future upstream changes could break that.
 
-The third way of creating a core at startup is to use the image extension mechanism explained in the next section.
+The third way of creating a core at startup is to use the mechanism explained in the "Extending the image" section below.
 
 ## Using Docker Compose
 
@@ -153,6 +153,33 @@ volumes:
 ```
 
 and just run `docker-compose up`.
+
+
+## Custom SOLR_HOME
+
+In Solr, it is common to specify a custom SOLR_HOME, to store cores and configuration in a different volume.
+In docker-solr, you can use that with mounted volumes:
+
+    mkdir mysolrhome
+    sudo chown 8983:8983 mysolrhome
+    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+
+Solr requires a solr.xml file and configsets in the SOLR_HOME, so you must provide that ahead of time.
+One way of doing that is to copy the default content before running Solr:
+
+    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr \
+       bash -c "cp -R /opt/solr/server/solr/* /mysolrhome"
+    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+
+or, in a single command:
+
+    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr \
+       bash -c "cp -R /opt/solr/server/solr/* /mysolrhome && exec docker-entrypoint.sh solr"
+
+As an added convenience, you can pass `-e INIT_SOLR_HOME=yes` to do that automatically (if SOLR_HOME is empty):
+
+    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
+
 
 ## Extending the image
 
