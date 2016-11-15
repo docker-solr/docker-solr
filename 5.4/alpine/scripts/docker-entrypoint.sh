@@ -2,7 +2,7 @@
 set -e
 
 if [ "${1:0:1}" = '-' ]; then
-    set -- solr "$@"
+    set -- solr-foreground "$@"
 fi
 
 if [[ "$VERBOSE" = "yes" ]]; then
@@ -52,7 +52,7 @@ function init_actions {
     done
 }
 
-if [[ "$1" = 'solr' ]]; then
+if [[ "$1" = 'solr-foreground' ]]; then
     init_actions
     shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
