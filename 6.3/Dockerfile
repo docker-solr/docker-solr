@@ -53,4 +53,4 @@ WORKDIR /opt/solr
 USER $SOLR_USER
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["solr"]
+CMD ["solr-foreground"]
