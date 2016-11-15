@@ -68,7 +68,7 @@ $ docker cp $HOME/mydata/mydata.xml my_solr:/opt/solr/mydata.xml
 $ docker exec -it --user=solr my_solr post -c gettingstarted mydata.xml
 ```
 
-or by using Docker host volumes:
+or by mounting a host directory as a volume:
 
 ```console
 $ docker run --name my_solr -d -p 8983:8983 -t -v $HOME/mydata:/opt/solr/mydata solr
