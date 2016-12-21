@@ -96,7 +96,7 @@ elif [[ "$1" = 'solr-precreate' ]]; then
     # To create a core from mounted config:
     #      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-precreate mycore /myconfig
     # To create a core in a mounted directory:
-    #      mkdir mycores; chown 8983:8983
+    #      mkdir mycores; chown 8983:8983 mycores
     #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precreate mycore
     echo "Executing $1 command"
     init_actions
