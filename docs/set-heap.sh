@@ -1,6 +1,10 @@
 #!/bin/bash
 #
 # This script is mainly an illustration for the docker-entrypoint-initdb.d extension mechanism.
+# Run it with e.g.:
+#
+#   docker run -d -P -v $PWD/docs/set-heap.sh:/docker-entrypoint-initdb.d/set-heap.sh solr
+#
 # The SOLR_HEAP configuration technique here is usable for older versions of Solr.
 # From Solr 6.3 setting the SOLR_HEAP can be done more easily with:
 #

@@ -165,8 +165,8 @@ In docker-solr you can simply pass these environment variables to the container.
 
   docker run -d -P -e SOLR_HEAP=800m docker-solr/docker-solr:6.3.0
 
-This works for Solr versions newer than 6.3.0. Older versions had some hardcoded defaults in `solr.in.sh`.
-See `docs/set-heap.sh` for how to modify that configuration.
+This works for Solr versions newer than 6.3.0. Older versions had some hardcoded defaults in `solr.in.sh`;
+see `docs/set-heap.sh` for how to modify that configuration.
 
 ## Custom SOLR_HOME
 
