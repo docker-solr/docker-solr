@@ -189,25 +189,22 @@ in the `/docker-entrypoint-initdb.d/` directory. You can add your own scripts th
 or by using a custom Dockerfile. These scripts can for example copy a core directory with pre-loaded data for continuous
 integration testing, or modify the Solr configuration.
 
-Here is a simple example. With a `set-heap.sh` script like:
+Here is a simple example. With a `custom.sh` script like:
 
 ```console
 #!/bin/bash
 set -e
-cp /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig
-sed -e 's/SOLR_HEAP=".*"/SOLR_HEAP="1024m"/' </opt/solr/bin/solr.in.sh.orig >/opt/solr/bin/solr.in.sh
-grep '^SOLR_HEAP=' /opt/solr/bin/solr.in.sh
+echo "this is running inside the container before Solr starts"
 ```
 
 you can run:
 
 ```console
-$ docker run --name solr_heap1 -d -P -v $PWD/docs/set-heap.sh:/docker-entrypoint-initdb.d/set-heap.sh solr
+$ docker run --name solr_custom1 -d -P -v $PWD/docs/custom.sh:/docker-entrypoint-initdb.d/custom.sh solr
 $ sleep 5
-$ docker logs solr_heap1 | head
+$ docker logs solr_custom1 | head
 /opt/docker-solr/scripts/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/set-heap.sh
-SOLR_HEAP="1024m"
-
+this is running inside the container before Solr starts
 
 Starting Solr on port 8983 from /opt/solr/server
 ```

@@ -44,7 +44,6 @@ function init_actions {
     /opt/docker-solr/scripts/init-solr-home.sh
 
     # execute files in /docker-entrypoint-initdb.d before starting solr
-    # for an example see docs/set-heap.sh
     shopt -s nullglob
     for f in /docker-entrypoint-initdb.d/*; do
         case "$f" in
