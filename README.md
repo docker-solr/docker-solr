@@ -156,6 +156,18 @@ volumes:
 and just run `docker-compose up`.
 
 
+## solr.in.sh configuration
+
+In Solr it is common to configure settings in [solr.in.sh](https://github.com/apache/lucene-solr/blob/master/solr/bin/solr.in.sh),
+as documented in the [Solr Reference Guide](https://cwiki.apache.org/confluence/display/solr/Taking+Solr+to+Production#TakingSolrtoProduction-Environmentoverridesincludefile).
+
+In docker-solr you can simply pass these environment variables to the container. For example:
+
+  docker run -d -P -e SOLR_HEAP=800m docker-solr/docker-solr:6.3.0
+
+This works for Solr versions newer than 6.3.0. Older versions had some hardcoded defaults in `solr.in.sh`.
+See `docs/set-heap.sh` for how to modify that configuration.
+
 ## Custom SOLR_HOME
 
 In Solr, it is common to specify a custom SOLR_HOME, to store cores and configuration in a different volume.
@@ -200,7 +212,7 @@ echo "this is running inside the container before Solr starts"
 you can run:
 
 ```console
-$ docker run --name solr_custom1 -d -P -v $PWD/docs/custom.sh:/docker-entrypoint-initdb.d/custom.sh solr
+$ docker run --name solr_custom1 -d -P -v $PWD/custom.sh:/docker-entrypoint-initdb.d/custom.sh solr
 $ sleep 5
 $ docker logs solr_custom1 | head
 /opt/docker-solr/scripts/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/set-heap.sh
