@@ -41,7 +41,7 @@ RUN mkdir -p /opt/solr && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
-  mkdir /docker-entrypoint-initdb.d /opt/docker-solr/
+  mkdir /docker-entrypoint-initdb.d /docker-entrypoint-start.d /opt/docker-solr/
 
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
