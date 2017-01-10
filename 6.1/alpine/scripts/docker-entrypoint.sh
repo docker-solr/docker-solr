@@ -54,8 +54,31 @@ function init_actions {
     done
 }
 
+function start_actions {
+
+    echo Executing start actions...
+    initial_solr_begin
+
+    CWD=$( pwd )
+
+    # execute files in /docker-entrypoint-start.d with a background solr
+    for f in /docker-entrypoint-start.d/*; do
+        case "$f" in
+            *.sh)     echo "$0: running $f"; . "$f" ;;
+            *)        echo "$0: ignoring $f" ;;
+        esac
+        echo
+    done
+
+    cd $CWD
+
+    echo Finished with start actions!
+    initial_solr_end
+}
+
 if [[ "$1" = 'solr-foreground' ]]; then
     init_actions
+    start_actions
     shift; set -- solr -f "$@"
 elif [[ "$1" = 'solr-create' ]]; then
     # arguments are passed to "solr create"
