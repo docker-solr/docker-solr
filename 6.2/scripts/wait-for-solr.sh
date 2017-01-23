@@ -4,6 +4,8 @@
 #
 # Usage: wait-for-solr.sh [ max_try [ wait_seconds ] ]
 
+set -e
+
 if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
