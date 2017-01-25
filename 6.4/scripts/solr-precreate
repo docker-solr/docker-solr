@@ -19,8 +19,8 @@ fi
 
 . /opt/docker-solr/scripts/run-initdb
 
-CORE=${2:-gettingstarted}
-CONFIG_SOURCE=${3:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
+CORE=${1:-gettingstarted}
+CONFIG_SOURCE=${2:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
 if [[ -z $SOLR_HOME ]]; then
     coresdir="/opt/solr/server/solr/mycores"
     mkdir -p $coresdir
