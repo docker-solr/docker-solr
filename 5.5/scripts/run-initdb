@@ -22,12 +22,11 @@ set -e
 /opt/docker-solr/scripts/init-solr-home
 
 # execute files in /docker-entrypoint-initdb.d before starting solr
-shopt -s nullglob
-ls /docker-entrypoint-initdb.d/ | sort -n | while read f; do
-	fpath="/docker-entrypoint-initdb.d/$f"
+while read f; do
+    fpath="/docker-entrypoint-initdb.d/$f"
     case "$f" in
         *.sh)     echo "$0: running $fpath"; . "$fpath" ;;
         *)        echo "$0: ignoring $fpath" ;;
     esac
     echo
-done
+done < <(ls /docker-entrypoint-initdb.d/ | sort -n)
