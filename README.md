@@ -159,7 +159,7 @@ as documented in the [Solr Reference Guide](https://cwiki.apache.org/confluence/
 
 In docker-solr you can simply pass these environment variables to the container. For example:
 
-  docker run -d -P -e SOLR_HEAP=800m docker-solr/docker-solr:6.3.0
+  docker run -d -P -e SOLR_HEAP=800m solr:6.3.0
 
 This works for Solr versions newer than 6.3.0. Older versions had some hardcoded defaults in `solr.in.sh`;
 see `docs/set-heap.sh` for how to modify that configuration.
