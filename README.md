@@ -20,6 +20,10 @@ Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr
 
 ![logo](https://raw.githubusercontent.com/docker-library/docs/master/solr/logo.png)
 
+# Introduction Video
+
+A video presentation "Introduction to docker-solr" can be found on https://www.youtube.com/watch?v=Zqst7CwAT60.
+
 # How to use this Docker image
 
 ## Run Solr and index example data
