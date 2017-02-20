@@ -6,10 +6,6 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-# Override the GPG keyserver with e.g.:
-#   docker build -t mine --build-arg GPG_KEYSERVER=hkp://eu.pool.sks-keyservers.net .
-ARG GPG_KEYSERVER
-
 RUN apk add --no-cache \
         lsof \
         gnupg \
@@ -26,9 +22,10 @@ RUN addgroup -S -g $SOLR_UID $SOLR_USER && \
   adduser -S -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
 ENV SOLR_KEY E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
-RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$SOLR_KEY"
-ENV GPG_KEYSERVER ${GPG_KEYSERVER:-hkp://ha.pool.sks-keyservers.net}
-RUN gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$SOLR_KEY"
+
+RUN wget -nv $KEYS -O /opt/KEYS && \
+  gpg --import /opt/KEYS && \
+  rm /opt/KEYS
 
 ENV SOLR_VERSION 6.4.1
 ENV SOLR_SHA256 ebce206dd4a66600384ccdd9a604536135594ce4c24814bbd5a3e8a8ec1efbb9
