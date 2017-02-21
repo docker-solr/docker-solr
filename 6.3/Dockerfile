@@ -16,18 +16,18 @@ ENV SOLR_UID 8983
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_KEY 38D2EA16DDF5FC722EBC433FDC92616F177050F6
-ENV KEYS=https://archive.apache.org/dist/lucene/solr/KEYS
-
-RUN wget -nv $KEYS -O /opt/KEYS && \
-  gpg --import /opt/KEYS && \
-  rm /opt/KEYS
-
 ENV SOLR_VERSION 6.3.0
+
+ENV SOLR_KEY 38D2EA16DDF5FC722EBC433FDC92616F177050F6
+ENV KEYS https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/KEYS
+
 ENV SOLR_SHA256 07692257575fe54ddb8a8f64e96d3d352f2f533aa91b5752be1869d2acf2f544
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
+  wget -nv $KEYS -O /opt/KEYS && \
+  gpg --import /opt/KEYS && \
+  rm /opt/KEYS && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
   wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \

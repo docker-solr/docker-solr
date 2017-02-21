@@ -21,17 +21,18 @@ ENV SOLR_UID 8983
 RUN addgroup -S -g $SOLR_UID $SOLR_USER && \
   adduser -S -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_KEY E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
-
-RUN wget -nv $KEYS -O /opt/KEYS && \
-  gpg --import /opt/KEYS && \
-  rm /opt/KEYS
-
 ENV SOLR_VERSION 6.4.1
+
+ENV SOLR_KEY E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
+ENV KEYS https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/KEYS
+
 ENV SOLR_SHA256 ebce206dd4a66600384ccdd9a604536135594ce4c24814bbd5a3e8a8ec1efbb9
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
+  wget -nv $KEYS -O /opt/KEYS && \
+  gpg --import /opt/KEYS && \
+  rm /opt/KEYS && \
   echo "downloading $SOLR_URL" && \
   wget -q $SOLR_URL -O /opt/solr.tgz && \
   echo "downloading $SOLR_URL.asc" && \
