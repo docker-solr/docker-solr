@@ -33,9 +33,15 @@ if [ ! -d "$SOLR_HOME" ]; then
     exit 1
 fi
 
-# don't do anything if it is non-empty
+# check for existing Solr
+if [ -d "$SOLR_HOME/server/solr" ]; then
+   exit
+fi
+
+# refuse to use non-empty directories, which are likely a misconfiguration
 if [ $(find "$SOLR_HOME" -mindepth  1 | wc -l) != '0' ]; then
-    exit
+    echo "SOLR_HOME directory $SOLR_HOME is not empty; refusing to create a solr home."
+    exit 1
 fi
 
 # populate with default solr home contents
