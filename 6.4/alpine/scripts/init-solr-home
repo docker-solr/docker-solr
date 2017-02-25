@@ -34,7 +34,7 @@ if [ ! -d "$SOLR_HOME" ]; then
 fi
 
 # check for existing Solr
-if [ -d "$SOLR_HOME/server/solr" ]; then
+if [ -f "$SOLR_HOME/solr.xml" ]; then
    exit
 fi
 
