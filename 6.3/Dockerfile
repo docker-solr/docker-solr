@@ -6,10 +6,6 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-# Override the GPG keyserver with e.g.:
-#   docker build -t mine --build-arg GPG_KEYSERVER=hkp://eu.pool.sks-keyservers.net .
-ARG GPG_KEYSERVER
-
 RUN apt-get update && \
   apt-get -y install lsof && \
   rm -rf /var/lib/apt/lists/*
@@ -20,15 +16,18 @@ ENV SOLR_UID 8983
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_KEY 38D2EA16DDF5FC722EBC433FDC92616F177050F6
-ENV GPG_KEYSERVER ${GPG_KEYSERVER:-hkp://ha.pool.sks-keyservers.net}
-RUN gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$SOLR_KEY"
-
 ENV SOLR_VERSION 6.3.0
+
+ENV SOLR_KEY 38D2EA16DDF5FC722EBC433FDC92616F177050F6
+ENV KEYS https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/KEYS
+
 ENV SOLR_SHA256 07692257575fe54ddb8a8f64e96d3d352f2f533aa91b5752be1869d2acf2f544
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
+  wget -nv $KEYS -O /opt/KEYS && \
+  gpg --import /opt/KEYS && \
+  rm /opt/KEYS && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
   wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \

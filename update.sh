@@ -10,8 +10,6 @@ set -e
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-GPG_KEYSERVER=${GPG_KEYSERVER:-hkp://pool.sks-keyservers.net}
-
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
     echo "Usage: bash update.sh [version ...]"
@@ -102,17 +100,11 @@ for version in "${versions[@]}"; do
         fi
 
         # Get the code signing keys
-        # Per http://www.apache.org/dyn/closer.html and a message from Hoss on
+        # Per https://wiki.apache.org/solr/HowToReleaseSlowly#Making_a_release
+        # http://www.apache.org/dyn/closer.html and a message from Hoss on
         # http://stackoverflow.com/questions/32539810/apache-lucene-5-3-0-release-keys-missing-key-3fcfdb3e
         wget -nv --output-document KEYS $archiveUrl/$full_version/KEYS
         gpg --import KEYS
-
-        # and for some extra verification we check the key on the keyserver too:
-        KEY=$(gpg --status-fd 1 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 | awk '$1 == "[GNUPG:]" && ($2 == "BADSIG" || $2 == "VALIDSIG") { print $3; exit }')
-        gpg --keyserver "$GPG_KEYSERVER" --recv-key "$KEY" || {
-            echo "Failed to get the key from the key server"
-            exit 1
-        }
 
         # verify the signature matches our content
         gpg --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz
