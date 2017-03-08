@@ -16,18 +16,27 @@ ENV SOLR_UID 8983
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_VERSION 5.5.4
-
 ENV SOLR_KEY E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
-ENV KEYS https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/KEYS
+RUN echo "fetching GPG key $SOLR_KEY"; \
+  for server in \
+    ha.pool.sks-keyservers.net \
+    hkp://keyserver.ubuntu.com:80 \
+    hkp://p80.pool.sks-keyservers.net:80 \
+    pgp.mit.edu \
+  ; do \
+    echo "  trying $server"; \
+    if gpg --keyserver "$server" --recv-keys "$SOLR_KEY"; then \
+      exit 0; \
+    fi; \
+  done; \
+  echo >&2 "error: failed to fetch $SOLR_KEY from several disparate servers -- network issues?"; \
+  exit 1
 
+ENV SOLR_VERSION 5.5.4
 ENV SOLR_SHA256 c1528e4afc9a0b8e7e5be0a16f40bb4080f410d502cd63b4447d448c49e9f500
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
 
 RUN mkdir -p /opt/solr && \
-  wget -nv $KEYS -O /opt/KEYS && \
-  gpg --import /opt/KEYS && \
-  rm /opt/KEYS && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
   wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \

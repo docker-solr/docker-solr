@@ -99,6 +99,9 @@ for version in "${versions[@]}"; do
             wget -nv --output-document=solr-$full_version.tgz.asc $archiveUrl/$full_version/solr-$full_version.tgz.asc
         fi
 
+        # use a temporary directory for "gpg" data (so it can be pristine every time we run this script)
+        export GNUPGHOME="$PWD/.gnupg"
+
         # Get the code signing keys
         # Per https://wiki.apache.org/solr/HowToReleaseSlowly#Making_a_release
         # http://www.apache.org/dyn/closer.html and a message from Hoss on
@@ -110,12 +113,22 @@ for version in "${versions[@]}"; do
         gpg --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz
         # get the full fingerprint (since we only get the "long id" if it was BADSIG before)
         KEY=$(gpg --status-fd 1 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 | awk '$1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3; exit }')
+        # make sure that key is public on the gossip network (using several servers to ensure the message gets across)
+        for keyserver in \
+            ha.pool.sks-keyservers.net \
+            hkp://keyserver.ubuntu.com:80 \
+            pgp.mit.edu \
+        ; do
+            # use "timeout" to ensure we don't spend too long trying (in case a server is down, etc)
+            timeout 2s gpg --keyserver "$keyserver" --send-keys $KEY || true
+        done
 
         if [ -z "$KEEP_ALL_ARTIFACTS" ]; then
             rm solr-$full_version.tgz.asc solr-$full_version.tgz.sha1 solr-$full_version.tgz.md5
             if [ -z "$KEEP_SOLR_ARTIFACT" ]; then
                 rm solr-$full_version.tgz
             fi
+            rm -rf .gnupg
         fi
 
         cd ..
