@@ -22,17 +22,26 @@ RUN addgroup -S -g $SOLR_UID $SOLR_USER && \
   adduser -S -u $SOLR_UID -g $SOLR_USER $SOLR_USER
 
 ENV SOLR_VERSION 6.4.2
-
-ENV SOLR_KEY 2085660D9C1FCCACC4A479A3BF160FF14992A24C
-ENV KEYS https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/KEYS
-
-ENV SOLR_SHA256 354e1affd9cad7d6e86cde8c03aaeb604876f0764129621d8e231cdb35b31c55
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
+ENV SOLR_SHA256 354e1affd9cad7d6e86cde8c03aaeb604876f0764129621d8e231cdb35b31c55
+ENV SOLR_KEYS 2085660D9C1FCCACC4A479A3BF160FF14992A24C 2085660D9C1FCCACC4A479A3BF160FF14992A24C
+
+RUN set -ex; for key in $SOLR_KEYS; do \
+    found=''; \
+    for server in \
+      ha.pool.sks-keyservers.net \
+      hkp://keyserver.ubuntu.com:80 \
+      hkp://p80.pool.sks-keyservers.net:80 \
+      pgp.mit.edu \
+    ; do \
+      echo "  trying $server for $key"; \
+      gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
+    done; \
+    test -z "$found" && echo >&2 "error: failed to fetch $key from several disparate servers -- network issues?" && exit 1; \
+  done; \
+  exit 0
 
 RUN mkdir -p /opt/solr && \
-  wget -nv $KEYS -O /opt/KEYS && \
-  gpg --import /opt/KEYS && \
-  rm /opt/KEYS && \
   echo "downloading $SOLR_URL" && \
   wget -q $SOLR_URL -O /opt/solr.tgz && \
   echo "downloading $SOLR_URL.asc" && \
