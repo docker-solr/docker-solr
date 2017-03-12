@@ -137,7 +137,7 @@ function verify_signature {
   else
     echo "signature verification failed!"
     if egrep '\[GNUPG:\] NO_PUBKEY' gpg.status; then
-      # there was at least onw missing key. Help the admin by fetching it from the keyserver
+      # there was at least one missing key. Help the admin by fetching it from the keyserver
       missing_keys=$(egrep '\[GNUPG:\] NO_PUBKEY' gpg.status|sed -e 's/\[GNUPG:\] NO_PUBKEY //'|sort|uniq)
       for missing_key in $missing_keys; do
         echo "looks like a unknown key was used: $missing_key"
