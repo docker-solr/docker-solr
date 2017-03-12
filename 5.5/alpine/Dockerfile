@@ -26,7 +26,7 @@ ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr
 ENV SOLR_SHA256 c1528e4afc9a0b8e7e5be0a16f40bb4080f410d502cd63b4447d448c49e9f500
 ENV SOLR_KEYS E6E21FFCDCEA14C95910EA65051A0FAF76BC6507
 
-RUN set -ex; for key in $SOLR_KEYS; do \
+RUN set -e; for key in $SOLR_KEYS; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
