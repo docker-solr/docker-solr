@@ -12,6 +12,9 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 TOP=$PWD
 OWNERTRUSTFILE="ownertrust.txt"
+KEYSERVERS=(hkp://keyserver.ubuntu.com:80
+      ha.pool.sks-keyservers.net
+      pgp.mit.edu)
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
@@ -43,10 +46,11 @@ function write_files {
 
 function load_keys {
     echo "loading keys"
-    local KEYSERVERS=(hkp://keyserver.ubuntu.com:80
-      ha.pool.sks-keyservers.net
-      pgp.mit.edu)
     export GNUPGHOME="$PWD/.gnupg"
+    if [ -d "$GNUPGHOME" ]; then
+      # this is useful during development, but could be bad on a CI server
+      echo "warning: using existing .gnupg"
+    fi
     # we have a local record with key:owner lines
     while IFS=: read key owner; do
         if gpg --list-keys "$key"  >/dev/null 2>&1; then
@@ -132,19 +136,35 @@ function verify_signature {
   # verify the signature matches our content
   echo "verifying GPG signature"
   if 5>gpg.status gpg --status-fd 5 --batch --verify solr-$full_version.tgz.asc solr-$full_version.tgz 2>&1 > gpg.out; then
-    # set KEYS for write_files
+    # signature verified. set KEYS for write_files
     KEYS=$(awk 'BEGIN { ORS=" "} $1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3 }' gpg.status|sed '-e s/ $//')
   else
     echo "signature verification failed!"
     if egrep '\[GNUPG:\] NO_PUBKEY' gpg.status; then
-      # there was at least one missing key. Help the admin by fetching it from the keyserver
+      # there was at least one missing key. Help the admin by fetching it from the keyservers
       missing_keys=$(egrep '\[GNUPG:\] NO_PUBKEY' gpg.status|sed -e 's/\[GNUPG:\] NO_PUBKEY //'|sort|uniq)
       for missing_key in $missing_keys; do
         echo "looks like a unknown key was used: $missing_key"
-        gpg --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options verbose,timeout=10 --recv-key "$missing_key"
-        fingerprint=$(gpg --fingerprint -k "$missing_key" |grep fingerprint|sed -e 's/^.* = //' -e 's/ //g')
-        owner=$(gpg --with-colons -k "$fingerprint" |egrep '^pub'| cut -d : -f 10)
-        echo "$fingerprint:$owner" >> $TOP/known_keys.txt
+        fingerprint=''
+        for keyserver in $KEYSERVERS; do
+          if 5>gpg-import.status gpg --keyserver $keyserver --keyserver-options verbose,timeout=10 --recv-key "$missing_key"; then
+            fingerprint=$(gpg --fingerprint -k "$missing_key" |grep fingerprint|sed -e 's/^.* = //' -e 's/ //g')
+            owner=$(gpg --with-colons -k "$fingerprint" |egrep '^pub'| cut -d : -f 10)
+            echo "$fingerprint:$owner" >> $TOP/known_keys.txt
+            break
+          else
+            if egrep '\[GNUPG:\] NO_DATA' gpg-import.status; then
+              echo "and that key appears not to exist on keyserver $keyservers"
+            else
+              echo "failed to get the key from $keyserver"
+            fi
+            cat gpg-import.status
+          fi
+        done
+        if [[ -z $fingerprint ]]; then
+          echo "The key $missing_key could not be retrieved from the keyservers; take extra care verifying, and if it checks out you may need to upload it"
+          exit 1
+        fi
       done
       git diff $TOP/known_keys.txt
       echo "verify that those keys are valid:"
@@ -154,7 +174,7 @@ function verify_signature {
       echo "- KEYS files are available below https://dist.apache.org/repos/dist/release/lucene/solr/"
       echo "Once confirmed: git commit -m 'Added new key' known_keys.txt"
       echo "Then re-run update.sh"
-      exit 1
+      echo "If not confirmed: GNUPGHOME='$GNUPGHOME' gpg --delete-key $missing_key; git checkout known_keys.txt"
     else
       # failed for another reason, like BADSIG
       cat gpg.status
