@@ -114,7 +114,7 @@ function verify_checksum {
     local checksum_file="solr-$full_version.tgz.$checksum_type"
     local url="$archiveUrl/$full_version/$checksum_file"
     if [ ! -f "$checksum_file" ]; then
-        wget -nv --output-document="$checksum_file $url"
+        wget -nv --output-document="$checksum_file" "$url"
     fi
     echo "verifying $checksum_type checksum"
     case $checksum_type in
