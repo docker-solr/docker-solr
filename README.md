@@ -1,8 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
--       [`6.4.2`, `6.4`, `6`, `latest` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/6.4/Dockerfile)
--       [`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/6.3/Dockerfile)
--       [`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/5.5/Dockerfile)
+-	[`6.5.0`, `6.5`, `6` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1738f9a3cbad82e46c5ccebfb44707da13d05479/6.5/Dockerfile)
+-	[`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/6.4/Dockerfile)
+-	[`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/6.3/Dockerfile)
+-	[`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1ccf51aaeef0636445f670d9fd083730d4a6e9c1/5.5/Dockerfile)
 
 For each of these there are variants based on the Alpine image, .e.g `6.4-alpine`.
 
