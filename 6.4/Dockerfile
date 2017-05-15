@@ -14,7 +14,7 @@ ENV SOLR_USER solr
 ENV SOLR_UID 8983
 
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
-  useradd -r -u $SOLR_UID -g $SOLR_USER $SOLR_USER
+  useradd -r -u $SOLR_UID -G $SOLR_USER -g $SOLR_USER $SOLR_USER
 
 ENV SOLR_VERSION 6.4.2
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
