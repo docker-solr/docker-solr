@@ -63,19 +63,53 @@ $ docker run --name solr_demo -d -P solr solr-demo
 
 ## Loading your own data
 
-If you want load your own data, you'll have to make it available to the container, for example by copying it into the container:
+Solr comes with a ["post" utility](https://cwiki.apache.org/confluence/display/solr/Post+Tool) that reads data from disk, and submits it to a Solr collection.
+We can use that in various ways with Docker.
+
+The proper way is to start a Solr server container, create the collection, then use a temporary second container
+to load data into the Solr server container.
+To give "post" access to the data, you can use a mounted host directory, data volumes, or copy to the container.
+For example, if you have an XML file name `mydata.xml` in a `mydata` directory, you could do:
 
 ```console
-$ docker cp $HOME/mydata/mydata.xml my_solr:/opt/solr/mydata.xml
-$ docker exec -it --user=solr my_solr post -c gettingstarted mydata.xml
+$ docker run --name my_solr -d -p 8983:8983 -t solr
+$ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
+$ MY_SOLR_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' my_solr)
+$ docker run --rm -t -v $HOME/mydata:/opt/solr/mydata:ro solr post -host $MY_SOLR_IP -port 8983  -c gettingstarted mydata/mydata.xml
 ```
 
-or by mounting a host directory as a volume:
+You can make that a bit simpler with just a single container:
 
 ```console
-$ docker run --name my_solr -d -p 8983:8983 -t -v $HOME/mydata:/opt/solr/mydata solr
+$ docker run --name my_solr -d -p 8983:8983 -t -v $HOME/mydata:/opt/solr/mydata:ro solr
 $ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
 $ docker exec -it --user=solr my_solr post -c gettingstarted mydata/mydata.xml
+```
+
+which has the disadvantage that the host directory is mounted during the entire lifetime
+of the Solr container.
+
+If you use a remote Docker host, and thus cannot use mounted host directories, you can
+use a data volume instead. Here I use a temporary container for the file copy so that
+I can still mount the data volume read-only in Solr.
+
+```console
+$ docker volume create --name mydata
+$ docker create -v mydata:/mydata --name my_data solr
+$ docker cp $HOME/mydata/mydata.xml my_data:/mydata/
+$ docker run --name my_solr -d -p 8983:8983 -t -v mydata:/opt/solr/mydata:ro solr
+$ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
+$ docker exec -it --user=solr my_solr post -c gettingstarted mydata/mydata.xml
+```
+
+You can make it even simpler by just temporarily copying the data into the container directly, so you don't need volumes at all:
+
+```console
+$ docker run --name my_solr -d -p 8983:8983 -t solr
+$ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
+$ docker cp $HOME/mydata/mydata.xml my_solr:/opt/solr/mydata.xml
+$ docker exec -it --user=solr my_solr post -c gettingstarted mydata.xml
+$ docker exec -it my_solr rm -f mydata.xml
 ```
 
 To learn more about Solr, see the [Apache Solr Reference Guide](https://cwiki.apache.org/confluence/display/solr/Apache+Solr+Reference+Guide).
