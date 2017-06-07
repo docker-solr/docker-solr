@@ -177,12 +177,22 @@ Verify that that succeeds.
 Now we need to tell the Docker library team about this new version so they can make an official build,
 by updating the versions in https://github.com/docker-solr/official-images/blob/master/library/solr
 and submitting a Pull Request. We can just make the change on the master branch in our fork.
-We'll use the output provided by `generate-stackbrew-library.sh` earlier:
+
+First we'll sync our fork:
 
 ```
 cd
 git clone git@github.com:docker-solr/official-images
 cd official-images/
+git remote add upstream https://github.com/docker-library/official-images.git
+git fetch upstream
+git merge upstream/master
+git push
+```
+
+We'll use the output provided by `generate-stackbrew-library.sh` earlier:
+
+```
 cat ../new-versions > library/solr 
 git diff
 ```
@@ -196,6 +206,7 @@ git push
 
 Now you can create a Pull Request at https://github.com/docker-library/official-images/compare/master...docker-solr:master?expand=1
 In the comment section add a link to the announcement email from the archives http://mail-archives.apache.org/mod_mbox/www-announce/
+See https://github.com/docker-library/official-images/pulls?q=is%3Apr+solr for older examples
 
 ## The docs repository
 
