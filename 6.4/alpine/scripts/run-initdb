@@ -29,4 +29,4 @@ while read f; do
         *)        echo "$0: ignoring $fpath" ;;
     esac
     echo
-done < <(ls /docker-entrypoint-initdb.d/ | sort -n)
+done < <(find /docker-entrypoint-initdb.d/ -mindepth 1 | sed -e 's,^d/,,' | sort -n)
