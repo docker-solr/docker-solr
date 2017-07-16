@@ -7,7 +7,7 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 ARG SOLR_DOWNLOAD_SERVER
 
 RUN apt-get update && \
-  apt-get -y install lsof && \
+  apt-get -y install lsof procps && \
   rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER solr
