@@ -8,6 +8,8 @@ if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
+/opt/docker-solr/scripts/add-user
+
 # when invoked with e.g.: docker run solr -help
 if [ "${1:0:1}" = '-' ]; then
     set -- solr-foreground "$@"

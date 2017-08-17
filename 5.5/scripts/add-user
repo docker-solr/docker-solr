@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# add a user to /etc/passwd if needed
+# See https://docs.openshift.org/latest/creating_images/guidelines.html#use-uid
+
+set -e
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+if [[ ! -z "$NO_ADD_USER" ]]; then
+  exit 0
+fi
+
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
+fi
