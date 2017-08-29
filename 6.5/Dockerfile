@@ -45,23 +45,22 @@ RUN mkdir -p /opt/solr && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores && \
+  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/docker-solr /docker-entrypoint-initdb.d && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
-  chgrp -R 0 /opt/solr && \
-  chmod -R g=u /opt/solr && \
-  chmod g=u /etc/passwd && \
-  mkdir /docker-entrypoint-initdb.d /opt/docker-solr/
+  chown -R $SOLR_USER:0 /opt/solr /opt/docker-solr /docker-entrypoint-initdb.d && \
+  chmod -R g=u /opt/solr /opt/docker-solr /docker-entrypoint-initdb.d && \
+  chmod g=u /etc/passwd
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
+RUN chown -R $SOLR_USER:0 /opt/docker-solr/scripts && \
+  chmod -R g=u /opt/docker-solr/scripts
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
 
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
+USER $SOLR_UID
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["solr-foreground"]
