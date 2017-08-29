@@ -23,10 +23,9 @@ set -e
 
 # execute files in /docker-entrypoint-initdb.d before starting solr
 while read f; do
-    fpath="/docker-entrypoint-initdb.d/$f"
     case "$f" in
-        *.sh)     echo "$0: running $fpath"; . "$fpath" ;;
-        *)        echo "$0: ignoring $fpath" ;;
+        *.sh)     echo "$0: running $f"; . "$f" ;;
+        *)        echo "$0: ignoring $f" ;;
     esac
     echo
-done < <(find /docker-entrypoint-initdb.d/ -mindepth 1 | sed -e 's,^d/,,' | sort -n)
+done < <(find /docker-entrypoint-initdb.d/ -mindepth 1 -type f | sort -n)
