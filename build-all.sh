@@ -60,7 +60,7 @@ function get_versions {
     full_version="${min_versions[$v]}"
     tags_for_version["$full_version"]="${tags_for_version["$full_version"]} $v"
   done
-  tags_for_version["$latest"]="${tags_for_version["$full_version"]} latest"
+  tags_for_version["$latest"]="${tags_for_version["$latest"]} latest"
 }
 
 function print_versions {
