@@ -37,6 +37,7 @@ function write_files {
         template=Dockerfile-$variant.template
     fi
 
+    echo "generating $target_dir"
     mkdir -p "$target_dir"
     <"$template" sed -r \
       -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' \
@@ -232,6 +233,7 @@ for version in "${versions[@]}"; do
 
     write_files "$full_version"
     write_files "$full_version" 'alpine'
+    write_files "$full_version" 'slim'
     echo
 done
 
