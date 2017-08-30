@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Based on https://github.com/docker-library/elasticsearch/blob/master/generate-stackbrew-library.sh
+# Based on https://github.com/docker-library/httpd/blob/master/generate-stackbrew-library.sh
 set -eu
 
 declare -A aliases=(
@@ -10,6 +10,7 @@ declare -A aliases=(
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+
 extglob_old=$(shopt -p extglob||true)
 shopt -s extglob
 
@@ -43,6 +44,22 @@ dirCommit() {
 	)
 }
 
+getArches() {
+	local repo="$1"; shift
+	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
+
+	eval "declare -g -A parentRepoToArches=( $(
+		find -name 'Dockerfile' -exec awk '
+				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|microsoft\/[^:]+)(:|$)/ {
+					print "'"$officialImagesUrl"'" $2
+				}
+			' '{}' + \
+			| sort -u \
+			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
+	) )"
+}
+getArches 'solr'
+
 cat <<-EOH
 # this file is generated via https://github.com/docker-library/solr/blob/$(fileCommit "$self")/$self
 
@@ -59,43 +76,36 @@ join() {
 }
 
 for version in "${versions[@]}"; do
-	commit="$(dirCommit "$version")"
+	for variant in '' alpine; do
+		dir="$version${variant:+/$variant}"
+		[ -f "$dir/Dockerfile" ] || continue
 
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "SOLR_VERSION" { gsub(/~/, "-", $3); print $3; exit }')"
+		commit="$(dirCommit "$dir")"
 
-	rcVersion="${version%-rc}"
+		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "SOLR_VERSION" { print $3; exit }')"
 
-	versionAliases=()
-	while [ "$fullVersion" != "$rcVersion" -a "${fullVersion%[.-]*}" != "$fullVersion" ]; do
-		versionAliases+=( $fullVersion )
-		fullVersion="${fullVersion%[.-]*}"
-	done
-	versionAliases+=(
-		$rcVersion
-		${aliases[$version]:-}
-	)
+		versionAliases=(
+			$fullVersion
+			$version
+			${aliases[$version]:-}
+		)
 
-	echo
-	cat <<-EOE
-		Tags: $(join ', ' "${versionAliases[@]}")
-		Architectures: amd64, arm32v5, arm32v7, arm64v8, i386, ppc64le, s390x
-		GitCommit: $commit
-		Directory: $version
-	EOE
+		if [ -z "$variant" ]; then
+			variantAliases=( "${versionAliases[@]}" )
+		else
+			variantAliases=( "${versionAliases[@]/%/-$variant}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
+		fi
 
-	for variant in alpine; do
-		[ -f "$version/$variant/Dockerfile" ] || continue
-
-		commit="$(dirCommit "$version/$variant")"
-
-		variantAliases=( "${versionAliases[@]/%/-$variant}" )
-		variantAliases=( "${variantAliases[@]//latest-/}" )
+		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+		variantArches="${parentRepoToArches[$variantParent]}"
 
 		echo
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
+			Architectures: $(join ', ' $variantArches)
 			GitCommit: $commit
-			Directory: $version/$variant
+			Directory: $dir
 		EOE
 	done
 done
