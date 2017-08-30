@@ -76,7 +76,7 @@ join() {
 }
 
 for version in "${versions[@]}"; do
-	for variant in '' alpine; do
+	for variant in '' alpine slim; do
 		dir="$version${variant:+/$variant}"
 		[ -f "$dir/Dockerfile" ] || continue
 

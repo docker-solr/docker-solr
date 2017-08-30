@@ -1,5 +1,5 @@
 
-FROM    openjdk:8-jre
+FROM    openjdk:8-jre-slim
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
@@ -16,10 +16,10 @@ ENV SOLR_UID 8983
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -G $SOLR_USER -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_VERSION version-goes-here
+ENV SOLR_VERSION 6.3.0
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
-ENV SOLR_SHA256 checksum-goes-here
-ENV SOLR_KEYS fingerprint-goes-here
+ENV SOLR_SHA256 07692257575fe54ddb8a8f64e96d3d352f2f533aa91b5752be1869d2acf2f544
+ENV SOLR_KEYS 38D2EA16DDF5FC722EBC433FDC92616F177050F6
 
 RUN set -e; for key in $SOLR_KEYS; do \
     found=''; \

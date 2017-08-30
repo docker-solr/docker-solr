@@ -17,7 +17,7 @@ TAG_LOCAL_BASE=docker-solr/docker-solr
 # The hub user is "dockersolrbuilder".
 TAG_PUSH_BASE=dockersolr/docker-solr
 
-VARIANTS="alpine"
+VARIANTS=(alpine slim)
 
 versions=()
 latest=''
@@ -45,7 +45,7 @@ function get_versions {
     dir_for_version["$full_version"]=$build_dir
     tags_for_version["$full_version"]="${tags[@]}"
 
-    for variant in $VARIANTS; do
+    for variant in ${VARIANTS[@]}; do
       build_dir="./$x_y_dir/$variant"
       full_version="$(grep 'ENV SOLR_VERSION' $build_dir/Dockerfile|awk '{print $3}')"
       min_version=$(echo $full_version | sed -e 's/\..*//')
