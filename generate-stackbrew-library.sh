@@ -61,7 +61,7 @@ join() {
 for version in "${versions[@]}"; do
 	commit="$(dirCommit "$version")"
 
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "ELASTICSEARCH_VERSION" { gsub(/~/, "-", $3); print $3; exit }')"
+	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "SOLR_VERSION" { gsub(/~/, "-", $3); print $3; exit }')"
 
 	rcVersion="${version%-rc}"
 
