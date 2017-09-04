@@ -1,5 +1,5 @@
 
-FROM    openjdk:8-jre
+FROM    openjdk:8-jre-slim
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
@@ -16,9 +16,9 @@ ENV SOLR_UID 8983
 RUN groupadd -r -g $SOLR_UID $SOLR_USER && \
   useradd -r -u $SOLR_UID -G $SOLR_USER -g $SOLR_USER $SOLR_USER
 
-ENV SOLR_VERSION 6.6.0
+ENV SOLR_VERSION 6.4.2
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
-ENV SOLR_SHA256 6b1d1ed0b74aef320633b40a38a790477e00d75b56b9cdc578533235315ffa1e
+ENV SOLR_SHA256 354e1affd9cad7d6e86cde8c03aaeb604876f0764129621d8e231cdb35b31c55
 ENV SOLR_KEYS 2085660D9C1FCCACC4A479A3BF160FF14992A24C
 
 RUN set -e; for key in $SOLR_KEYS; do \
@@ -46,8 +46,6 @@ RUN mkdir -p /opt/solr && \
   rm /opt/solr.tgz* && \
   rm -Rf /opt/solr/docs/ && \
   mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores && \
-  sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
-  sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_USER /opt/solr && \

@@ -3,9 +3,9 @@
 # Script to rebuild Solr images in this repository locally, and test them.
 # This should probably be replaced with some bashbrew.
 
-set -e
+set -euo pipefail
 
-if [[ ! -z $DEBUG ]]; then
+if [[ ! -z "${DEBUG:-}" ]]; then
   set -x
 fi
 
@@ -17,7 +17,7 @@ TAG_LOCAL_BASE=docker-solr/docker-solr
 # The hub user is "dockersolrbuilder".
 TAG_PUSH_BASE=dockersolr/docker-solr
 
-VARIANTS="alpine"
+VARIANTS=(alpine slim)
 
 versions=()
 latest=''
@@ -29,43 +29,45 @@ declare -A tags_for_version
 # map minimum version to the full_version
 declare -A min_versions
 
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
 function get_versions {
-  x_y_dirs=$(ls | grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
+  x_y_dirs=$(find . -maxdepth 1 -print | sed 's,^\./,,' | grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
   latest_dir=$(echo "$x_y_dirs" | tail -n 1)
   for x_y_dir in $x_y_dirs; do
     build_dir="./$x_y_dir"
-    full_version="$(grep 'ENV SOLR_VERSION' $build_dir/Dockerfile|awk '{print $3}')"
+    full_version="$(grep 'ENV SOLR_VERSION' "$build_dir/Dockerfile" | awk '{print $3}')"
     versions+=($full_version)
-    min_version=$(echo $full_version | sed -e 's/\..*//')
+    min_version=$(sed -e 's/\..*//' <<<$full_version)
     min_versions["$min_version"]=$full_version
-    tags=($full_version $x_y_dir)
-    if [[ $x_y_dir = $latest_dir ]]; then
+    tags="$full_version $x_y_dir"
+    if [[ $x_y_dir = "$latest_dir" ]]; then
       latest=$full_version
     fi
     dir_for_version["$full_version"]=$build_dir
-    tags_for_version["$full_version"]="${tags[@]}"
+    tags_for_version["$full_version"]=$tags
 
-    for variant in $VARIANTS; do
+    for variant in "${VARIANTS[@]}"; do
       build_dir="./$x_y_dir/$variant"
-      full_version="$(grep 'ENV SOLR_VERSION' $build_dir/Dockerfile|awk '{print $3}')"
-      min_version=$(echo $full_version | sed -e 's/\..*//')
+      full_version="$(grep 'ENV SOLR_VERSION' "$build_dir/Dockerfile" | awk '{print $3}')"
+      min_version=$(sed -e 's/\..*//' <<<$full_version)
       min_versions["$min_version-$variant"]="$full_version-$variant"
       versions+=("$full_version-$variant")
-      tags=("$full_version-$variant" "$x_y_dir-$variant")
+      tags="$full_version-$variant $x_y_dir-$variant"
       dir_for_version["$full_version-$variant"]=$build_dir
-      tags_for_version["$full_version-$variant"]="${tags[@]}"
+      tags_for_version["$full_version-$variant"]=$tags
     done
   done
   for v in "${!min_versions[@]}"; do
     full_version="${min_versions[$v]}"
     tags_for_version["$full_version"]="${tags_for_version["$full_version"]} $v"
   done
-  tags_for_version["$latest"]="${tags_for_version["$full_version"]} latest"
+  tags_for_version["$latest"]="${tags_for_version["$latest"]} latest"
 }
 
 function print_versions {
   echo "versions found:"
-  for full_version in ${versions[@]}; do
+  for full_version in "${versions[@]}"; do
     echo "  full_version=$full_version build_dir=${dir_for_version[$full_version]} tags: ${tags_for_version[$full_version]}"
   done
 }
@@ -73,13 +75,12 @@ function print_versions {
 function build {
   local full_version=$1
   local build_dir=$2
-  shift 2
-  local tags=$@
+  local tags=$3
   tag="$TAG_LOCAL_BASE:$full_version"
   # write a build script in the directory, so you can go there and invoke manually for debugging
   # Travis is still on Docker 1.9 at the moment, so do only a single tag during the build,
   # and apply the other tags after.
-  cat > $build_dir/build.sh <<EOM
+  cat > "$build_dir/build.sh" <<EOM
 #!/bin/bash
 set -e
 if [ ! -z "\$SOLR_DOWNLOAD_SERVER" ]; then
@@ -97,20 +98,20 @@ for t in $tags; do
   \$cmd
 done
 EOM
-  chmod u+x $build_dir/build.sh
-  (cd $build_dir; ./build.sh)
+  chmod u+x "$build_dir/build.sh"
+  (cd "$build_dir"; ./build.sh)
   echo
 }
 
 function container_cleanup {
   local container_name=$1
-  previous=$(docker ps --filter name=$container_name --format '{{.ID}}' --no-trunc)
+  previous=$(docker ps --filter name="$container_name" --format '{{.ID}}' --no-trunc)
   if [[ ! -z $previous ]]; then
     echo "killing $container_name"
-    docker kill $container_name || true
+    docker kill "$container_name" || true
     sleep 2
     echo "removing $container_name"
-    docker rm $container_name || true
+    docker rm "$container_name" || true
   fi
 }
 
@@ -119,41 +120,41 @@ function container_cleanup {
 function test_simple {
   local tag=$1
   echo "Test $tag"
-  container_name='test_'$(echo $tag|tr ':/-' '_')
+  container_name='test_'$(echo "$tag" | tr ':/-' '_')
   echo "Cleaning up left-over containers from previous runs"
-  container_cleanup $container_name
+  container_cleanup "$container_name"
   echo "Running $container_name"
-  docker run --name $container_name -d $tag
+  docker run --name "$container_name" -d "$tag"
   SLEEP_SECS=5
   echo "Sleeping $SLEEP_SECS seconds..."
   sleep $SLEEP_SECS
-  container_status=$(docker inspect --format='{{.State.Status}}' $container_name)
+  container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
   echo "container $container_name status: $container_status"
   if [[ $container_status == 'exited' ]]; then
-    docker logs $container_name
+    docker logs "$container_name"
     exit 1
   fi
   echo "Checking that the OS matches the tag '$tag'"
   if echo "$tag" | grep -q -- -alpine; then
-    alpine_version=$(docker exec --user=solr $container_name cat /etc/alpine-release || true)
+    alpine_version=$(docker exec --user=solr "$container_name" cat /etc/alpine-release || true)
     if [[ -z $alpine_version ]]; then
       echo "Could not get alpine version from container $container_name"
-      container_cleanup $container_name
+      container_cleanup "$container_name"
       exit 1
     fi
     echo "Alpine $alpine_version"
   else
-    debian_version=$(docker exec --user=solr $container_name cat /etc/debian_version || true)
+    debian_version=$(docker exec --user=solr "$container_name" cat /etc/debian_version || true)
     if [[ -z $debian_version ]]; then
       echo "Could not get debian version from container $container_name"
-      container_cleanup $container_name
+      container_cleanup "$container_name"
       exit 1
     fi
     echo "Debian $debian_version"
   fi
 
   # check that the version of Solr matches the tag
-  changelog_version=$(docker exec --user=solr $container_name bash -c "grep '==========' /opt/solr/CHANGES.txt | head -n 1 |  awk '{print $2}' | tr -d '= '")
+  changelog_version=$(docker exec --user=solr "$container_name" bash -c "egrep '^==========* ' /opt/solr/CHANGES.txt | head -n 1 | tr -d '= '")
   echo "Solr version $changelog_version"
   if [[ $tag = "$TAG_LOCAL_BASE:latest" ]]; then
     solr_version_from_tag=$latest
@@ -162,7 +163,7 @@ function test_simple {
   fi
   if [[ $changelog_version != $solr_version_from_tag ]]; then
     echo "Solr version mismatch"
-    container_cleanup $container_name
+    container_cleanup "$container_name"
     exit 1
   fi
 
@@ -170,24 +171,24 @@ function test_simple {
   echo "Sleeping $SLEEP_SECS seconds..."
   sleep $SLEEP_SECS
   echo "Checking Solr is running"
-  status=$(docker exec $container_name /opt/docker-solr/scripts/wait-for-solr.sh)
+  status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh)
   if ! egrep -q 'solr is running' <<<$status; then
     echo "Test test_simple $tag failed; solr did not start"
-    container_cleanup $container_name
+    container_cleanup "$container_name"
     exit 1
   fi
   echo "Creating core"
-  docker exec --user=solr $container_name bin/solr create_core -c gettingstarted
+  docker exec --user=solr "$container_name" bin/solr create_core -c gettingstarted
   echo "Loading data"
-  docker exec --user=solr $container_name bin/post -c gettingstarted example/exampledocs/manufacturers.xml
+  docker exec --user=solr "$container_name" bin/post -c gettingstarted example/exampledocs/manufacturers.xml
   sleep 1
   echo "Checking data"
-  data=$(docker exec --user=solr $container_name wget -q -O - http://localhost:8983/solr/gettingstarted/select'?q=*:*')
+  data=$(docker exec --user=solr "$container_name" wget -q -O - http://localhost:8983/solr/gettingstarted/select'?q=*:*')
   if ! egrep -q 'Round Rock' <<<$data; then
     echo "Test test_simple $tag failed; data did not load"
     exit 1
   fi
-  container_cleanup $container_name
+  container_cleanup "$container_name"
 
   echo "Test test_simple $tag succeeded"
 }
@@ -200,17 +201,17 @@ function push {
   let i=1
   while true; do
     echo "Pushing $push_tag (attempt $i)"
-    if docker push $push_tag; then
+    if docker push "$push_tag"; then
       echo "Pushed $push_tag"
       return
     else
       echo "Push $push_tag attempt $i failed"
-      if (( $i == $max_try )); then
+      if (( i == max_try )); then
         echo "Failed to push $push_tag in $max_try attempts; giving up"
         exit 1
       else
         echo "retrying in $wait_seconds seconds"
-        sleep $wait_seconds
+        sleep "$wait_seconds"
       fi
     fi
     let "i++"
@@ -243,7 +244,7 @@ function push_all {
   echo "current docker-solr images on this machine:"
   docker images | grep docker-solr
 
-  for full_version in ${versions[@]}; do
+  for full_version in "${versions[@]}"; do
     for tag in ${tags_for_version[$full_version]}; do
       cmd="docker tag $TAG_LOCAL_BASE:$tag $TAG_PUSH_BASE:$tag"
       echo "tagging: $cmd"
@@ -256,19 +257,19 @@ function push_all {
 }
 
 function build_all {
-  for full_version in ${versions[@]}; do
-    build $full_version ${dir_for_version[$full_version]} ${tags_for_version[$full_version]}
+  for full_version in "${versions[@]}"; do
+    build "$full_version" "${dir_for_version[$full_version]}" "${tags_for_version[$full_version]}"
   done
   echo "all docker-solr images:"
   docker images | grep docker-solr
 }
 
 function build_latest {
-  build $latest ${dir_for_version[$latest]} ${tags_for_version[$latest]}
+  build "$latest" "${dir_for_version[$latest]}" "${tags_for_version[$latest]}"
 }
 
 function test_all {
-  for full_version in ${versions[@]}; do
+  for full_version in "${versions[@]}"; do
     test_simple "$TAG_LOCAL_BASE:$full_version"
   done
 }
@@ -283,7 +284,7 @@ get_versions
 if [[ $# -eq 0 ]] ; then
   args="build_all"
 else
-  args="$@"
+  args="$(join_by ' ' $@)"
 fi
 for arg in $args; do
   case $arg in
