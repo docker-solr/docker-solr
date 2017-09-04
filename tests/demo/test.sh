@@ -43,7 +43,7 @@ if ! egrep -q 'solr is running' <<<$status; then
   container_cleanup "$container_name"
   exit 1
 fi
-sleep 1
+sleep 5
 echo "Checking data"
 data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/demo/select?q=address_s%3ARound Rock')
 if ! egrep -q 'One Dell Way Round Rock, Texas 78682' <<<$data; then
