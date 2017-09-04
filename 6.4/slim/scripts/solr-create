@@ -7,26 +7,40 @@
 #      docker run -P -d solr solr-create -c mycore
 # To create a core from mounted config:
 #      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
-# To create a core in a mounted directory:
-#      mkdir mycores; chown 8983:8983 mycores
-#      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-create -c mycore
 
-set -e
-echo "Executing $0 $@"
+set -euo pipefail
+echo "Executing $0" "$@"
 
-if [[ "$VERBOSE" = "yes" ]]; then
+if [[ "${VERBOSE:-}" = "yes" ]]; then
     set -x
 fi
 
 . /opt/docker-solr/scripts/run-initdb
 
-sentinel=/opt/docker-solr/core_created
-if [ -f $sentinel ]; then
-    echo "skipping core creation"
+# solr uses "-c corename". Parse the arguments to determine the core name.
+CORE_NAME="$(
+  while (( $# > 0 )); do
+    if [[ "$1" == '-c' ]]; then
+      shift
+      echo "$1"
+    fi
+    shift
+  done
+)"
+if [[ -z "${CORE_NAME:-}" ]]; then
+  echo "could not determine core name"
+  exit 1
+fi
+
+# cores get created in SOLR_HOME
+CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$CORE_NAME"
+
+if [[ -d $CORE_DIR ]]; then
+    echo "$CORE_DIR exists; skipping core creation"
 else
     start-local-solr
 
-    echo "Creating core with: ${@:1}"
+    echo "Creating core with:" "${@:1}"
     /opt/solr/bin/solr create "${@:1}"
 
     # See https://github.com/docker-solr/docker-solr/issues/27
@@ -36,8 +50,13 @@ else
       exit 1
     fi
 
-    echo "Created core with: ${@:1}"
+    echo "Created core with:" "${@:1}"
     stop-local-solr
-    touch $sentinel
+
+    # check the core_dir exists; otherwise the detecting above will fail after stop/start
+    if [ ! -d "$CORE_DIR" ]; then
+        echo "Missing $CORE_DIR"
+        exit 1
+    fi
 fi
 exec solr -f
