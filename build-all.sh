@@ -103,96 +103,6 @@ EOM
   echo
 }
 
-function container_cleanup {
-  local container_name=$1
-  previous=$(docker ps --filter name="$container_name" --format '{{.ID}}' --no-trunc)
-  if [[ ! -z $previous ]]; then
-    echo "killing $container_name"
-    docker kill "$container_name" || true
-    sleep 2
-    echo "removing $container_name"
-    docker rm "$container_name" || true
-  fi
-}
-
-# A simple kick-the-tires test to verify that the images
-# run as containers, start Solr, and can load some data
-function test_simple {
-  local tag=$1
-  echo "Test $tag"
-  container_name='test_'$(echo "$tag" | tr ':/-' '_')
-  echo "Cleaning up left-over containers from previous runs"
-  container_cleanup "$container_name"
-  echo "Running $container_name"
-  docker run --name "$container_name" -d "$tag"
-  SLEEP_SECS=5
-  echo "Sleeping $SLEEP_SECS seconds..."
-  sleep $SLEEP_SECS
-  container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
-  echo "container $container_name status: $container_status"
-  if [[ $container_status == 'exited' ]]; then
-    docker logs "$container_name"
-    exit 1
-  fi
-  echo "Checking that the OS matches the tag '$tag'"
-  if echo "$tag" | grep -q -- -alpine; then
-    alpine_version=$(docker exec --user=solr "$container_name" cat /etc/alpine-release || true)
-    if [[ -z $alpine_version ]]; then
-      echo "Could not get alpine version from container $container_name"
-      container_cleanup "$container_name"
-      exit 1
-    fi
-    echo "Alpine $alpine_version"
-  else
-    debian_version=$(docker exec --user=solr "$container_name" cat /etc/debian_version || true)
-    if [[ -z $debian_version ]]; then
-      echo "Could not get debian version from container $container_name"
-      container_cleanup "$container_name"
-      exit 1
-    fi
-    echo "Debian $debian_version"
-  fi
-
-  # check that the version of Solr matches the tag
-  changelog_version=$(docker exec --user=solr "$container_name" bash -c "egrep '^==========* ' /opt/solr/CHANGES.txt | head -n 1 | tr -d '= '")
-  echo "Solr version $changelog_version"
-  if [[ $tag = "$TAG_LOCAL_BASE:latest" ]]; then
-    solr_version_from_tag=$latest
-  else
-    solr_version_from_tag=$(echo "$tag" | sed -e 's/^.*://' -e 's/-.*//')
-  fi
-  if [[ $changelog_version != $solr_version_from_tag ]]; then
-    echo "Solr version mismatch"
-    container_cleanup "$container_name"
-    exit 1
-  fi
-
-  SLEEP_SECS=10
-  echo "Sleeping $SLEEP_SECS seconds..."
-  sleep $SLEEP_SECS
-  echo "Checking Solr is running"
-  status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh)
-  if ! egrep -q 'solr is running' <<<$status; then
-    echo "Test test_simple $tag failed; solr did not start"
-    container_cleanup "$container_name"
-    exit 1
-  fi
-  echo "Creating core"
-  docker exec --user=solr "$container_name" bin/solr create_core -c gettingstarted
-  echo "Loading data"
-  docker exec --user=solr "$container_name" bin/post -c gettingstarted example/exampledocs/manufacturers.xml
-  sleep 1
-  echo "Checking data"
-  data=$(docker exec --user=solr "$container_name" wget -q -O - http://localhost:8983/solr/gettingstarted/select'?q=*:*')
-  if ! egrep -q 'Round Rock' <<<$data; then
-    echo "Test test_simple $tag failed; data did not load"
-    exit 1
-  fi
-  container_cleanup "$container_name"
-
-  echo "Test test_simple $tag succeeded"
-}
-
 function push {
   push_tag=$1
   # pushing to the docker registry sometimes fails, so retry
@@ -270,12 +180,8 @@ function build_latest {
 
 function test_all {
   for full_version in "${versions[@]}"; do
-    test_simple "$TAG_LOCAL_BASE:$full_version"
+    ./tests/test.sh "$TAG_LOCAL_BASE:$full_version"
   done
-}
-
-function test_latest {
-  test_simple "$TAG_LOCAL_BASE:latest"
 }
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -299,9 +205,6 @@ for arg in $args; do
       ;;
     build_latest)
       build_latest
-      ;;
-    test_latest)
-      test_latest
       ;;
     push_all)
       push_all
