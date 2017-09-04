@@ -9,7 +9,7 @@
 #      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
 
 set -euo pipefail
-echo "Executing $0 $@"
+echo "Executing $0" "$@"
 
 if [[ "${VERBOSE:-}" = "yes" ]]; then
     set -x
@@ -40,7 +40,7 @@ if [[ -d $CORE_DIR ]]; then
 else
     start-local-solr
 
-    echo "Creating core with: ${@:1}"
+    echo "Creating core with:" "${@:1}"
     /opt/solr/bin/solr create "${@:1}"
 
     # See https://github.com/docker-solr/docker-solr/issues/27
@@ -50,7 +50,7 @@ else
       exit 1
     fi
 
-    echo "Created core with: ${@:1}"
+    echo "Created core with:" "${@:1}"
     stop-local-solr
 
     # check the core_dir exists; otherwise the detecting above will fail after stop/start
