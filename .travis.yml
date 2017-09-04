@@ -9,6 +9,7 @@ before_install:
 - docker info
 - docker pull openjdk:8-jre
 - docker pull openjdk:8-jre-alpine
+- docker pull openjdk:8-jre-slim
 
 script:
 - bash build-all.sh versions build_all test_all push_all
