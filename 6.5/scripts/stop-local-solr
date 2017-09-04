@@ -9,6 +9,3 @@ fi
 
 echo "Shutting down the background Solr"
 solr stop
-
-echo "Restoring Solr configuration"
-mv /opt/solr/bin/solr.in.sh.orig /opt/solr/bin/solr.in.sh
