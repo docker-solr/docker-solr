@@ -1,0 +1,25 @@
+#!/bin/bash
+# configure Solr to run on the local interface, and start it running in the background
+
+set -e
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+echo "Configuring Solr to bind to 127.0.0.1"
+cp /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig
+echo "SOLR_OPTS=-Djetty.host=127.0.0.1" >> /opt/solr/bin/solr.in.sh
+
+echo "Running solr in the background. Logs are in /opt/solr/server/logs"
+solr start
+max_try=${MAX_TRY:-12}
+wait_seconds=${WAIT_SECONDS:-5}
+if ! /opt/docker-solr/scripts/wait-for-solr.sh "$max_try" "$wait_seconds"; then
+    echo "Could not start Solr."
+    if [ -f /opt/solr/server/logs/solr.log ]; then
+        echo "Here is the log:"
+        cat /opt/solr/server/logs/solr.log
+    fi
+    exit 1
+fi

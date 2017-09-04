@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# This script starts Solr on localhost, creates a core with "solr create",
+# stops Solr, and then starts Solr as normal.
+# Any arguments are passed to the "solr create".
+# To simply create a core:
+#      docker run -P -d solr solr-create -c mycore
+# To create a core from mounted config:
+#      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
+# To create a core in a mounted directory:
+#      mkdir mycores; chown 8983:8983 mycores
+#      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-create -c mycore
+
+set -e
+echo "Executing $0 $@"
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+. /opt/docker-solr/scripts/run-initdb
+
+sentinel=/opt/docker-solr/core_created
+if [ -f $sentinel ]; then
+    echo "skipping core creation"
+else
+    start-local-solr
+
+    echo "Creating core with: ${@:1}"
+    /opt/solr/bin/solr create "${@:1}"
+
+    # See https://github.com/docker-solr/docker-solr/issues/27
+    echo "Checking core"
+    if ! wget -O - 'http://localhost:8983/solr/admin/cores?action=STATUS' | grep -q instanceDir; then
+      echo "Could not find any cores"
+      exit 1
+    fi
+
+    echo "Created core with: ${@:1}"
+    stop-local-solr
+    touch $sentinel
+fi
+exec solr -f

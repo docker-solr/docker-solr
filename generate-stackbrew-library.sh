@@ -1,51 +1,111 @@
 #!/bin/bash
-set -e
+#
+# Based on https://github.com/docker-library/httpd/blob/master/generate-stackbrew-library.sh
+set -eu
 
-declare -A aliases
-aliases=(
-        [6.6]='6 latest'
-        [5.5]='5'
+declare -A aliases=(
+    [6.6]='6 latest'
+    [5.5]='5'
 )
 
+self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-versions=( */ )
-versions=( "${versions[@]%/}" )
-url='git://github.com/docker-solr/docker-solr'
+extglob_old=$(shopt -p extglob||true)
+shopt -s extglob
 
-echo '# maintainer: Martijn Koster <mak-github@greenhills.co.uk> (@makuk66)'
-echo '# maintainer: Shalin Mangar <shalin@apache.org> (@shalinmangar)'
+versions=( +([0-9])\.+([0-9])/ )
+eval "$extglob_old"
+
+versions=( "${versions[@]%/}" )
+
+# sort version numbers with highest first
+IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -rV) ); unset IFS
+
+# get the most recent commit which modified any of "$@"
+fileCommit() {
+	git log -1 --format='format:%H' HEAD -- "$@"
+}
+
+# get the most recent commit which modified "$1/Dockerfile" or any file COPY'd from "$1/Dockerfile"
+dirCommit() {
+	local dir="$1"; shift
+	(
+		cd "$dir"
+		fileCommit \
+			Dockerfile \
+			$(git show HEAD:./Dockerfile | awk '
+				toupper($1) == "COPY" {
+					for (i = 2; i < NF; i++) {
+						print $i
+					}
+				}
+			')
+	)
+}
+
+getArches() {
+	local repo="$1"; shift
+	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
+
+	eval "declare -g -A parentRepoToArches=( $(
+		find -name 'Dockerfile' -exec awk '
+				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|microsoft\/[^:]+)(:|$)/ {
+					print "'"$officialImagesUrl"'" $2
+				}
+			' '{}' + \
+			| sort -u \
+			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
+	) )"
+}
+getArches 'solr'
+
+cat <<-EOH
+# this file is generated via https://github.com/docker-library/solr/blob/$(fileCommit "$self")/$self
+
+Maintainers: Martijn Koster <mak-github@greenhills.co.uk> (@makuk66),
+             Shalin Mangar <shalin@apache.org> (@shalinmangar)
+GitRepo: https://github.com/docker-solr/docker-solr.git
+EOH
+
+# prints "$2$1$3$1...$N"
+join() {
+	local sep="$1"; shift
+	local out; printf -v out "${sep//%/%%}%s" "$@"
+	echo "${out#$sep}"
+}
 
 for version in "${versions[@]}"; do
-        if [ ! -f "$version/Dockerfile" ]; then
-          continue
-        fi
+	for variant in '' alpine slim; do
+		dir="$version${variant:+/$variant}"
+		[ -f "$dir/Dockerfile" ] || continue
 
-	commit="$(git log -1 --format='format:%H' -- "$version")"
-	fullVersion="$(grep -m1 'ENV SOLR_VERSION' "$version/Dockerfile" | cut -d' ' -f3)"
-	
-	versionAliases=()
-	while [ "$fullVersion" != "$version" -a "${fullVersion%[.-]*}" != "$fullVersion" ]; do
-		versionAliases+=( $fullVersion )
-		fullVersion="${fullVersion%[.-]*}"
-	done
-	versionAliases+=( $version ${aliases[$version]} )
-	
-	echo
-	for va in "${versionAliases[@]}"; do
-		echo "$va: ${url}@${commit} $version"
-	done
+		commit="$(dirCommit "$dir")"
 
-	for variant in alpine; do
-		commit="$(git log -1 --format='format:%H' -- "$version/$variant")"
+		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "SOLR_VERSION" { print $3; exit }')"
+
+		versionAliases=(
+			$fullVersion
+			$version
+			${aliases[$version]:-}
+		)
+
+		if [ -z "$variant" ]; then
+			variantAliases=( "${versionAliases[@]}" )
+		else
+			variantAliases=( "${versionAliases[@]/%/-$variant}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
+		fi
+
+		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+		variantArches="${parentRepoToArches[$variantParent]}"
+
 		echo
-		for va in "${versionAliases[@]}"; do
-			if [ "$va" = 'latest' ]; then
-				va="$variant"
-			else
-				va="$va-$variant"
-			fi
-			echo "$va: ${url}@${commit} $version/$variant"
-		done
+		cat <<-EOE
+			Tags: $(join ', ' "${variantAliases[@]}")
+			Architectures: $(join ', ' $variantArches)
+			GitCommit: $commit
+			Directory: $dir
+		EOE
 	done
 done
