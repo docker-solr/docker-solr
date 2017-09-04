@@ -17,9 +17,11 @@ RUN apk add --no-cache ca-certificates wget && \
 
 ENV SOLR_USER solr
 ENV SOLR_UID 8983
+ENV SOLR_GROUP solr
+ENV SOLR_GID 8983
 
-RUN addgroup -S -g $SOLR_UID $SOLR_USER && \
-  adduser -S -u $SOLR_UID -G $SOLR_USER -g $SOLR_USER $SOLR_USER
+RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 ENV SOLR_VERSION 6.5.1
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
@@ -57,11 +59,11 @@ RUN mkdir -p /opt/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_USER /opt/solr && \
+  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr && \
   mkdir /docker-entrypoint-initdb.d /opt/docker-solr/
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_USER /opt/docker-solr
+RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
 
