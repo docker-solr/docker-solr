@@ -11,8 +11,7 @@ if [[ "$VERBOSE" = "yes" ]]; then
 fi
 
 function usage {
-  echo $@
-  echo "$0 [ max_try [ wait_seconds ] ]"
+  echo "Usage: $0 [ max_try [ wait_seconds ] ]"
   exit 1
 }
 
@@ -31,7 +30,7 @@ fi
 let i=1
 until wget -q -O - http://localhost:8983 | grep -q -i solr; do
   echo "solr is not running yet"
-  if (( $i == $max_try )); then
+  if (( i == max_try )); then
     echo "solr is still not running; giving up"
     exit 1
   fi
