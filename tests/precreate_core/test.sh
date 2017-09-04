@@ -43,6 +43,7 @@ if ! egrep -q 'solr is running' <<<$status; then
   container_cleanup "$container_name"
   exit 1
 fi
+sleep 5
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c gettingstarted example/exampledocs/manufacturers.xml
 sleep 1
