@@ -180,6 +180,10 @@ function build_latest {
 
 function test_all {
   for full_version in "${versions[@]}"; do
+    if [[ "${TRAVIS:-}" = "true" ]] && egrep -q -- '-slim' <<<$full_version; then
+      echo "skipping $full_version on travis"
+      continue
+    fi
     ./tests/test.sh "$TAG_LOCAL_BASE:$full_version"
   done
 }
