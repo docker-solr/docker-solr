@@ -7,9 +7,66 @@ services:
 
 before_install:
 - docker info
-- docker pull openjdk:8-jre
-- docker pull openjdk:8-jre-alpine
-- docker pull openjdk:8-jre-slim
 
-script:
-- bash build-all.sh versions build_all test_all push_all
+jobs:
+  include:
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.6/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.6/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.6
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.5/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.5/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.5
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.4/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.4/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.4
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.3/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.3/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 6.3
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 5.5/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 5.5/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=
+      script: tools/build_test_push.sh 5.5

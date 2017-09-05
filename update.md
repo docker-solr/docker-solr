@@ -10,7 +10,7 @@ To do that, you need a Linux host that runs Docker, and has `git`, `wget` and `g
 
 First, get the repository:
 
-```
+```bash
 git clone git@github.com:docker-solr/docker-solr.git
 
 cd docker-solr
@@ -18,58 +18,50 @@ cd docker-solr
 
 If you're in Europe, you can override the download file locations for much faster downloads:
 
-```
+```bash
 export SOLR_DOWNLOAD_SERVER="http://www-eu.apache.org/dist/lucene/solr"
 export archiveUrl="https://www-eu.apache.org/dist/lucene/solr"
 ```
 
 Run the script that creates a directory for the new version, downloads solr to checksum, and creates a Dockerfile:
 
-```
-bash update.sh [0-9]\.[0-9]
+```bash
+tools/update.sh
 git status
 ```
 
 ## Test the new Dockerfile
 
-To test the Dockerfile locally I configure my environment to point to a Docker host, and run a script:
+To test the Dockerfile locally:
 
-```
-export DOCKER_HOST=tcp://cylon.lan:2375
-
-./build-all.sh
+```bash
+tools/build_all.sh
 ```
 
 Keep an eye out for "This key is not certified with a trusted signature!"; it would be good to verify the fingerprints with ones you have in your PGP keyring.
 
-This will have created the images:
+To run simple automated tests against the images:
 
-```
-docker images | grep docker-solr
-```
-
-To run simple automated tests against those images:
-
-```
-./build-all.sh test_all
+```bash
+tools/test_all.sh
 ```
 
 To manually test a container:
 
-```
-docker run --name solr-test -d -P docker-solr/docker-solr:latest solr-demo
+```bash
+docker container run --name solr-test -d -p 98983:8983 docker-solr/docker-solr:latest solr-demo
 ```
 
 Check the logs for startup messages:
 
-```
-docker logs solr-test
+```bash
+docker container logs solr-test
 ```
 
 Get the URL of the Solr running on it:
 
-```
-echo "http://$(echo $DOCKER_HOST | sed -e 's,tcp://,,' -e 's,:.*,,'):$(docker port solr-test 8983/tcp| sed 's/^.*://')/"
+```bash
+echo "http://localhost:$(docker port solr-test 8983/tcp| sed 's/^.*://')/"
 ```
 
 and check that URL in your browser, paying particular attention to the `solr-impl` in the administration interface, which lists the Solr version.
@@ -77,28 +69,30 @@ Check for errors under "Logging".
 
 If that looks in order, then clean up the container:
 
-```
-docker kill solr-test
-docker rm solr-test
+```bash
+docker container kill solr-test
+docker container rm solr-test
 ```
 
 and remove our local images:
 
-```
-docker images | grep docker-solr/docker-solr | awk '{print $1 ":" $2}' | xargs -n 1 docker rmi
+```bash
+docker image list docker-solr/docker-solr | awk '{print $1":"$2}' | xargs -n 1 docker image rm
 ```
 
 ## Update the generate-stackbrew-library.sh
 
 Next we'll modify our `generate-stackbrew-library.sh` script to include the version.
 
-```
+```bash
 vi generate-stackbrew-library.sh
 ```
+
 and make the aliases section look like for example:
-```
+
+```bash
 aliases=(
-        [5.4]='5 latest'
+        [6.6]='6 latest'
 )
 ```
 
@@ -108,31 +102,32 @@ Now we can commit the changes to our repository.
 
 First identify myself:
 
-```
+```bash
 git config --global user.email "mak-github@greenhills.co.uk"
 git config --global user.name "Martijn Koster"
 git config --global push.default simple
-```	
+```
 
 Check in the changes:
 
-```
+```bash
 git status
-git add 5.4/Dockerfile generate-stackbrew-library.sh
-# add whatever else needs adding
-git commit -m "Add Solr 5.4.0" 
+git add 6.6
+git add -A
+git commit -m "Add Solr 6.6.0"
 git push
 git rev-parse HEAD
 ```
 
 Make note of that git SHA.
 
-Now that this has been comitted, we can run the `generate-stackbrew-library.sh`, and save the output:
+Now that this has been committed, we can run the `generate-stackbrew-library.sh`, and save the output:
 
-```
-bash generate-stackbrew-library.sh | tee ../new-versions
+```bash
+./generate-stackbrew-library.sh | tee ../new-versions
 ```
 
+This requires https://github.com/docker-library/official-images/tree/master/bashbrew to be installed.
 
 ## Update our README
 
@@ -151,16 +146,16 @@ The versions should be such that the 'latest' tag points to the latest version, 
 to the latest 5.4, in this case 5.4.0, and the `5` tag points to the latest 5, in thise case also 5.4.0.
 For example:
 
-```
+```bash
 -       [`5.4.0`, `5.4`, `5`, `latest` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/3e61ef877ca9d04e7f005cd40ba726abd1f74259/5.4/Dockerfile)
--	[`5.3.1`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/80ee84f565414c4f1218d39417049049d9f2c0d1/5.3/Dockerfile)
+-       [`5.3.1`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/80ee84f565414c4f1218d39417049049d9f2c0d1/5.3/Dockerfile)
 ```
 
 Remove any versions that are end-of-life.
 
 Then commit and push that change:
 
-```
+```bash
 git commit -m "Update Solr to 5.4.0" README.md
 git push
 ```
@@ -180,7 +175,7 @@ and submitting a Pull Request. We can just make the change on the master branch 
 
 First we'll sync our fork:
 
-```
+```bash
 cd
 git clone git@github.com:docker-solr/official-images
 cd official-images/
@@ -192,14 +187,14 @@ git push
 
 We'll use the output provided by `generate-stackbrew-library.sh` earlier:
 
-```
+```bash
 cat ../new-versions > library/solr 
 git diff
 ```
 
 If that all looks plausible, push to master on our fork:
 
-```
+```bash
 git commit -m "Update Solr to 5.4.0" library/solr
 git push
 ```

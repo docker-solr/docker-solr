@@ -3,38 +3,56 @@
 # Usage: bash update.sh x.y.z
 #
 # This script creates Dockerfiles for Solr versions.
-# If you specify a partial version, like '5' or '5.3', it will determine the most recent sub version like 5.3.0.
+# If you specify a partial version, like '5.3', it will determine the most recent sub version like 5.3.0.
 # We record a checksum in the Dockerfile, for verification at docker build time.
 # We verify the content's GPG signature here.
+# We also write a TAGS file with the docker tags for the image.
 set -e
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 
-TOP=$PWD
+TOP_DIR=$PWD
 OWNERTRUSTFILE="ownertrust.txt"
 KEYSERVERS=(hkp://keyserver.ubuntu.com:80
       ha.pool.sks-keyservers.net
       pgp.mit.edu)
 
-versions=( "$@" )
-if [ ${#versions[@]} -eq 0 ]; then
-    echo "Usage: bash update.sh [version ...]"
-    exit 1
+if (( $# == 0 )); then
+  x_y_dirs=($(find . -maxdepth 1 -print | sed 's,^\./,,' | \
+            grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort))
+  set -- "${x_y_dirs[@]}"
 fi
+
+versions=( "$@" )
 versions=( "${versions[@]%/}" )
 
 function write_files {
     local full_version=$1
     local variant=$2
 
-    # get the right template and target dir for this version and variant
     short_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
+
+    # get the right template and target dir for this version and variant
     if [[ -z $variant ]]; then
+        dash_variant=""
         target_dir="$short_version"
         template=Dockerfile.template
     else
+        dash_variant="-$variant"
         target_dir="$short_version/$variant"
         template=Dockerfile-$variant.template
+    fi
+
+    extra_tags="$short_version$dash_variant"
+
+    for v in $latest_major_versions; do
+        if [[ $v == "$full_version" ]]; then
+            major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).*/\1/')
+            extra_tags="$extra_tags $major_version$dash_variant"
+        fi
+    done
+    if [[ $full_version == "$latest_version" ]]; then
+        extra_tags="$extra_tags latest$dash_variant"
     fi
 
     echo "generating $target_dir"
@@ -45,6 +63,11 @@ function write_files {
       -e 's/^(ENV SOLR_KEYS) .*/\1 '"$KEYS"'/' \
       > "$target_dir/Dockerfile"
     cp -r scripts "$target_dir"
+
+    # The TAGS file will list build_dir:full_version:tags
+    # Other scripts in ./tools/ will parse the TAGS file.
+    # This is only for local/Travis use; the official library does not use the TAGS file.
+    echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<$extra_tags | sed 's/ $//')" >> "$TOP_DIR/TAGS"
 }
 
 function load_keys {
@@ -157,7 +180,7 @@ function verify_signature {
           if 5>gpg-import.status gpg --keyserver "$keyserver" --keyserver-options verbose,timeout=10 --recv-key "$missing_key"; then
             fingerprint=$(gpg --fingerprint -k "$missing_key" |grep fingerprint|sed -e 's/^.* = //' -e 's/ //g')
             owner=$(gpg --with-colons -k "$fingerprint" |egrep '^pub'| cut -d : -f 10)
-            echo "$fingerprint:$owner" >> "$TOP/known_keys.txt"
+            echo "$fingerprint:$owner" >> "$TOP_DIR/known_keys.txt"
             break
           else
             if egrep '\[GNUPG:\] NO_DATA' gpg-import.status; then
@@ -173,7 +196,7 @@ function verify_signature {
           exit 1
         fi
       done
-      git diff "$TOP/known_keys.txt"
+      git diff "$TOP_DIR/known_keys.txt"
       echo "verify that those keys are valid:"
       echo "- see https://httpd.apache.org/dev/verification.html"
       echo "- check your own keyring: gpg --list-sigs --list-options show-uid-validity --fingerprint xxx"
@@ -181,7 +204,7 @@ function verify_signature {
       echo "- KEYS files are available below https://dist.apache.org/repos/dist/release/lucene/solr/"
       echo "Once confirmed: git commit -m 'Added new key' known_keys.txt"
       echo "Then re-run update.sh"
-      echo "If not confirmed: GNUPGHOME='$GNUPGHOME' gpg --delete-key '$missing_key'; git checkout $TOP/known_keys.txt"
+      echo "If not confirmed: GNUPGHOME='$GNUPGHOME' gpg --delete-key '$missing_key'; git checkout $TOP_DIR/known_keys.txt"
     else
       # failed for another reason, like BADSIG
       cat gpg.status
@@ -200,7 +223,22 @@ DOWNLOADS=downloads
 upstream_versions='upstream-versions'
 curl -sSL "$archiveUrl" | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
+# To ignore a specific version, for when it's not on the mirrors yet, or bad
+#sed -i '/6.6.1/d' "$upstream_versions"
+
 mkdir -p "$DOWNLOADS"
+
+latest_major_versions=$(tac<"$upstream_versions" |sed -E 's/^((([0-9]+)\.[0-9]+)\.[0-9]+)$/\1 \3/'|uniq -f 1|cut -d ' ' -f 1)
+latest_version=$(sed 's/ .*//' <<<$latest_major_versions)
+latest_x_y=$(sed -E 's/(([0-9])+\.([0-9])+).*$/\1/' <<<$latest_version)
+if [[ ! -d "$latest_x_y" ]]; then
+  echo "The latest version of Solr is $latest_version but we have no $latest_x_y directory; creating"
+  echo
+  mkdir "$latest_x_y"
+  versions+=("$latest_x_y")
+fi
+
+:>TAGS
 for version in "${versions[@]}"; do
     full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
     if [[ -z $full_version ]]; then
@@ -222,14 +260,7 @@ for version in "${versions[@]}"; do
     # We will record a stronger SHA256, for write_files
     SHA256=$(sha256sum "solr-$full_version.tgz" | awk '{print $1}')
 
-    if [ -z "$KEEP_ALL_ARTIFACTS" ]; then
-        rm "solr-$full_version.tgz.asc" "solr-$full_version.tgz.sha1" "solr-$full_version.tgz.md5"
-        if [ -z "$KEEP_SOLR_ARTIFACT" ]; then
-            rm "solr-$full_version.tgz"
-        fi
-    fi
-
-    cd "$TOP"
+    cd "$TOP_DIR"
 
     write_files "$full_version"
     write_files "$full_version" 'alpine'
@@ -239,3 +270,5 @@ done
 
 if [ -f "$OWNERTRUSTFILE" ]; then rm "$OWNERTRUSTFILE"; fi
 if [ -f "$upstream_versions" ]; then rm "$upstream_versions"; fi
+
+tools/write_travis.sh > .travis.yml
