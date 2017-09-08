@@ -1,13 +1,12 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`6.6.0`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/c61a0c9b012c7313c2b5d0d97ddc06693270b734/6.6/Dockerfile)
-git://github.com/docker-solr/docker-solr@c61a0c9b012c7313c2b5d0d97ddc06693270b734
--	[`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f02cef1654e7c5cdd46411b6dbe351e7fcb6422c/6.5/Dockerfile)
--	[`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f02cef1654e7c5cdd46411b6dbe351e7fcb6422c/6.4/Dockerfile)
--	[`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f02cef1654e7c5cdd46411b6dbe351e7fcb6422c/6.3/Dockerfile)
--	[`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f02cef1654e7c5cdd46411b6dbe351e7fcb6422c/5.5/Dockerfile)
+-	[`6.6.1`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.6/Dockerfile)
+-	[`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.5/Dockerfile)
+-	[`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.4/Dockerfile)
+-	[`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.3/Dockerfile)
+-	[`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/5.5/Dockerfile)
 
-For each of these there are variants based on the Alpine image, .e.g `6.4-alpine`.
+For each of these there are variants based on the `openjdk:8-jre-alpine` and `openjdk:8-jre-slim` images, .e.g `6.4-alpine`.
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 
