@@ -42,10 +42,10 @@ function push {
   # It should really have been "docker-solr" for consistency with the organisation
   # on github but currently dashes are not allowed, see https://github.com/docker/hub-feedback/issues/373
   # The hub user is "dockersolrbuilder".
-  if ! egrep -q '^docker-solr/docker-solr' <<<$tag; then
+  if ! egrep -q '^docker-solr/docker-solr:' <<<$tag; then
    tag="docker-solr/docker-solr:$tag"
   fi
-  push_tag=$(sed 's,^docker-solr/,dockersolr,' <<<$tag)
+  push_tag=$(sed 's,^docker-solr/,dockersolr/,' <<<$tag)
   # pushing to the docker registry sometimes fails, so retry
   local max_try=3
   local wait_seconds=15
