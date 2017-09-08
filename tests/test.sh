@@ -18,6 +18,7 @@ if ! grep -q : <<<$tag; then
   tag="$IMAGE_NAME:$tag"
 fi
 
+echo "Running all tests for $tag"
 find . -mindepth 1 -maxdepth 1 -type d > tests_to_run
 while read  -r d; do
   if [ -f "$d/test.sh" ]; then
@@ -28,3 +29,4 @@ while read  -r d; do
   fi
 done < tests_to_run
 rm tests_to_run
+echo "Completed all tests for $tag"
