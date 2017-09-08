@@ -12,7 +12,7 @@ as expected. If you already have the artifacts, this takes 10 minutes.
 
 ```
 git pull
-./update.sh
+tools/update.sh
 git diff
 tools/build_all.sh
 tools/test_all.sh
