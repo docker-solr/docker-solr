@@ -55,5 +55,5 @@ function wait_for_server_started {
     sleep $SLEEP_SECS
   done
   echo "server started"
-  sleep 2
+  sleep 4
 }
