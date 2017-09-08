@@ -25,6 +25,6 @@ for d in $build_dirs; do
   echo '    - stage: build, test, deploy'
   # set the PROCESS variable just so that its value show up in the Travis UI
   echo '      env:'
-  echo "      - PROCESS=$()"
+  echo "      - PROCESS=$d"
   echo "      script: tools/build_test_push.sh $d"
 done

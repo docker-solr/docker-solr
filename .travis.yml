@@ -12,61 +12,61 @@ jobs:
   include:
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.6/slim
       script: tools/build_test_push.sh 6.6/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.6/alpine
       script: tools/build_test_push.sh 6.6/alpine
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.6
       script: tools/build_test_push.sh 6.6
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.5/slim
       script: tools/build_test_push.sh 6.5/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.5/alpine
       script: tools/build_test_push.sh 6.5/alpine
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.5
       script: tools/build_test_push.sh 6.5
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.4/slim
       script: tools/build_test_push.sh 6.4/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.4/alpine
       script: tools/build_test_push.sh 6.4/alpine
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.4
       script: tools/build_test_push.sh 6.4
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.3/slim
       script: tools/build_test_push.sh 6.3/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.3/alpine
       script: tools/build_test_push.sh 6.3/alpine
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=6.3
       script: tools/build_test_push.sh 6.3
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=5.5/slim
       script: tools/build_test_push.sh 5.5/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=5.5/alpine
       script: tools/build_test_push.sh 5.5/alpine
     - stage: build, test, deploy
       env:
-      - PROCESS=
+      - PROCESS=5.5
       script: tools/build_test_push.sh 5.5
