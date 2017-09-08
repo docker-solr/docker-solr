@@ -49,7 +49,7 @@ function wait_for_container_and_solr {
 function wait_for_server_started {
   local container_name=$1
   echo "waiting for server start"
-  while ! (docker logs "$container_name" | grep -q 'o.e.j.s.Server Started'); do
+  while ! (docker logs "$container_name" | egrep -q '(o.e.j.s.Server Started|Started SocketConnector)'); do
     SLEEP_SECS=2
     echo "sleeping $SLEEP_SECS seconds..."
     sleep $SLEEP_SECS
