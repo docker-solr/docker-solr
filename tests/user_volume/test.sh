@@ -29,8 +29,8 @@ docker run \
   -v "$PWD/myconf:/myconf" \
   --user "$(id -u):$(id -g)" \
   --rm "$tag" bash -c 'cp -r /opt/solr/server/solr/configsets/data_driven_schema_configs/conf/* /myconf/'
-find myconf
-if [ ! f myconf/solrconfig.xml ]; then
+
+if [ ! -f myconf/solrconfig.xml ]; then
   find myconf
   echo "ERROR: no solrconfig.xml"
   exit 1
@@ -53,27 +53,8 @@ docker run \
   --name "$container_name" \
   -d "$tag"
 
-SLEEP_SECS=5
-echo "Sleeping $SLEEP_SECS seconds..."
-sleep $SLEEP_SECS
-container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
-echo "container $container_name status: $container_status"
-if [[ $container_status == 'exited' ]]; then
-  docker logs "$container_name"
-  exit 1
-fi
+wait_for_server_started "$container_name"
 
-SLEEP_SECS=10
-echo "Sleeping $SLEEP_SECS seconds..."
-sleep $SLEEP_SECS
-echo "Checking Solr is running"
-status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh)
-if ! egrep -q 'solr is running' <<<$status; then
-  echo "Test test_simple $tag failed; solr did not start"
-  container_cleanup "$container_name"
-  exit 1
-fi
-sleep 5
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c mycore example/exampledocs/manufacturers.xml
 sleep 1

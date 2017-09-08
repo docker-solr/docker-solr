@@ -20,9 +20,9 @@ else
   /opt/solr/bin/solr create -c "$CORE"
   echo "Created $CORE"
   echo "Loading example data"
-  /opt/solr/bin/post -c $CORE example/exampledocs/*.xml
-  /opt/solr/bin/post -c $CORE example/exampledocs/books.json
-  /opt/solr/bin/post -c $CORE example/exampledocs/books.csv
+  /opt/solr/bin/post -c $CORE -commit no example/exampledocs/*.xml
+  /opt/solr/bin/post -c $CORE -commit no example/exampledocs/books.json
+  /opt/solr/bin/post -c $CORE -commit yes example/exampledocs/books.csv
   echo "Loaded example data"
   stop-local-solr
 

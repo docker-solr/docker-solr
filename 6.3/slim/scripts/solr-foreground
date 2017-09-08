@@ -9,4 +9,6 @@ fi
 
 . /opt/docker-solr/scripts/run-initdb
 
+echo "Starting Solr $SOLR_VERSION"
+
 exec solr -f "$@"

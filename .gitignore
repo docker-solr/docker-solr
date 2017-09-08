@@ -1,4 +1,5 @@
 downloads
 .gnupg
+upstream_versions
+tests/tests_to_run
 mycores
-build.sh
