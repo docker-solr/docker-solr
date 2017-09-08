@@ -52,6 +52,7 @@ function push {
   let i=1
   while true; do
 
+    echo "Tagging $tag $push_tag"
     docker tag "$tag" "$push_tag"
 
     echo "Pushing $push_tag (attempt $i)"
