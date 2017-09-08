@@ -23,4 +23,4 @@ docker pull "$parent" >/dev/null 2>&1
 full_version=$(awk --field-separator ':' '$1 == "'"$build_dir"'" {print $2}' "$TOP_DIR/TAGS")
 ./tests/test.sh "$full_version"
 tags=($(awk --field-separator ':' '$1 == "'"$build_dir"'" {print $3}' "$TOP_DIR/TAGS"))
-/tools/push.sh "$full_version" "${tags[@]}"
+./tools/push.sh "$full_version" "${tags[@]}"
