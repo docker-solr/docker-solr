@@ -11,9 +11,9 @@
 #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precreate mycore
 set -e
 
-echo "Executing $0 $@"
+echo "Executing $0" "$@"
 
-if [[ "$VERBOSE" = "yes" ]]; then
+if [[ "${VERBOSE:-}" = "yes" ]]; then
     set -x
 fi
 
@@ -29,7 +29,7 @@ else
 fi
 coredir="$coresdir/$CORE"
 if [[ ! -d $coredir ]]; then
-    cp -r $CONFIG_SOURCE/ $coredir
+    cp -r "$CONFIG_SOURCE/" "$coredir"
     touch "$coredir/core.properties"
     echo created "$CORE"
 else

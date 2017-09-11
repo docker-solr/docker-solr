@@ -17,9 +17,11 @@ RUN apk add --no-cache ca-certificates wget && \
 
 ENV SOLR_USER solr
 ENV SOLR_UID 8983
+ENV SOLR_GROUP solr
+ENV SOLR_GID 8983
 
-RUN addgroup -S -g $SOLR_UID $SOLR_USER && \
-  adduser -S -u $SOLR_UID -G $SOLR_USER -g $SOLR_USER $SOLR_USER
+RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 ENV SOLR_VERSION 5.5.4
 ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
@@ -50,15 +52,16 @@ RUN mkdir -p /opt/solr && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/docker-solr /docker-entrypoint-initdb.d && \
+  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /opt/docker-solr /docker-entrypoint-initdb.d && \
+  sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
+  sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:0 /opt/solr /opt/docker-solr /docker-entrypoint-initdb.d && \
-  chmod -R g=u /opt/solr /opt/docker-solr /docker-entrypoint-initdb.d && \
+  chown -R $SOLR_USER:0 /opt/solr && \
   chmod g=u /etc/passwd
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:0 /opt/docker-solr/scripts && \
+RUN chown -R $SOLR_USER:0 /opt/docker-solr \
   chmod -R g=u /opt/docker-solr/scripts
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH

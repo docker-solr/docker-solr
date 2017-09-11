@@ -2,40 +2,91 @@
 #
 # A helper script to wait for solr
 #
-# Usage: wait-for-solr.sh [ max_try [ wait_seconds ] ]
+# Usage: wait-for-solr.sh [--max-attempts count] [--wait-seconds seconds] [--solr-url url]
+# Deprecated usage: wait-for-solr.sh [ max_attempts [ wait_seconds ] ]
 
-set -e
+set -euo pipefail
 
-if [[ "$VERBOSE" = "yes" ]]; then
+SCRIPT="$0"
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
     set -x
 fi
 
 function usage {
-  echo $@
-  echo "$0 [ max_try [ wait_seconds ] ]"
+  echo "$1"
+  echo "Usage: $SCRIPT [--max-attempts count] [--wait-seconds seconds ] [--solr-url url]"
   exit 1
 }
 
-max_try=$1
-if [[ -z $max_try ]]; then
-  max_try=12
-else
-  grep -q -E '^[0-9]+$' <<<$max_try || usage "$max_try is not a number"
+max_attempts=12
+wait_seconds=5
+solr_url=http://localhost:8983
+
+while (( $# > 0 )); do
+  case "$1" in
+   --help)
+     cat <<EOM
+Usage: $SCRIPT [options]
+
+Options:
+  --max-attempts count: number of attempts to check Solr is up. Default: $max_attempts
+  --wait-seconds seconds: number of seconds to wait between attempts. Default: $wait_seconds
+  --solr-url url: URL for Solr server to check. Default: $solr_url
+EOM
+     exit 0
+     ;;
+   --solr-url)
+     solr_url="$2";
+     shift 2
+     ;;
+
+   --max-attempts)
+     max_attempts="$2";
+     shift 2;
+     ;;
+
+   --wait-seconds)
+     wait_seconds="$2";
+     shift 2;
+     ;;
+
+  * )
+    # deprecated invocation, kept for backwards compatibility
+    max_attempts=$1;
+    wait_seconds=$2;
+    echo "WARNING: deprecated invocation. Use $SCRIPT [--max-attempts count] [--wait-seconds seconds]"
+    shift 2;
+    break;
+    ;;
+
+  esac
+done
+
+grep -q -E '^[0-9]+$' <<<$max_attempts || usage "--max-attempts $max_attempts: not a number"
+if (( max_attempts == 0 )); then
+  echo "--max-attempts should be >0"
+  exit 1
 fi
-wait_seconds=$2
-if [[ -z $wait_seconds ]]; then
-  wait_seconds=5
-else
-  grep -q -E '^[0-9]+$' <<<$wait_seconds || usage "$wait_seconds is not a number"
-fi
-let i=1
-until wget -q -O - http://localhost:8983 | grep -q -i solr; do
-  echo "solr is not running yet"
-  if (( $i == $max_try )); then
+grep -q -E '^[0-9]+$' <<<$wait_seconds || usage "--wait-seconds $wait_seconds: not a number"
+grep -q -E '^https?://' <<<$solr_url || usage "--solr-url $solr_url: not a URL"
+
+let attempts_left=$max_attempts
+while ( (( attempts_left > 0 )) ); do
+  if wget -q -O - "$solr_url" | grep -q -i solr; then
+    break
+  fi
+  let "attempts_left--"
+  if (( attempts_left == 0 )); then
     echo "solr is still not running; giving up"
     exit 1
   fi
-  let "i++"
-  sleep $wait_seconds
+  if (( attempts_left == 1 )); then
+    attempts=attempt
+  else
+    attempts=attempts
+  fi
+  echo "solr is not running yet on $solr_url. $attempts_left $attempts left"
+  sleep "$wait_seconds"
 done
-echo "solr is running"
+echo "solr is running on $solr_url"
