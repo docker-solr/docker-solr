@@ -61,7 +61,7 @@ getArches() {
 getArches 'solr'
 
 cat <<-EOH
-# this file is generated via https://github.com/docker-library/solr/blob/$(fileCommit "$self")/$self
+# this file is generated via https://github.com/docker-solr/docker-solr/blob/$(fileCommit "$self")/$self
 
 Maintainers: Martijn Koster <mak-github@greenhills.co.uk> (@makuk66),
              Shalin Mangar <shalin@apache.org> (@shalinmangar)
