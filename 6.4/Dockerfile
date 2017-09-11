@@ -56,7 +56,7 @@ RUN mkdir -p /opt/solr && \
   chmod g=u /etc/passwd
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:0 /opt/docker-solr \
+RUN chown -R $SOLR_USER:0 /opt/docker-solr && \
   chmod -R g=u /opt/docker-solr/scripts
 
 ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
