@@ -7,18 +7,25 @@
 set -euo pipefail
 TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "$BASH_SOURCE")")/..")"
 
-build_dir=$1
-cd "$TOP_DIR/$build_dir"
-
-if [[ ! -f Dockerfile ]]; then
-  echo "Run this from a build directory"
+if (( $# != 1 )); then
+  echo "Usage: $0 build-dir"
   exit 1
 fi
+
+build_dir=$1
+
+if [[ ! -f "$build_dir/Dockerfile" ]]; then
+  echo "$build_dir is not a build directory"
+  exit 1
+fi
+build_dir="$(readlink -f "$build_dir")"
+relative_dir="$(sed -e "s,$TOP_DIR/,," <<< $build_dir)"
+cd "$build_dir"
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then
   IMAGE_NAME="docker-solr/docker-solr"
 fi
-full_tag="$(awk --field-separator ':' '$1 == "'"$build_dir"'" {print $2}' "$TOP_DIR/TAGS")"
+full_tag="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $2}' "$TOP_DIR/TAGS")"
 
 if [[ ! -f "$TOP_DIR/TAGS" ]]; then
   echo "missing TAGS; run update.sh"
@@ -36,7 +43,7 @@ fi
 cmd="docker build --pull --rm=true ${build_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
 echo "running: $cmd"
 $cmd
-extra_tags="$(awk --field-separator ':' '$1 == "'"$build_dir"'" {print $3}' "$TOP_DIR/TAGS")"
+extra_tags="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")"
 for tag in $extra_tags; do
   cmd="docker tag $IMAGE_NAME:$full_tag $IMAGE_NAME:$tag"
   echo "running: $cmd"
