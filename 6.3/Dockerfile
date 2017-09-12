@@ -10,18 +10,18 @@ RUN apt-get update && \
   apt-get -y install lsof procps wget gpg && \
   rm -rf /var/lib/apt/lists/*
 
-ENV SOLR_USER solr
-ENV SOLR_UID 8983
-ENV SOLR_GROUP solr
-ENV SOLR_GID 8983
+ENV SOLR_USER="solr" \
+    SOLR_UID="8983" \
+    SOLR_GROUP="solr" \
+    SOLR_GID="8983" \
+    SOLR_VERSION="6.3.0" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.3.0/solr-6.3.0.tgz" \
+    SOLR_SHA256="07692257575fe54ddb8a8f64e96d3d352f2f533aa91b5752be1869d2acf2f544" \
+    SOLR_KEYS="38D2EA16DDF5FC722EBC433FDC92616F177050F6" \
+    PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
   useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER
-
-ENV SOLR_VERSION 6.3.0
-ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
-ENV SOLR_SHA256 07692257575fe54ddb8a8f64e96d3d352f2f533aa91b5752be1869d2acf2f544
-ENV SOLR_KEYS 38D2EA16DDF5FC722EBC433FDC92616F177050F6
 
 RUN set -e; for key in $SOLR_KEYS; do \
     found=''; \
@@ -39,7 +39,9 @@ RUN set -e; for key in $SOLR_KEYS; do \
   exit 0
 
 RUN mkdir -p /opt/solr && \
+  echo "downloading $SOLR_URL" && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
+  echo "downloading $SOLR_URL.asc" && \
   wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
   (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
@@ -56,8 +58,6 @@ RUN mkdir -p /opt/solr && \
 
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
-
-ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
 
 EXPOSE 8983
 WORKDIR /opt/solr

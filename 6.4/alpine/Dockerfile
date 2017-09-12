@@ -15,18 +15,18 @@ RUN apk add --no-cache \
 RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
 
-ENV SOLR_USER solr
-ENV SOLR_UID 8983
-ENV SOLR_GROUP solr
-ENV SOLR_GID 8983
+ENV SOLR_USER="solr" \
+    SOLR_UID="8983" \
+    SOLR_GROUP="solr" \
+    SOLR_GID="8983" \
+    SOLR_VERSION="6.4.2" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.4.2/solr-6.4.2.tgz" \
+    SOLR_SHA256="354e1affd9cad7d6e86cde8c03aaeb604876f0764129621d8e231cdb35b31c55" \
+    SOLR_KEYS="2085660D9C1FCCACC4A479A3BF160FF14992A24C" \
+    PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
     adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
-
-ENV SOLR_VERSION 6.4.2
-ENV SOLR_URL ${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$SOLR_VERSION/solr-$SOLR_VERSION.tgz
-ENV SOLR_SHA256 354e1affd9cad7d6e86cde8c03aaeb604876f0764129621d8e231cdb35b31c55
-ENV SOLR_KEYS 2085660D9C1FCCACC4A479A3BF160FF14992A24C
 
 RUN set -e; for key in $SOLR_KEYS; do \
     found=''; \
@@ -63,8 +63,6 @@ RUN mkdir -p /opt/solr && \
 
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
-
-ENV PATH /opt/solr/bin:/opt/docker-solr/scripts:$PATH
 
 EXPOSE 8983
 WORKDIR /opt/solr

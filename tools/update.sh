@@ -58,9 +58,9 @@ function write_files {
     echo "generating $target_dir"
     mkdir -p "$target_dir"
     <"$template" sed -r \
-      -e 's/^(ENV SOLR_VERSION) .*/\1 '"$full_version"'/' \
-      -e 's/^(ENV SOLR_SHA256) .*/\1 '"$SHA256"'/' \
-      -e 's/^(ENV SOLR_KEYS) .*/\1 '"$KEYS"'/' \
+      -e "s/\\\$REPLACE_SOLR_VERSION/$full_version/g" \
+      -e "s/\\\$REPLACE_SOLR_SHA256/$SHA256/g" \
+      -e "s/\\\$REPLACE_SOLR_KEYS/$KEYS/g" \
       > "$target_dir/Dockerfile"
     cp -r scripts "$target_dir"
 
