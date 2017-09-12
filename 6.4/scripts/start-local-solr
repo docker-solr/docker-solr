@@ -32,7 +32,7 @@ echo "Running solr in the background. Logs are in $MY_SOLR_LOGS_DIR"
 SOLR_OPTS=$MY_SOLR_OPTS solr start
 max_try=${MAX_TRY:-12}
 wait_seconds=${WAIT_SECONDS:-5}
-if ! /opt/docker-solr/scripts/wait-for-solr.sh "$max_try" "$wait_seconds"; then
+if ! /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts "$max_try" --wait-seconds "$wait_seconds"; then
     echo "Could not start Solr."
     if [ -f "$MY_SOLR_LOGS_DIR/solr.log" ]; then
         echo "Here is the log:"
