@@ -49,7 +49,7 @@ Then with a web browser go to `http://localhost:8983/` to see the Admin Console 
 To use Solr, you need to create a "core", an index for your data. For example:
 
 ```console
-$ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
+$ docker exec -it my_solr solr create_core -c gettingstarted
 ```
 
 In the web UI if you click on "Core Admin" you should now see the "gettingstarted" core.
@@ -57,7 +57,7 @@ In the web UI if you click on "Core Admin" you should now see the "gettingstarte
 If you want to load some of the example data that is included in the container:
 
 ```console
-$ docker exec -it --user=solr my_solr post -c gettingstarted example/exampledocs/manufacturers.xml
+$ docker exec -it my_solr post -c gettingstarted example/exampledocs/manufacturers.xml
 ```
 
 In the UI, find the "Core selector" popup menu and select the "gettingstarted" core, then select the "Query" menu item. This gives you a default search for `*:*` which returns all docs. Hit the "Execute Query" button, and you should see a few docs with data. Congratulations!
@@ -76,15 +76,15 @@ If you want load your own data, you'll have to make it available to the containe
 
 ```console
 $ docker cp $HOME/mydata/mydata.xml my_solr:/opt/solr/mydata.xml
-$ docker exec -it --user=solr my_solr post -c gettingstarted mydata.xml
+$ docker exec -it my_solr post -c gettingstarted mydata.xml
 ```
 
 or by mounting a host directory as a volume:
 
 ```console
 $ docker run --name my_solr -d -p 8983:8983 -t -v $HOME/mydata:/opt/solr/mydata solr
-$ docker exec -it --user=solr my_solr solr create_core -c gettingstarted
-$ docker exec -it --user=solr my_solr post -c gettingstarted mydata/mydata.xml
+$ docker exec -it my_solr solr create_core -c gettingstarted
+$ docker exec -it my_solr post -c gettingstarted mydata/mydata.xml
 ```
 
 To learn more about Solr, see the [Apache Solr Reference Guide](https://cwiki.apache.org/confluence/display/solr/Apache+Solr+Reference+Guide).
