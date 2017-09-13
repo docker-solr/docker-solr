@@ -1,12 +1,20 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`6.6.1`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.6/Dockerfile)
--	[`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.5/Dockerfile)
--	[`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.4/Dockerfile)
--	[`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/6.3/Dockerfile)
--	[`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/8fc0983d6ea9d97baf7fa1583063f8c72d3b3812/5.5/Dockerfile)
-
-For each of these there are variants based on the `openjdk:8-jre-alpine` and `openjdk:8-jre-slim` images, .e.g `6.4-alpine`.
+- [`6.6.1-slim`, `6.6-slim`, `6-slim`, `latest-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/slim/Dockerfile)
+- [`6.6.1-alpine`, `6.6-alpine`, `6-alpine`, `latest-alpine` (*6.6/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/alpine/Dockerfile)
+- [`6.6.1`, `6.6`, `6`, `latest` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/Dockerfile)
+- [`6.5.1-slim`, `6.5-slim` (*6.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/slim/Dockerfile)
+- [`6.5.1-alpine`, `6.5-alpine` (*6.5/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/alpine/Dockerfile)
+- [`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/Dockerfile)
+- [`6.4.2-slim`, `6.4-slim` (*6.4/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.4/slim/Dockerfile)
+- [`6.4.2-alpine`, `6.4-alpine` (*6.4/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.4/alpine/Dockerfile)
+- [`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.4/Dockerfile)
+- [`6.3.0-slim`, `6.3-slim` (*6.3/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.3/slim/Dockerfile)
+- [`6.3.0-alpine`, `6.3-alpine` (*6.3/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.3/alpine/Dockerfile)
+- [`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.3/Dockerfile)
+- [`5.5.4-slim`, `5.5-slim`, `5-slim` (*5.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/5.5/slim/Dockerfile)
+- [`5.5.4-alpine`, `5.5-alpine`, `5-alpine` (*5.5/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/5.5/alpine/Dockerfile)
+- [`5.5.4`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/5.5/Dockerfile)
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 

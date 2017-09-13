@@ -133,25 +133,12 @@ This requires https://github.com/docker-library/official-images/tree/master/bash
 
 Our repository has a README https://github.com/docker-solr/docker-solr/blob/master/README.md which shows
 supported tags. This is not consumed by the Docker library team, but is there for the convenience of
-our users. We want to update that to add our new version. The Dockerfile URL should point to the
-specific version, not just "https://github.com/docker-solr/docker-solr/blob/master/5.4/Dockerfile".
-To get the right URL, go the commits https://github.com/docker-solr/docker-solr/commits/master, find the
-appropriate commit (typically the most recent one), click on the "<>" button on the right to browse
-the repository at that point in the history, then navigate to the directory for the version we've
-added, and click on the Dockerfile. Now copy the URL form the url-bar. It should look like
-https://github.com/docker-solr/docker-solr/blob/cf53b9b7cd6d7221f9c569f2eef68350dce0d633/5.3/Dockerfile
-The commit sha there should match the one we committed earlier.
+our users to update this section, run:
 
-The versions should be such that the 'latest' tag points to the latest version, the '5.4' tag points
-to the latest 5.4, in this case 5.4.0, and the `5` tag points to the latest 5, in thise case also 5.4.0.
-For example:
-
-```bash
--       [`5.4.0`, `5.4`, `5`, `latest` (*5.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/3e61ef877ca9d04e7f005cd40ba726abd1f74259/5.4/Dockerfile)
--       [`5.3.1`, `5.3` (*5.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/80ee84f565414c4f1218d39417049049d9f2c0d1/5.3/Dockerfile)
 ```
-
-Remove any versions that are end-of-life.
+tools/update-readme.sh
+git diff README.md
+```
 
 Then commit and push that change:
 
