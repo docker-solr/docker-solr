@@ -9,6 +9,8 @@
 # To create a core in a mounted directory:
 #      mkdir mycores; chown 8983:8983 mycores
 #      docker run -it --rm -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precreate mycore
+# To create multiple cores:
+#      docker run -P -d solr solr-precreate mycore1 /path/to/core1 mycore2 /path/to/core2
 set -e
 
 echo "Executing $0" "$@"
@@ -19,20 +21,28 @@ fi
 
 . /opt/docker-solr/scripts/run-initdb
 
-CORE=${1:-gettingstarted}
-CONFIG_SOURCE=${2:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
-if [[ -z $SOLR_HOME ]]; then
-    coresdir="/opt/solr/server/solr/mycores"
-    mkdir -p $coresdir
+if [ "$#" -eq 0 ]; then
+    ARGS="-gettingstarted"
 else
-    coresdir=$SOLR_HOME
+    ARGS=$@
 fi
-coredir="$coresdir/$CORE"
-if [[ ! -d $coredir ]]; then
-    cp -r "$CONFIG_SOURCE/" "$coredir"
-    touch "$coredir/core.properties"
-    echo created "$CORE"
-else
-    echo "core $CORE already exists"
-fi
+
+while read CORE ARG2; do
+    CONFIG_SOURCE=${ARG2:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
+    if [[ -z $SOLR_HOME ]]; then
+        coresdir="/opt/solr/server/solr/mycores"
+        mkdir -p $coresdir
+    else
+        coresdir=$SOLR_HOME
+    fi
+    coredir="$coresdir/$CORE"
+    if [[ ! -d $coredir ]]; then
+        cp -r "$CONFIG_SOURCE/" "$coredir"
+        touch "$coredir/core.properties"
+        echo created "$CORE"
+    else
+        echo "core $CORE already exists"
+    fi
+done < <(echo $ARGS | xargs -n2)
+
 exec solr -f
