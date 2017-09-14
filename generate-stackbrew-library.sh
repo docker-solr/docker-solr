@@ -82,8 +82,14 @@ for version in "${versions[@]}"; do
 
 		commit="$(dirCommit "$dir")"
 
-		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "SOLR_VERSION" { print $3; exit }')"
-
+    # grep the full version from the Dockerfile, eg: SOLR_VERSION="6.6.1"
+		fullVersion="$(git show "$commit":"$dir/Dockerfile" | \
+      egrep 'SOLR_VERSION="[^"]+"' | \
+      sed -E -e 's/.*SOLR_VERSION="([^"]+)".*$/\1/')"
+    if [[ -z $fullVersion ]]; then
+      echo "Cannot determine full version from $dir/Dockerfile"
+      exit 1
+    fi
 		versionAliases=(
 			$fullVersion
 			$version
