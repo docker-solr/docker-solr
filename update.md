@@ -136,7 +136,7 @@ supported tags. This is not consumed by the Docker library team, but is there fo
 our users to update this section, run:
 
 ```
-tools/update-readme.sh
+tools/update_readme.sh
 git diff README.md
 ```
 
