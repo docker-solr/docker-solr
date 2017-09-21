@@ -72,7 +72,7 @@ grep -q -E '^[0-9]+$' <<<$wait_seconds || usage "--wait-seconds $wait_seconds: n
 grep -q -E '^https?://' <<<$solr_url || usage "--solr-url $solr_url: not a URL"
 
 let attempts_left=$max_attempts
-while ( (( attempts_left > 0 )) ); do
+while (( attempts_left > 0 )); do
   if wget -q -O - "$solr_url" | grep -q -i solr; then
     break
   fi

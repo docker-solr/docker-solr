@@ -2,7 +2,7 @@
 #
 set -euo pipefail
 
-TEST_DIR="$(dirname -- "${BASH_SOURCE-$0}")"
+TEST_DIR="$(dirname -- $(readlink -f "${BASH_SOURCE-$0}"))"
 
 if (( $# == 0 )); then
   echo "Usage: $BASH_SOURCE tag"
@@ -17,7 +17,8 @@ fi
 
 source "$TEST_DIR/../shared.sh"
 
-echo "Test $tag"
+echo "Test $TEST_DIR $tag"
+
 container_name='test_'$(echo "$tag" | tr ':/-' '_')
 
 container_cleanup "$container_name"
@@ -35,9 +36,9 @@ docker run --name "$container_name" -d -v "$PWD/mysolrhome:/mysolrhome" -e SOLR_
 wait_for_server_started "$container_name"
 
 echo "Checking data"
-data=$(docker exec --user=solr "$container_name" wget -O - 'http://localhost:8983/solr/demo/select?q=address_s%3ARound%20Rock')
+data=$(docker exec --user=solr "$container_name" wget -O - 'http://localhost:8983/solr/demo/select?q=id%3Adell')
 if ! egrep -q 'One Dell Way Round Rock, Texas 78682' <<<$data; then
-  echo "Test test_simple $tag failed; data did not load"
+  echo "Test $TEST_DIR $tag failed; data did not load"
   exit 1
 fi
 echo "Data loaded OK"
@@ -47,4 +48,4 @@ container_cleanup "$container_name"
 docker run --rm -v "$PWD/mysolrhome:/mysolrhome" "$tag" bash -c "rm -fr /mysolrhome/*"
 rmdir mysolrhome
 
-echo "Test $BASH_SOURCE $tag succeeded"
+echo "Test $TEST_DIR $tag succeeded"

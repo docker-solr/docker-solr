@@ -2,7 +2,7 @@
 #
 set -euo pipefail
 
-TEST_DIR="$(dirname -- "${BASH_SOURCE-$0}")"
+TEST_DIR="$(dirname -- $(readlink -f "${BASH_SOURCE-$0}"))"
 
 if (( $# == 0 )); then
   echo "Usage: $BASH_SOURCE tag"
@@ -17,19 +17,28 @@ fi
 
 source "$TEST_DIR/../shared.sh"
 
-echo "Test $tag"
+echo "Test $TEST_DIR $tag"
 container_name='test_'$(echo "$tag" | tr ':/-' '_')
 echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
+container_cleanup "$container_name-copier"
 
 # create a core by hand:
-rm -fr myconf
-mkdir myconf
-docker run \
-  -v "$PWD/myconf:/myconf" \
-  --user "$(id -u):$(id -g)" \
-  --rm "$tag" bash -c 'cp -r /opt/solr/server/solr/configsets/data_driven_schema_configs/conf/* /myconf/'
-
+rm -fr myconf configsets
+docker create --name "$container_name-copier" "$tag"
+docker cp "$container_name-copier:/opt/solr/server/solr/configsets" configsets
+docker rm "$container_name-copier"
+for d in data_driven_schema_configs _default; do
+  if [ -d configsets/$d ]; then
+    cp -r configsets/$d/conf myconf
+    break
+  fi
+done
+rm -fr configsets
+if [ ! -d myconf ]; then
+  echo "Could not get config"
+  exit 1
+fi
 if [ ! -f myconf/solrconfig.xml ]; then
   find myconf
   echo "ERROR: no solrconfig.xml"
@@ -59,13 +68,13 @@ echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c mycore example/exampledocs/manufacturers.xml
 sleep 1
 echo "Checking data"
-data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/mycore/select?q=address_s%3ARound Rock')
+data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/mycore/select?q=id%3Adell')
 if ! egrep -q 'One Dell Way Round Rock, Texas 78682' <<<$data; then
-  echo "Test test_simple $tag failed; data did not load"
+  echo "Test $TEST_DIR $tag failed; data did not load"
   exit 1
 fi
 container_cleanup "$container_name"
 
 rm -fr myconf mycore mylogs
 
-echo "Test test_simple $tag succeeded"
+echo "Test $TEST_DIR $tag succeeded"

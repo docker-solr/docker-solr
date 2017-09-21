@@ -19,20 +19,6 @@ fi
 
 . /opt/docker-solr/scripts/run-initdb
 
-CORE=${1:-gettingstarted}
-CONFIG_SOURCE=${2:-'/opt/solr/server/solr/configsets/data_driven_schema_configs'}
-if [[ -z $SOLR_HOME ]]; then
-    coresdir="/opt/solr/server/solr/mycores"
-    mkdir -p $coresdir
-else
-    coresdir=$SOLR_HOME
-fi
-coredir="$coresdir/$CORE"
-if [[ ! -d $coredir ]]; then
-    cp -r "$CONFIG_SOURCE/" "$coredir"
-    touch "$coredir/core.properties"
-    echo created "$CORE"
-else
-    echo "core $CORE already exists"
-fi
+/opt/docker-solr/scripts/precreate-core "$@"
+
 exec solr -f

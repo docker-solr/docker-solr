@@ -2,7 +2,7 @@
 #
 set -euo pipefail
 
-TEST_DIR="$(dirname -- "${BASH_SOURCE-$0}")"
+TEST_DIR="$(dirname -- $(readlink -f "${BASH_SOURCE-$0}"))"
 
 if (( $# == 0 )); then
   echo "Usage: $BASH_SOURCE tag"
@@ -17,7 +17,7 @@ fi
 
 source "$TEST_DIR/../shared.sh"
 
-echo "Test $tag"
+echo "Test $TEST_DIR $tag"
 container_name='test_'$(echo "$tag" | tr ':/-' '_')
 echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
@@ -33,11 +33,11 @@ echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c gettingstarted example/exampledocs/manufacturers.xml
 sleep 1
 echo "Checking data"
-data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/gettingstarted/select?q=address_s%3ARound Rock')
+data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/gettingstarted/select?q=id%3Adell')
 if ! egrep -q 'One Dell Way Round Rock, Texas 78682' <<<$data; then
-  echo "Test test_simple $tag failed; data did not load"
+  echo "Test $TEST_DIR $tag failed; data did not load"
   exit 1
 fi
 container_cleanup "$container_name"
 
-echo "Test test_simple $tag succeeded"
+echo "Test $TEST_DIR $tag succeeded"

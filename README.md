@@ -121,7 +121,8 @@ so should be reliable.
 
 The second way of creating a core at start time is using the `solr-precreate` command. This will create the core
 in the filesystem before running Solr. You should pass it the core name, and optionally the directory to copy the
-config from (this defaults to Solr's built-in "data_driven_schema_configs"). For example:
+config from (this defaults to the built-in "_default" config in Solr 7, and "data_driven_schema_configs" in Solr 6).
+For example:
 
 ```console
 $ docker run -d -P solr solr-precreate mycore
@@ -137,7 +138,6 @@ $ docker run -d -P -v $PWD/mycores:/opt/solr/server/solr/mycores solr solr-precr
 ```
 
 This second way is quicker, easier to monitor because it logs to the docker log, and can fail immediately if something is wrong.
-But, because it makes assumptions about Solr's "data_driven_schema_configs", future upstream changes could break that.
 
 The third way of creating a core at startup is to use the mechanism explained in the "Extending the image" section below.
 

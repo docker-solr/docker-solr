@@ -4,16 +4,16 @@
 
 function container_cleanup {
   local container_name=$1
-  previous=$(docker ps --all --filter name="$container_name" --format '{{.ID}}' --no-trunc)
+  previous=$(docker inspect "$container_name" --format '{{.ID}}' || true)
   if [[ ! -z $previous ]]; then
-    container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
+    container_status=$(docker inspect --format='{{.State.Status}}' "$previous")
     if [[ $container_status == 'running' ]]; then
-      echo "killing $container_name"
-      docker kill "$container_name" || true
+      echo "killing $previous"
+      docker kill "$previous" || true
       sleep 2
     fi
-    echo "removing $container_name"
-    docker rm "$container_name" || true
+    echo "removing $previous"
+    docker rm "$previous" || true
   fi
 }
 
