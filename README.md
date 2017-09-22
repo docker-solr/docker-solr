@@ -1,8 +1,11 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`6.6.1-slim`, `6.6-slim`, `6-slim`, `latest-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/slim/Dockerfile)
-- [`6.6.1-alpine`, `6.6-alpine`, `6-alpine`, `latest-alpine` (*6.6/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/alpine/Dockerfile)
-- [`6.6.1`, `6.6`, `6`, `latest` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/Dockerfile)
+- [`7.0.0-slim`, `7.0-slim`, `7-slim`, `latest-slim` (*7.0/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1b577d7f761f34db1aeec4264d447bb69803b6c8/7.0/slim/Dockerfile)
+- [`7.0.0-alpine`, `7.0-alpine`, `7-alpine`, `latest-alpine` (*7.0/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1b577d7f761f34db1aeec4264d447bb69803b6c8/7.0/alpine/Dockerfile)
+- [`7.0.0`, `7.0`, `7`, `latest` (*7.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1b577d7f761f34db1aeec4264d447bb69803b6c8/7.0/Dockerfile)
+- [`6.6.1-slim`, `6.6-slim`, `6-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/slim/Dockerfile)
+- [`6.6.1-alpine`, `6.6-alpine`, `6-alpine` (*6.6/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/alpine/Dockerfile)
+- [`6.6.1`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.6/Dockerfile)
 - [`6.5.1-slim`, `6.5-slim` (*6.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/slim/Dockerfile)
 - [`6.5.1-alpine`, `6.5-alpine` (*6.5/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/alpine/Dockerfile)
 - [`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/Dockerfile)
