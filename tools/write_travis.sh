@@ -19,9 +19,8 @@ jobs:
   include:
 EOM
 
-build_dirs=$(find . -name Dockerfile -exec dirname {} \; | sort --version-sort --reverse)
+build_dirs=$(find . -name Dockerfile -exec dirname {} \; | sort --version-sort --reverse | sed 's,^\./,,' | egrep '^[0-9]\.[0-9]')
 for d in $build_dirs; do
-  d=$(sed 's,^\./,,' <<<$d)
   echo '    - stage: build, test, deploy'
   # set the PROCESS variable just so that its value show up in the Travis UI
   echo '      env:'
