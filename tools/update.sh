@@ -72,9 +72,9 @@ function write_files {
 
 function load_keys {
     echo "loading keys"
-    export GNUPGHOME="$PWD/.gnupg"
+    export GNUPGHOME="$TOP_DIR/.gnupg"
     if [ -d "$GNUPGHOME" ]; then
-      echo "using existing .gnupg"
+      rm -fr "$GNUPGHOME"
     fi
     # we have a local record with key:owner lines
     while IFS=: read key owner; do
