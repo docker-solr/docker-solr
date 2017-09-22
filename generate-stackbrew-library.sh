@@ -4,7 +4,8 @@
 set -eu
 
 declare -A aliases=(
-    [6.6]='6 latest'
+    [7.0]='7 latest'
+    [6.6]='6'
     [5.5]='5'
 )
 
