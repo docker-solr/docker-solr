@@ -228,9 +228,9 @@ curl -sSL "$archiveUrl" | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)
 
 mkdir -p "$DOWNLOADS"
 
-latest_major_versions=$(tac<"$upstream_versions" |sed -E 's/^((([0-9]+)\.[0-9]+)\.[0-9]+)$/\1 \3/'|uniq -f 1|cut -d ' ' -f 1)
-latest_version=$(sed 's/ .*//' <<<$latest_major_versions)
-latest_x_y=$(sed -E 's/(([0-9])+\.([0-9])+).*$/\1/' <<<$latest_version)
+latest_major_versions="$(tac<"$upstream_versions" |sed -E 's/^((([0-9]+)\.[0-9]+)\.[0-9]+)$/\1 \3/'|uniq -f 1|cut -d ' ' -f 1)"
+latest_version="$(head -n 1 <<<"$latest_major_versions")"
+latest_x_y="$(sed -E 's/(([0-9])+\.([0-9])+).*$/\1/' <<<"$latest_version")"
 if [[ ! -d "$latest_x_y" ]]; then
   echo "The latest version of Solr is $latest_version but we have no $latest_x_y directory; creating"
   echo
