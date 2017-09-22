@@ -7,7 +7,7 @@
 # We record a checksum in the Dockerfile, for verification at docker build time.
 # We verify the content's GPG signature here.
 # We also write a TAGS file with the docker tags for the image.
-set -e
+set -euo pipefail
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
 
@@ -28,7 +28,7 @@ versions=( "${versions[@]%/}" )
 
 function write_files {
     local full_version=$1
-    local variant=$2
+    local variant=${2:-}
 
     short_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
 
@@ -177,11 +177,20 @@ function verify_signature {
         echo "looks like a unknown key was used: $missing_key"
         fingerprint=""
         for keyserver in "${KEYSERVERS[@]}"; do
-          if 5>gpg-import.status gpg --keyserver "$keyserver" --keyserver-options verbose,timeout=10 --recv-key "$missing_key"; then
-            fingerprint=$(gpg --fingerprint -k "$missing_key" |grep fingerprint|sed -e 's/^.* = //' -e 's/ //g')
-            owner=$(gpg --with-colons -k "$fingerprint" |egrep '^pub'| cut -d : -f 10)
-            echo "$fingerprint:$owner" >> "$TOP_DIR/known_keys.txt"
-            break
+          echo "trying keyserver $keyserver"
+          if 5>gpg-import.status gpg --keyserver "$keyserver" --keyserver-options timeout=10 --recv-key "$missing_key"; then
+            fingerprint=$(gpg --fingerprint -k "$missing_key" | egrep -A 1 '^pub'| tail -n 1|sed -e 's/^.* = //' -e 's/ //g')
+            if [[ -z $fingerprint ]]; then
+              echo "Could not get fingerprint for $missing_key"
+            else
+              owner=$(gpg --export "$missing_key" | gpg --list-packets | egrep '^:user ID packet'| cut -d : -f 3 | sed -e 's/^ //' -e 's/"//g')
+              if [[ -z $owner ]]; then
+                echo "Could not get owner for $missing_key"
+              else
+                echo "$fingerprint:$owner" >> "$TOP_DIR/known_keys.txt"
+                break
+              fi
+            fi
           else
             if egrep '\[GNUPG:\] NO_DATA' gpg-import.status; then
               echo "and that key appears not to exist on keyserver $keyserver"
