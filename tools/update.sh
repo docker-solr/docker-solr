@@ -126,7 +126,7 @@ function download_solr  {
             echo "Failed to fetch $download_url"
         fi
     done
-    if [[ -z "$download_url_used" ]]; then
+    if [[ -z "${download_url_used:-}" ]]; then
         echo "Failed to fetch Solr for $full_version"
         exit 1
     fi
