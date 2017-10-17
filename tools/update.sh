@@ -21,6 +21,9 @@ if (( $# == 0 )); then
   x_y_dirs=($(find . -maxdepth 1 -print | sed 's,^\./,,' | \
             grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort))
   set -- "${x_y_dirs[@]}"
+  all_dirs=true
+else
+  all_dirs=false
 fi
 
 versions=( "$@" )
@@ -64,10 +67,12 @@ function write_files {
       > "$target_dir/Dockerfile"
     cp -r scripts "$target_dir"
 
-    # The TAGS file will list build_dir:full_version:tags
-    # Other scripts in ./tools/ will parse the TAGS file.
-    # This is only for local/Travis use; the official library does not use the TAGS file.
-    echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<$extra_tags | sed 's/ $//')" >> "$TOP_DIR/TAGS"
+    if [[ "$all_dirs" == "true" ]]; then
+      # The TAGS file will list build_dir:full_version:tags
+      # Other scripts in ./tools/ will parse the TAGS file.
+      # This is only for local/Travis use; the official library does not use the TAGS file.
+      echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<$extra_tags | sed 's/ $//')" >> "$TOP_DIR/TAGS"
+    fi
 }
 
 function load_keys {
@@ -247,7 +252,9 @@ if [[ ! -d "$latest_x_y" ]]; then
   versions+=("$latest_x_y")
 fi
 
-:>TAGS
+if [[ "$all_dirs" == "true" ]]; then
+  :>TAGS
+fi
 for version in "${versions[@]}"; do
     full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
     if [[ -z $full_version ]]; then
@@ -281,3 +288,8 @@ if [ -f "$OWNERTRUSTFILE" ]; then rm "$OWNERTRUSTFILE"; fi
 if [ -f "$upstream_versions" ]; then rm "$upstream_versions"; fi
 
 tools/write_travis.sh > .travis.yml
+
+if [[ "$all_dirs" == "false" ]]; then
+  echo "WARNING: TAGS was not updated, because directories were specified"
+  echo "To update tags, run: ./tools/$(basename "$BASH_SOURCE")"
+fi
