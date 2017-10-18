@@ -30,6 +30,7 @@ if [ -d mysolrhome ]; then
 fi
 
 mkdir mysolrhome
+mkdir mysolrhome/lost+found
 chmod a+w mysolrhome
 docker run --name "$container_name" -d -v "$PWD/mysolrhome:/mysolrhome" -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes -d "$tag" "solr-demo"
 
