@@ -39,7 +39,7 @@ if [ -f "$SOLR_HOME/solr.xml" ]; then
 fi
 
 # refuse to use non-empty directories, which are likely a misconfiguration
-if [ "$(find "$SOLR_HOME" -mindepth  1 | wc -l)" != '0' ]; then
+if [ "$(find "$SOLR_HOME" -mindepth  1 ! -name lost+found | wc -l)" != '0' ]; then
     echo "SOLR_HOME directory $SOLR_HOME is not empty; refusing to create a solr home."
     exit 1
 fi
