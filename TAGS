@@ -1,6 +1,6 @@
-5.5:5.5.4:5.5 5
-5.5/alpine:5.5.4-alpine:5.5-alpine 5-alpine
-5.5/slim:5.5.4-slim:5.5-slim 5-slim
+5.5:5.5.5:5.5 5
+5.5/alpine:5.5.5-alpine:5.5-alpine 5-alpine
+5.5/slim:5.5.5-slim:5.5-slim 5-slim
 6.3:6.3.0:6.3
 6.3/alpine:6.3.0-alpine:6.3-alpine
 6.3/slim:6.3.0-slim:6.3-slim
