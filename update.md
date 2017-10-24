@@ -182,7 +182,7 @@ git diff
 If that all looks plausible, push to master on our fork:
 
 ```bash
-git commit -m "Update Solr to 5.4.0" library/solr
+git commit -m "Update Solr to 6.6.0" library/solr
 git push
 ```
 
