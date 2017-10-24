@@ -143,7 +143,7 @@ git diff README.md
 Then commit and push that change:
 
 ```bash
-git commit -m "Update Solr to 5.4.0" README.md
+git commit -m "Update README for Solr 6.6.0" README.md
 git push
 ```
 
