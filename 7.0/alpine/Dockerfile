@@ -1,5 +1,5 @@
 
-FROM    openjdk:8-jre-alpine
+FROM    openjdk:8u131-jre-alpine
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
