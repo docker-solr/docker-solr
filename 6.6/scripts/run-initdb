@@ -22,14 +22,10 @@ set -e
 /opt/docker-solr/scripts/init-solr-home
 
 # execute files in /docker-entrypoint-initdb.d before starting solr
-SCRIPTS_TO_RUN=/tmp/init-scripts-to-run
-find /docker-entrypoint-initdb.d/ -mindepth 1 -type f | sort -n > "$SCRIPTS_TO_RUN"
-readarray -t scripts_to_run < "$SCRIPTS_TO_RUN"
-rm "$SCRIPTS_TO_RUN"
-for f in "${scripts_to_run[@]}"; do
+while read f; do
     case "$f" in
         *.sh)     echo "$0: running $f"; . "$f" ;;
         *)        echo "$0: ignoring $f" ;;
     esac
     echo
-done
+done < <(find /docker-entrypoint-initdb.d/ -mindepth 1 -type f | sort -n)
