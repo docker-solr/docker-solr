@@ -6,21 +6,9 @@
 - [`7.1.0-slim`, `7.1-slim` (*7.1/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1c47a6d6a1796706aaea6ff75358aa5ab691f5a5/7.1/slim/Dockerfile)
 - [`7.1.0-alpine`, `7.1-alpine` (*7.1/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/7.1/alpine/Dockerfile)
 - [`7.1.0`, `7.1` (*7.1/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/1c47a6d6a1796706aaea6ff75358aa5ab691f5a5/7.1/Dockerfile)
-- [`7.0.1-slim`, `7.0-slim` (*7.0/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e459dbee3bedba0535f3c1b3be97f14dbabaf3bb/7.0/slim/Dockerfile)
-- [`7.0.1-alpine`, `7.0-alpine` (*7.0/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/7.0/alpine/Dockerfile)
-- [`7.0.1`, `7.0` (*7.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e459dbee3bedba0535f3c1b3be97f14dbabaf3bb/7.0/Dockerfile)
 - [`6.6.2-slim`, `6.6-slim`, `6-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/9fc02620e0d2cd4eaa4586271a730a5ea3ceba7b/6.6/slim/Dockerfile)
 - [`6.6.2-alpine`, `6.6-alpine`, `6-alpine` (*6.6/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/6.6/alpine/Dockerfile)
 - [`6.6.2`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/9fc02620e0d2cd4eaa4586271a730a5ea3ceba7b/6.6/Dockerfile)
-- [`6.5.1-slim`, `6.5-slim` (*6.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/slim/Dockerfile)
-- [`6.5.1-alpine`, `6.5-alpine` (*6.5/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/6.5/alpine/Dockerfile)
-- [`6.5.1`, `6.5` (*6.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.5/Dockerfile)
-- [`6.4.2-slim`, `6.4-slim` (*6.4/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.4/slim/Dockerfile)
-- [`6.4.2-alpine`, `6.4-alpine` (*6.4/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/6.4/alpine/Dockerfile)
-- [`6.4.2`, `6.4` (*6.4/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.4/Dockerfile)
-- [`6.3.0-slim`, `6.3-slim` (*6.3/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.3/slim/Dockerfile)
-- [`6.3.0-alpine`, `6.3-alpine` (*6.3/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/6.3/alpine/Dockerfile)
-- [`6.3.0`, `6.3` (*6.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/341f5d28230a9450e9db0bae295de8e0e9b92381/6.3/Dockerfile)
 - [`5.5.5-slim`, `5.5-slim`, `5-slim` (*5.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/4ed56419308ecee62149a65db8b4b9ef7fab05c1/5.5/slim/Dockerfile)
 - [`5.5.5-alpine`, `5.5-alpine`, `5-alpine` (*5.5/alpine/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/f4b10b8d89f16a70aa9710498b8fa85e0fe24828/5.5/alpine/Dockerfile)
 - [`5.5.5`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/4ed56419308ecee62149a65db8b4b9ef7fab05c1/5.5/Dockerfile)
@@ -182,7 +170,7 @@ as documented in the [Solr Reference Guide](https://cwiki.apache.org/confluence/
 
 In docker-solr you can simply pass these environment variables to the container. For example:
 
-  docker run -d -P -e SOLR_HEAP=800m solr:6.3.0
+  docker run -d -P -e SOLR_HEAP=800m solr:7.2.0
 
 This works for Solr versions newer than 6.3.0. Older versions had some hardcoded defaults in `solr.in.sh`;
 see `docs/set-heap.sh` for how to modify that configuration.
