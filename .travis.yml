@@ -20,6 +20,10 @@ jobs:
       script: tools/build_test_push.sh 7.2/alpine
     - stage: build, test, deploy
       env:
+      - PROCESS=7.2/centos
+      script: tools/build_test_push.sh 7.2/centos
+    - stage: build, test, deploy
+      env:
       - PROCESS=7.2
       script: tools/build_test_push.sh 7.2
     - stage: build, test, deploy
@@ -30,6 +34,10 @@ jobs:
       env:
       - PROCESS=7.1/alpine
       script: tools/build_test_push.sh 7.1/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.1/centos
+      script: tools/build_test_push.sh 7.1/centos
     - stage: build, test, deploy
       env:
       - PROCESS=7.1
@@ -44,6 +52,10 @@ jobs:
       script: tools/build_test_push.sh 6.6/alpine
     - stage: build, test, deploy
       env:
+      - PROCESS=6.6/centos
+      script: tools/build_test_push.sh 6.6/centos
+    - stage: build, test, deploy
+      env:
       - PROCESS=6.6
       script: tools/build_test_push.sh 6.6
     - stage: build, test, deploy
@@ -54,6 +66,10 @@ jobs:
       env:
       - PROCESS=5.5/alpine
       script: tools/build_test_push.sh 5.5/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=5.5/centos
+      script: tools/build_test_push.sh 5.5/centos
     - stage: build, test, deploy
       env:
       - PROCESS=5.5
