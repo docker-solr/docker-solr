@@ -35,6 +35,14 @@ if echo "$tag" | grep -q -- -alpine; then
     exit 1
   fi
   echo "Alpine $alpine_version"
+elif echo "$tag" | grep -q -- -centos; then
+  centos_version=$(docker exec --user=solr "$container_name" cat /etc/centos-release || true)
+  if [[ -z $centos_version ]]; then
+    echo "Could not get centos version from container $container_name"
+    container_cleanup "$container_name"
+    exit 1
+  fi
+  echo "CentOS $centos_version"
 else
   debian_version=$(docker exec --user=solr "$container_name" cat /etc/debian_version || true)
   if [[ -z $debian_version ]]; then

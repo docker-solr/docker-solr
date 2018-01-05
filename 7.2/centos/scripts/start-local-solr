@@ -1,0 +1,42 @@
+#!/bin/bash
+# configure Solr to run on the local interface, and start it running in the background
+
+set -euo pipefail
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
+    set -x
+fi
+
+# determine the solr logs dir, set by SOLR_LOGS_DIR in the environment or in solr.in.sh.
+# let bash parse it, then prefix MY_ so we don't polute the environment used by Solr.
+MY_SOLR_INCLUDE="${SOLR_INCLUDE:-/opt/solr/bin/solr.in.sh}"
+eval "$( set +e +u +o pipefail; . "$MY_SOLR_INCLUDE"; set -o posix; set | egrep '^SOLR_(LOGS_DIR|OPTS)=' | sed 's/^SOLR_/MY_SOLR_/')"
+
+MY_SOLR_LOGS_DIR="${MY_SOLR_LOGS_DIR:-/opt/solr/server/logs}"
+MY_SOLR_OPTS="${MY_SOLR_OPTS:-} -Djetty.host=${SOLR_LOCAL_HOST:-localhost}"
+
+if [ ! -w "$MY_SOLR_LOGS_DIR" ]; then
+    echo "Log directory $MY_SOLR_LOGS_DIR is not writable by $(id -u):$(id -g)"
+    exit 1
+fi
+
+# If the SOLR_PID_DIR is specified by the user, let Solr use that
+if [ -z "${MY_SOLR_PID_DIR:-}" ]; then
+    # if not, and the default location is not writable, put it in the log dir
+    if [ ! -w "${MY_SOLR_PID_DIR:-/opt/solr/bin}" ]; then
+        export SOLR_PID_DIR="$MY_SOLR_LOGS_DIR"
+    fi
+fi
+
+echo "Running solr in the background. Logs are in $MY_SOLR_LOGS_DIR"
+SOLR_OPTS=$MY_SOLR_OPTS solr start
+max_try=${MAX_TRY:-12}
+wait_seconds=${WAIT_SECONDS:-5}
+if ! /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts "$max_try" --wait-seconds "$wait_seconds"; then
+    echo "Could not start Solr."
+    if [ -f "$MY_SOLR_LOGS_DIR/solr.log" ]; then
+        echo "Here is the log:"
+        cat "$MY_SOLR_LOGS_DIR/solr.log"
+    fi
+    exit 1
+fi
