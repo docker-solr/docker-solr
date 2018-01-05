@@ -21,7 +21,7 @@ function usage {
 
 max_attempts=12
 wait_seconds=5
-solr_url=http://localhost:8983
+solr_url=http://localhost:${SOLR_PORT}
 
 while (( $# > 0 )); do
   case "$1" in
