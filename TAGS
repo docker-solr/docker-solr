@@ -1,12 +1,16 @@
 5.5:5.5.5:5.5 5
 5.5/alpine:5.5.5-alpine:5.5-alpine 5-alpine
 5.5/slim:5.5.5-slim:5.5-slim 5-slim
+5.5/centos:5.5.5-centos:5.5-centos 5-centos
 6.6:6.6.2:6.6 6
 6.6/alpine:6.6.2-alpine:6.6-alpine 6-alpine
 6.6/slim:6.6.2-slim:6.6-slim 6-slim
+6.6/centos:6.6.2-centos:6.6-centos 6-centos
 7.1:7.1.0:7.1
 7.1/alpine:7.1.0-alpine:7.1-alpine
 7.1/slim:7.1.0-slim:7.1-slim
+7.1/centos:7.1.0-centos:7.1-centos
 7.2:7.2.0:7.2 7 latest
 7.2/alpine:7.2.0-alpine:7.2-alpine 7-alpine latest-alpine
 7.2/slim:7.2.0-slim:7.2-slim 7-slim latest-slim
+7.2/centos:7.2.0-centos:7.2-centos 7-centos latest-centos
