@@ -12,49 +12,21 @@ jobs:
   include:
     - stage: build, test, deploy
       env:
-      - PROCESS=7.2/slim
-      script: tools/build_test_push.sh 7.2/slim
+      - IMAGE_NAME=shopping24/docker-solr-centos
+      - PROCESS=7.2/centos
+      script: tools/build_test_push.sh 7.2/centos
     - stage: build, test, deploy
       env:
-      - PROCESS=7.2/alpine
-      script: tools/build_test_push.sh 7.2/alpine
+      - IMAGE_NAME=shopping24/docker-solr-centos
+      - PROCESS=7.1/centos
+      script: tools/build_test_push.sh 7.1/centos
     - stage: build, test, deploy
       env:
-      - PROCESS=7.2
-      script: tools/build_test_push.sh 7.2
+      - IMAGE_NAME=shopping24/docker-solr-centos
+      - PROCESS=6.6/centos
+      script: tools/build_test_push.sh 6.6/centos
     - stage: build, test, deploy
       env:
-      - PROCESS=7.1/slim
-      script: tools/build_test_push.sh 7.1/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=7.1/alpine
-      script: tools/build_test_push.sh 7.1/alpine
-    - stage: build, test, deploy
-      env:
-      - PROCESS=7.1
-      script: tools/build_test_push.sh 7.1
-    - stage: build, test, deploy
-      env:
-      - PROCESS=6.6/slim
-      script: tools/build_test_push.sh 6.6/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=6.6/alpine
-      script: tools/build_test_push.sh 6.6/alpine
-    - stage: build, test, deploy
-      env:
-      - PROCESS=6.6
-      script: tools/build_test_push.sh 6.6
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5/slim
-      script: tools/build_test_push.sh 5.5/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5/alpine
-      script: tools/build_test_push.sh 5.5/alpine
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5
-      script: tools/build_test_push.sh 5.5
+      - IMAGE_NAME=shopping24/docker-solr-centos
+      - PROCESS=5.5/centos
+      script: tools/build_test_push.sh 5.5/centos

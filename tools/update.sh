@@ -281,6 +281,7 @@ for version in "${versions[@]}"; do
     write_files "$full_version"
     write_files "$full_version" 'alpine'
     write_files "$full_version" 'slim'
+    write_files "$full_version" 'centos'
     echo
 done
 
