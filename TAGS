@@ -7,6 +7,6 @@
 7.1:7.1.0:7.1
 7.1/alpine:7.1.0-alpine:7.1-alpine
 7.1/slim:7.1.0-slim:7.1-slim
-7.2:7.2.0:7.2 7 latest
-7.2/alpine:7.2.0-alpine:7.2-alpine 7-alpine latest-alpine
-7.2/slim:7.2.0-slim:7.2-slim 7-slim latest-slim
+7.2:7.2.1:7.2 7 latest
+7.2/alpine:7.2.1-alpine:7.2-alpine 7-alpine latest-alpine
+7.2/slim:7.2.1-slim:7.2-slim 7-slim latest-slim
