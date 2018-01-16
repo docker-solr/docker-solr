@@ -19,11 +19,11 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
+    SOLR_PORT="8983" \
     SOLR_VERSION="7.2.1" \
     SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.2.1/solr-7.2.1.tgz" \
     SOLR_SHA256="1dbe8dda842d2008210c0c56d56b714713444fb4e05390bb0bcdec29cf957748" \
     SOLR_KEYS="052C5B48A480B9CEA9E218A5F98C13CFA5A135D8" \
-    SOLR_PORT="8983" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \

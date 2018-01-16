@@ -21,7 +21,13 @@ function usage {
 
 max_attempts=12
 wait_seconds=5
-solr_url=http://localhost:${SOLR_PORT}
+
+if ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
+  echo "Invalid SOLR_PORT=$SOLR_PORT environment variable specified"
+  exit 1
+fi
+
+solr_url="http://localhost:$SOLR_PORT"
 
 while (( $# > 0 )); do
   case "$1" in
