@@ -6,6 +6,13 @@ set -e
 
 if [[ "$VERBOSE" = "yes" ]]; then
     set -x
+    env | grep SOLR | sort
+fi
+
+if ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
+  echo "Invalid SOLR_PORT=$SOLR_PORT environment variable specified; resetting to 8983"
+  SOLR_PORT=8983
+  export SOLR_PORT
 fi
 
 # when invoked with e.g.: docker run solr -help
