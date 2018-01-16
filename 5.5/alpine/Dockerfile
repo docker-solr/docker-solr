@@ -19,6 +19,7 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
+    SOLR_PORT="8983" \
     SOLR_VERSION="5.5.5" \
     SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/5.5.5/solr-5.5.5.tgz" \
     SOLR_SHA256="2bbe3a55976f118c5d8c2382d4591257f6e2af779c08c6561e44afa3181a87c1" \
@@ -57,14 +58,13 @@ RUN mkdir -p /opt/solr && \
   mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr && \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
 
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
-EXPOSE 8983
+EXPOSE $SOLR_PORT
 WORKDIR /opt/solr
 USER $SOLR_USER
 
