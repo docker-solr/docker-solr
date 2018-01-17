@@ -8,7 +8,7 @@ if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
-if ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT:-}"; then
   SOLR_PORT=8983
   export SOLR_PORT
 fi
