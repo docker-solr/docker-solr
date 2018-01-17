@@ -14,7 +14,6 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_PORT="8983" \
     SOLR_VERSION="7.1.0" \
     SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.1.0/solr-7.1.0.tgz" \
     SOLR_SHA256="5cd25cc2634e47efbb529658d6ddd406a7cd1b211affa26563a28db2d80b8133" \
@@ -59,7 +58,7 @@ RUN mkdir -p /opt/solr && \
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
-EXPOSE $SOLR_PORT
+EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 

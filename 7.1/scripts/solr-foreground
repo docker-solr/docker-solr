@@ -9,7 +9,7 @@ fi
 
 . /opt/docker-solr/scripts/run-initdb
 
-if ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT}"; then
   echo "Invalid SOLR_PORT=$SOLR_PORT environment variable specified"
   exit 1
 fi
