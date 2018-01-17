@@ -237,9 +237,9 @@ You can also run a distributed Solr configuration.
 
 The recommended and most flexible way to do that is to use Docker networking.
 See the [Can I run ZooKeeper and Solr clusters under Docker](https://github.com/docker-solr/docker-solr/blob/master/Docker-FAQ.md#can-i-run-zookeeper-and-solr-clusters-under-docker) FAQ,
-and [this example](docs/docker-networking.md).
+and [this example](https://github.com/docker-solr/docker-solr/blob/master/docs/docker-networking.md).
 
-You can also use legacy links, see the [Can I run ZooKeeper and Solr with Docker Links](Docker-FAQ.md#can-i-run-zookeeper-and-solr-clusters-under-docker) FAQ.
+You can also use legacy links, see the [Can I run ZooKeeper and Solr with Docker Links](https://github.com/docker-solr/docker-solr/blob/master/Docker-FAQ.md#can-i-run-zookeeper-and-solr-clusters-under-docker) FAQ.
 
 # About this repository
 
