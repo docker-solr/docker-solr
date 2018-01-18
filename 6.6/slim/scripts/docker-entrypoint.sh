@@ -8,6 +8,11 @@ if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT:-}"; then
+  SOLR_PORT=8983
+  export SOLR_PORT
+fi
+
 # when invoked with e.g.: docker run solr -help
 if [ "${1:0:1}" = '-' ]; then
     set -- solr-foreground "$@"

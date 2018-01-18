@@ -32,6 +32,11 @@ if [[ -z "${CORE_NAME:-}" ]]; then
   exit 1
 fi
 
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
+  echo "Invalid SOLR_PORT=$SOLRT_PORT environment variable specified"
+  exit 1
+fi
+
 # cores get created in SOLR_HOME
 CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$CORE_NAME"
 
@@ -45,7 +50,7 @@ else
 
     # See https://github.com/docker-solr/docker-solr/issues/27
     echo "Checking core"
-    if ! wget -O - 'http://localhost:8983/solr/admin/cores?action=STATUS' | grep -q instanceDir; then
+    if ! wget -O - "http://localhost:${SOLR_PORT:-8983}/solr/admin/cores?action=STATUS" | grep -q instanceDir; then
       echo "Could not find any cores"
       exit 1
     fi
