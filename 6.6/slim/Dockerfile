@@ -14,10 +14,10 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="6.6.2" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.2/solr-6.6.2.tgz" \
-    SOLR_SHA256="a41594888a30394df8819c36ceee727dd2ed0a7cd18b41230648f1ef1a8b0cd2" \
-    SOLR_KEYS="2085660D9C1FCCACC4A479A3BF160FF14992A24C" \
+    SOLR_VERSION="6.6.3" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.3/solr-6.6.3.tgz" \
+    SOLR_SHA256="326ad83d479d78a8bd72b69110073a6012c81dcb708164ec61e2816321f777f3" \
+    SOLR_KEYS="5F55943E13D49059D3F342777186B06E1ED139E7" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
