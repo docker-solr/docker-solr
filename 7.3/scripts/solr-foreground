@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# Run the initdb, then start solr in the foreground
+set -e
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+. /opt/docker-solr/scripts/run-initdb
+
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT}"; then
+  echo "Invalid SOLR_PORT=$SOLR_PORT environment variable specified"
+  exit 1
+fi
+
+echo "Starting Solr $SOLR_VERSION"
+
+exec solr -f "$@"

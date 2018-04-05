@@ -1,27 +1,32 @@
 
-FROM $REPLACE_FROM
+FROM openjdk:8-jre-alpine
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN apt-get update && \
-  apt-get -y install lsof procps wget gpg && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+        lsof \
+        gnupg \
+        procps \
+        tar \
+        bash
+RUN apk add --no-cache ca-certificates wget && \
+        update-ca-certificates
 
 ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="$REPLACE_SOLR_VERSION" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz" \
-    SOLR_SHA256="$REPLACE_SOLR_SHA256" \
-    SOLR_KEYS="$REPLACE_SOLR_KEYS" \
+    SOLR_VERSION="7.3.0" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.3.0/solr-7.3.0.tgz" \
+    SOLR_SHA256="4b9b9f5dfd4ea4b0fdf69bda9528de47903aaa9bd9c5cb405ce0ae09a8d12fe9" \
+    SOLR_KEYS="C5DCD3AAB897097D7815BD6B069E9741F3D97FD6" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
-RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
-  useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER
+RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 RUN set -e; for key in $SOLR_KEYS; do \
     found=''; \
@@ -40,9 +45,9 @@ RUN set -e; for key in $SOLR_KEYS; do \
 
 RUN mkdir -p /opt/solr && \
   echo "downloading $SOLR_URL" && \
-  wget -nv $SOLR_URL -O /opt/solr.tgz && \
+  wget -q $SOLR_URL -O /opt/solr.tgz && \
   echo "downloading $SOLR_URL.asc" && \
-  wget -nv $SOLR_URL.asc -O /opt/solr.tgz.asc && \
+  wget -q $SOLR_URL.asc -O /opt/solr.tgz.asc && \
   echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
   (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
   gpg --batch --verify /opt/solr.tgz.asc /opt/solr.tgz && \
