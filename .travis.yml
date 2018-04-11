@@ -12,6 +12,18 @@ jobs:
   include:
     - stage: build, test, deploy
       env:
+      - PROCESS=7.3/slim
+      script: tools/build_test_push.sh 7.3/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.3/alpine
+      script: tools/build_test_push.sh 7.3/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.3
+      script: tools/build_test_push.sh 7.3
+    - stage: build, test, deploy
+      env:
       - PROCESS=7.2/slim
       script: tools/build_test_push.sh 7.2/slim
     - stage: build, test, deploy

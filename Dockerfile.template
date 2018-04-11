@@ -1,5 +1,5 @@
 
-FROM    openjdk:8-jre
+FROM $REPLACE_FROM
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
