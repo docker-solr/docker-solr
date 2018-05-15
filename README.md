@@ -185,23 +185,23 @@ In docker-solr, you can use that with mounted volumes:
 
     mkdir mysolrhome
     sudo chown 8983:8983 mysolrhome
-    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+    docker run -it -v $PWD/mysolrhome:/opt/mysolrhome -e SOLR_HOME=/opt/mysolrhome solr
 
 Solr requires a solr.xml file and configsets in the SOLR_HOME, so you must provide that ahead of time.
 One way of doing that is to copy the default content before running Solr:
 
-    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr \
-       bash -c "cp -R /opt/solr/server/solr/* /mysolrhome"
-    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr
+    docker run -it -v $PWD/mysolrhome:/opt/mysolrhome -e SOLR_HOME=/opt/mysolrhome solr \
+       bash -c "cp -R /opt/solr/server/solr/* /opt/mysolrhome"
+    docker run -it -v $PWD/mysolrhome:/opt/mysolrhome -e SOLR_HOME=/opt/mysolrhome solr
 
 or, in a single command:
 
-    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome solr \
-       bash -c "cp -R /opt/solr/server/solr/* /mysolrhome && exec docker-entrypoint.sh solr"
+    docker run -it -v $PWD/mysolrhome:/opt/mysolrhome -e SOLR_HOME=/opt/mysolrhome solr \
+       bash -c "cp -R /opt/solr/server/solr/* /opt/mysolrhome && exec docker-entrypoint.sh solr-foreground"
 
 As an added convenience, you can pass `-e INIT_SOLR_HOME=yes` to do that automatically (if SOLR_HOME is empty):
 
-    docker run -it -v $PWD/mysolrhome:/mysolrhome -e SOLR_HOME=/mysolrhome -e INIT_SOLR_HOME=yes solr
+    docker run -it -v $PWD/mysolrhome:/opt/mysolrhome -e SOLR_HOME=/opt/mysolrhome -e INIT_SOLR_HOME=yes solr
 
 
 ## Extending the image
