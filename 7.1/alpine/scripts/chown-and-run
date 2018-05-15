@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# chown files to some user, then execute as that user.
+# It's just a thin wrapper around gosu.
+#
+# For example, to have the container chown the mounted directory for you,
+# then run as your own user:
+#
+#   mkdir mycores
+#   docker run -it --user 0:0 -v $PWD/mycores:/opt/solr/server/solr/mycores \
+#     solr:7.3 chown-and-run --uid "$(id -u)" --gid "$(id -g)" solr-precreate gettingstarted
+#
+# If you don't specify a uid, it defaults to solr:
+#
+#   mkdir mycores
+#   docker run -it --user 0:0 -v $PWD/mycores:/opt/solr/server/solr/mycores \
+#     solr:7.3 chown-and-run solr-precreate gettingstarted
+#
+# Or to run with some arbitrary user id, with the new user added:
+#
+#   docker run -it --user 0:0 \
+#     solr:7.3 chown-and-run --uid 9999 --gid 9999 --user solr9999 solr-demo
+
+
+set -euo pipefail
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
+    set -x
+fi
+
+if [[ "$(id -u)" != "0" ]]; then
+  echo "you must run this as root"
+  exit 1
+fi
+new_user=""
+new_uid=8983
+new_gid=8983
+rest=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+
+case $key in
+  --user)
+  shift
+  new_user=$1
+  shift
+  ;;
+  --uid)
+  shift
+  new_uid=$1
+  shift
+  ;;
+  --gid)
+  shift
+  new_gid=$1
+  shift
+  ;;
+  *)
+  rest+=("$1")
+  shift
+  ;;
+esac
+done
+
+chown -R "$new_uid:$new_gid" /opt
+
+if [[ ! -z "${new_user:-}" ]]; then
+  new_group="$new_user"
+  if [[ -f /etc/debian_version ]]; then
+    if [[ "$new_gid" != 0 ]]; then
+      addgroup --gid "$new_gid" "$new_group"
+    fi
+    adduser --home /opt/solr --shell /bin/bash --no-create-home \
+      --uid "$new_uid" --gid "$new_gid" --disabled-password --gecos "" "$new_user"
+  elif adduser --help 2>&1 | head -n 1| grep -q BusyBox; then
+    if [[ "$new_gid" != 0 ]]; then
+      addgroup -g "$new_gid" "$new_group"
+    fi
+    adduser -h /opt/solr -s /bin/bash -D -H -u "$new_uid" -G "$new_group" "$new_user"
+  else
+    echo "Cannot create user on this container"
+    exit 1
+  fi
+fi
+
+exec gosu "$new_uid:$new_gid" "${rest[@]}"
