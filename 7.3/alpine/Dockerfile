@@ -19,10 +19,10 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="7.3.0" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.3.0/solr-7.3.0.tgz" \
-    SOLR_SHA256="4b9b9f5dfd4ea4b0fdf69bda9528de47903aaa9bd9c5cb405ce0ae09a8d12fe9" \
-    SOLR_KEYS="C5DCD3AAB897097D7815BD6B069E9741F3D97FD6" \
+    SOLR_VERSION="7.3.1" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.3.1/solr-7.3.1.tgz" \
+    SOLR_SHA256="0cd8953cf7c85bc0d9a533429200c531822f18807f9fc9fb792c0b149dbd0c4d" \
+    SOLR_KEYS="A72C08F85D7666C3980C35DD1A3859BBABBDB295" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 ENV GOSU_VERSION 1.10
