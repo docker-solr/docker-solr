@@ -42,7 +42,7 @@ if ! egrep -q 'One Dell Way Round Rock, Texas 78682' <<<$data; then
 fi
 container_cleanup "$container_name"
 
-if [[ "$(stat -c %u mycores/gettingstarted/core.properties)" != 9999 ]]; then
+if [[ "$(stat -c %u mycores/gettingstarted/core.properties)" != 8983 ]]; then
   echo "mycores/gettingstarted/core.properties is owned by $(stat -c %u mycores/gettingstarted/core.properties)"
   exit 1
 fi
