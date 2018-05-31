@@ -18,10 +18,14 @@ if [ "${1:0:1}" = '-' ]; then
     set -- solr-foreground "$@"
 fi
 
+# Ensure that SOLR_HOME exists and Solr has RW access
+mkdir -p $SOLR_HOME
+chown $SOLR_USER:$SOLR_GROUP $SOLR_HOME
+
 # execute command passed in as arguments.
 # The Dockerfile has specified the PATH to include
 # /opt/solr/bin (for Solr) and /opt/docker-solr/scripts (for our scripts
 # like solr-foreground, solr-create, solr-precreate, solr-demo).
 # Note: if you specify "solr", you'll typically want to add -f to run it in
 # the foreground.
-exec "$@"
+exec sudo -E PATH=$PATH -u $SOLR_USER bash -c "$@"

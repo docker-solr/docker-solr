@@ -1,4 +1,3 @@
-
 FROM openjdk:9-jre
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
@@ -7,7 +6,11 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 ARG SOLR_DOWNLOAD_SERVER
 
 RUN apt-get update && \
-  apt-get -y install lsof procps wget gpg && \
+  apt-get -y install lsof \
+  procps \
+  wget \
+  sudo \
+  gpg && \
   rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
@@ -76,7 +79,6 @@ RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["solr-foreground"]
