@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Apply root group
+#
+# This is a bit over the top; we could limit it to directories
+# and files that we know we may actually legitimately get
+# written to; but there are some gotchas, like the DIH
+# writing to its config file, and the PID being written
+# in the bin dir. Postpone figuring that out for now and
+# just do everything.
+# But, exclude this script, to avoid "exec failed: text file busy"
+
+set -euo pipefail
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
+    set -x
+    PRINT_CHANGED="-print"
+else
+    PRINT_CHANGED=""
+fi
+THIS_SCRIPT="$0"
+
+[ $(id -u) -ne 0 ] && CHECK_OWNER=" -uid $(id -u)" || CHECK_OWNER=""
+
+DIRS=(/opt/solr /opt/docker-solr /opt/mysorlhome "${SOLR_HOME:-}" "${SOLR_EXTRA:-}")
+for dir in "${DIRS[@]}"; do
+  if [ ! -d "$dir" ]; then
+    continue
+  fi
+  # anything missing root group, add it (this will be mounted items)
+  find -L "$dir" ${CHECK_OWNER} \! -group "root" \! -path "$THIS_SCRIPT" \
+    -exec chgrp "root" {} + "$PRINT_CHANGED"
+  # anything the user can execute, root group should be able to
+  find -L "$dir" ${CHECK_OWNER} -perm /u+x \! -perm /g+x \! -path "$THIS_SCRIPT" \
+    -exec chmod g+x {} + "$PRINT_CHANGED"
+done
