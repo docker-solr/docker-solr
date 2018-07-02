@@ -1,5 +1,5 @@
 
-FROM openjdk:9-jre-slim
+FROM openjdk:10-jre-slim
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
