@@ -162,11 +162,11 @@ function verify_checksum {
     fi
     echo "verifying $checksum_type checksum"
     case $checksum_type in
-      md5)
-        md5sum -c "$checksum_file"
-        ;;
       sha1)
         sha1sum -c "$checksum_file"
+        ;;
+      sha512)
+        sha512sum -c "$checksum_file"
         ;;
       *)
         echo "unknown checksum type $checksum_type"
@@ -259,12 +259,14 @@ mkdir -p "$DOWNLOADS"
 
 latest_major_versions="$(tac<"$upstream_versions" |sed -E 's/^((([0-9]+)\.[0-9]+)\.[0-9]+)$/\1 \3/'|uniq -f 1|cut -d ' ' -f 1)"
 latest_version="$(head -n 1 <<<"$latest_major_versions")"
-latest_x_y="$(sed -E 's/(([0-9])+\.([0-9])+).*$/\1/' <<<"$latest_version")"
-if [[ ! -d "$latest_x_y" ]]; then
-  echo "The latest version of Solr is $latest_version but we have no $latest_x_y directory; creating"
+latest_major="$(sed -E 's/^([0-9]+)\.[0-9]+.*$/\1/' <<<"$latest_version")"
+latest_minor="$(sed -E 's/^[0-9]+\.([0-9]+).*$/\1/' <<<"$latest_version")"
+latest_major_minor="$latest_major.$latest_minor"
+if [[ ! -d "$latest_major_minor" ]]; then
+  echo "The latest version of Solr is $latest_version but we have no $latest_major_minor directory; creating"
   echo
-  mkdir "$latest_x_y"
-  versions+=("$latest_x_y")
+  mkdir "$latest_major_minor"
+  versions+=("$latest_major_minor")
 fi
 
 if [[ "$all_dirs" == "true" ]]; then
@@ -281,10 +283,15 @@ for version in "${versions[@]}"; do
     cd "$DOWNLOADS"
     download_solr "$full_version"
 
-    # The Solr release process publish MD5 and SHA1 checksum files. Check those first so we get a clear
+    # The Solr release process publish checksum files. Check those first so we get a clear
     # early failure for incomplete downloads, and avoid scary-sounding PGP mismatches
-    verify_checksum "$full_version" md5
-    verify_checksum "$full_version" sha1
+    this_major="$(sed -E 's/^([0-9]+)\.[0-9]+.*$/\1/' <<<"$full_version")"
+    this_minor="$(sed -E 's/^[0-9]+\.([0-9]+).*$/\1/' <<<"$full_version")"
+    if (( this_major == 7 && this_minor >= 4 )) || (( this_major > 7 )); then
+        verify_checksum "$full_version" sha512
+    else
+        verify_checksum "$full_version" sha1
+    fi
 
     verify_signature "$full_version"
 
