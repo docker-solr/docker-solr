@@ -3,10 +3,13 @@
 # This script starts Solr on localhost, creates a core with "solr create",
 # stops Solr, and then starts Solr as normal.
 # Any arguments are passed to the "solr create".
+# if you specify -cloud, it will create a collection instead
 # To simply create a core:
 #      docker run -P -d solr solr-create -c mycore
 # To create a core from mounted config:
 #      docker run -P -d -v $PWD/myconfig:/myconfig solr solr-create -c mycore -d /myconfig
+# To create a core in cloud mode:
+#      docker run -P -d solr solr-create -cloud -c mycollection
 
 set -euo pipefail
 echo "Executing $0" "$@"
@@ -15,21 +18,75 @@ if [[ "${VERBOSE:-}" = "yes" ]]; then
     set -x
 fi
 
-. /opt/docker-solr/scripts/run-initdb
+if [ -d /opt/docker-solr/scripts/run-initdb ]; then
+  . /opt/docker-solr/scripts/run-initdb
+fi
 
-# solr uses "-c corename". Parse the arguments to determine the core name.
-CORE_NAME="$(
-  while (( $# > 0 )); do
-    if [[ "$1" == '-c' ]]; then
-      shift
-      echo "$1"
-    fi
+SOLR_CREATE_ARGS=()
+SOLR_LOCAL_ARGS=()
+SOLR_FINAL_ARGS=("-f")
+while (( $# > 0 )); do
+  case "$1" in
+  -c)
     shift
-  done
-)"
-if [[ -z "${CORE_NAME:-}" ]]; then
-  echo "could not determine core name"
-  exit 1
+    ARG_CORE_NAME="$1"
+    SOLR_CREATE_ARGS+=("-c" "$1")
+    shift
+    ;;
+  -d)
+    shift
+    SOLR_CREATE_ARGS+=("-d" "$1")
+    shift
+    ;;
+  -p)
+    shift
+    SOLR_CREATE_ARGS+=("-p" "$1")
+    SOLR_LOCAL_ARGS+=("-p" "$1")
+    SOLR_FINAL_ARGS+=("-p" "$1")
+    shift
+    ;;
+  -cloud)
+    SOLR_LOCAL_ARGS+=('-cloud')
+    SOLR_FINAL_ARGS+=('-cloud')
+    ARG_CLOUD="$1"
+    shift
+    ;;
+  -V)
+    SOLR_CREATE_ARGS+=("$1")
+    shift
+    ;;
+  -n)
+    shift
+    SOLR_CREATE_ARGS+=("-n" "$1")
+    shift
+    ;;
+  -shards)
+    shift
+    SOLR_CREATE_ARGS+=("-shards" "$1")
+    shift
+    ;;
+  -replicationFactor)
+    shift
+    SOLR_CREATE_ARGS+=("-replicationFactor" "$1")
+    shift
+    ;;
+  -h|--help)
+    shift
+    cat <<EOM
+Usage: solr create [-c name] [-d confdir] [-n configName] [-shards #] [-replicationFactor #] [-p port] [-V]
+
+Start Solr in the background, create the core or collection, then stop Solr and restart it in the foreground
+EOM
+  exit 0
+  ;;
+  *)
+    echo "Unexpected argument: $1"
+    exit 1
+  esac
+done
+
+if [[ -z "${ARG_CORE_NAME:-}" ]]; then
+  ARG_CORE_NAME=_default
 fi
 
 if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
@@ -37,26 +94,26 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
   exit 1
 fi
 
-# cores get created in SOLR_HOME
-CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$CORE_NAME"
+if [ "${ARG_CLOUD:-}" == '-cloud' ]; then
+  CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/${ARG_CORE_NAME}_shard1_replica_n1"
+else
+  CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$ARG_CORE_NAME"
+fi
 
 if [[ -d $CORE_DIR ]]; then
     echo "$CORE_DIR exists; skipping core creation"
 else
-    start-local-solr
+  (
+     export SOLR_HOST=localhost
+     start-local-solr "${SOLR_LOCAL_ARGS[@]}"
 
-    echo "Creating core with:" "${@:1}"
-    /opt/solr/bin/solr create "${@:1}"
+      echo "Creating core or collection with:" "${SOLR_CREATE_ARGS[@]}"
+      /opt/solr/bin/solr create "${SOLR_CREATE_ARGS[@]}"
 
-    # See https://github.com/docker-solr/docker-solr/issues/27
-    echo "Checking core"
-    if ! wget -O - "http://localhost:${SOLR_PORT:-8983}/solr/admin/cores?action=STATUS" | grep -q instanceDir; then
-      echo "Could not find any cores"
-      exit 1
-    fi
+      echo "Created"
 
-    echo "Created core with:" "${@:1}"
-    stop-local-solr
+      stop-local-solr
+  )
 
     # check the core_dir exists; otherwise the detecting above will fail after stop/start
     if [ ! -d "$CORE_DIR" ]; then
@@ -64,4 +121,4 @@ else
         exit 1
     fi
 fi
-exec solr -f
+exec solr "${SOLR_FINAL_ARGS[@]}"
