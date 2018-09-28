@@ -94,14 +94,11 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
   exit 1
 fi
 
-if [ "${ARG_CLOUD:-}" == '-cloud' ]; then
-  CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/${ARG_CORE_NAME}_shard1_replica_n1"
-else
-  CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$ARG_CORE_NAME"
-fi
-
-if [[ -d $CORE_DIR ]]; then
-    echo "$CORE_DIR exists; skipping core creation"
+# We need to see if we are running first time (when we need to create the core
+# or collection), or booting an existing container (when we don't).
+SENTINEL="${SOLR_HOME:-/opt/solr/server/solr}/.created-$ARG_CORE_NAME"
+if [ -e "$SENTINEL" ]; then
+    echo "$SENTINEL exists; skipping core creation"
 else
   (
      export SOLR_HOST=localhost
@@ -111,14 +108,9 @@ else
       /opt/solr/bin/solr create "${SOLR_CREATE_ARGS[@]}"
 
       echo "Created"
+      touch "$SENTINEL"
 
       stop-local-solr
   )
-
-    # check the core_dir exists; otherwise the detecting above will fail after stop/start
-    if [ ! -d "$CORE_DIR" ]; then
-        echo "Missing $CORE_DIR"
-        exit 1
-    fi
 fi
 exec solr "${SOLR_FINAL_ARGS[@]}"
