@@ -19,25 +19,33 @@ function container_cleanup {
 
 function wait_for_container_and_solr {
   local container_name=$1
+  TIMEOUT_SECONDS=$(( 5 * 60 ))
+  started=$(date +%s)
   while /bin/true; do
+    if (( $(date +%s) > started + TIMEOUT_SECONDS )); then
+      echo "giving up after $TIMEOUT_SECONDS seconds"
+      exit 1
+    fi
     if ! docker inspect "$container_name" >/dev/null 2>&1; then
       sleep 1
       continue;
     fi
     container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
-    echo "container $container_name status: $container_status"
     if [[ $container_status == 'running' ]]; then
       break
     elif [[ $container_status == 'exited' ]]; then
+      echo "container $container_name status: $container_status"
       docker logs "$container_name"
       exit 1
+    else
+      echo "container $container_name status: $container_status"
     fi
+    printf '.'
     SLEEP_SECS=1
-    echo "sleeping $SLEEP_SECS seconds..."
     sleep $SLEEP_SECS
   done
 
-  echo "Checking Solr is running"
+  printf '\nChecking Solr is running\n'
   status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
   if ! egrep -q 'solr is running' <<<$status; then
     echo "solr did not start"
@@ -49,11 +57,30 @@ function wait_for_container_and_solr {
 function wait_for_server_started {
   local container_name=$1
   echo "waiting for server start"
-  while ! (docker logs "$container_name" | egrep -q '(o.e.j.s.Server Started|Started SocketConnector)'); do
+  TIMEOUT_SECONDS=$(( 5 * 60 ))
+  started=$(date +%s)
+  while true; do
+    log="tmp-${container_name}.log"
+    docker logs "$container_name" > "$log"
+    if grep -E -q '(o\.e\.j\.s\.Server Started|Started SocketConnector)' "$log" ; then
+      break
+    fi
+
+    container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
+    if [[ $container_status == 'exited' ]]; then
+      echo "container exited"
+      exit 1
+    fi
+
+    if (( $(date +%s) > started + TIMEOUT_SECONDS )); then
+      echo "giving up after $TIMEOUT_SECONDS seconds"
+      exit 1
+    fi
+    printf '.'
     SLEEP_SECS=2
-    echo "sleeping $SLEEP_SECS seconds..."
     sleep $SLEEP_SECS
   done
-  echo "server started"
+  printf '\nserver started\n'
+  rm "$log"
   sleep 4
 }
