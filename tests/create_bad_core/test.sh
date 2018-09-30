@@ -2,7 +2,7 @@
 #
 set -euo pipefail
 
-TEST_DIR="$(dirname -- $(readlink -f "${BASH_SOURCE-$0}"))"
+TEST_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE-$0}")")"
 
 if (( $# == 0 )); then
   echo "Usage: $BASH_SOURCE tag"
