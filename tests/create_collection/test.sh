@@ -28,8 +28,11 @@ wait_for_server_started "$container_name"
 
 echo "Checking cloud mode"
 system_info="system_info.txt"
-if ! docker exec --user=solr "$container_name" wget -q -O - http://localhost:8983/solr/admin/info/system | tee "$system_info" | \
-  grep -E -q '("mode":"solrcloud",|<str name="mode">solrcloud</str>)'; then
+if ! docker exec --user=solr "$container_name" wget -q -O - http://localhost:8983/solr/admin/info/system > "$system_info"; then
+  echo "Could not get status info"
+  exit 1
+fi
+if ! grep -E -q '("mode":"solrcloud",|<str name="mode">solrcloud</str>)' "$system_info"; then
   echo "Not running in cloud mode?"
   cat "$system_info"
   exit 1
