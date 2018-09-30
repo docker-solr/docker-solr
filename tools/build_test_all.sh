@@ -7,7 +7,7 @@ if [[ ! -z "${DEBUG:-}" ]]; then
   set -x
 fi
 
-TOP_DIR="$(dirname "$BASH_SOURCE")/.."
+TOP_DIR="$(dirname "${BASH_SOURCE[0]}")/.."
 cd "$TOP_DIR"
 cat TAGS
 ./tools/build_all.sh

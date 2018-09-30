@@ -80,22 +80,6 @@ and remove our local images:
 docker image list docker-solr/docker-solr | awk '{print $1":"$2}' | xargs -n 1 docker image rm
 ```
 
-## Update the generate-stackbrew-library.sh
-
-Next we'll modify our `generate-stackbrew-library.sh` script to include the version.
-
-```bash
-vi generate-stackbrew-library.sh
-```
-
-and make the aliases section look like for example:
-
-```bash
-aliases=(
-        [6.6]='6 latest'
-)
-```
-
 ## Commit changes to our local repository
 
 Now we can commit the changes to our repository.

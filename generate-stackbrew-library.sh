@@ -1,27 +1,30 @@
 #!/bin/bash
 #
+# Produce https://github.com/docker-library/official-images/blob/master/library/solr
 # Based on https://github.com/docker-library/httpd/blob/master/generate-stackbrew-library.sh
 set -eu
 
-declare -A aliases=(
-    [7.5]='7 latest'
-    [6.6]='6'
-    [5.5]='5'
-)
+declare -A aliases
+declare -g -A parentRepoToArches
 
-self="$(basename "$BASH_SOURCE")"
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+self="$(basename "${BASH_SOURCE[0]}")"
+cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-extglob_old=$(shopt -p extglob||true)
-shopt -s extglob
+declare -a versions
+readarray -t versions < <(find . -maxdepth 1 -regex '\./[0-9]+\.[0-9]+' -printf '%f\n' | sort -rV)
+latest_version="${versions[0]}"
 
-versions=( +([0-9])\.+([0-9])/ )
-eval "$extglob_old"
-
-versions=( "${versions[@]%/}" )
-
-# sort version numbers with highest first
-IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -rV) ); unset IFS
+# make a map from major version to most recent minor, eg 7->7.5
+readarray -t versions_increasing < <(printf '%s\n' "${versions[@]}" | tac )
+declare -A major_to_minor
+for v in "${versions_increasing[@]}"; do
+  major="$(sed -E 's/\..*//' <<<"$v")"
+  major_to_minor[$major]=$v
+done
+# invert that to create aliases eg 7.5 -> 7
+for major in "${!major_to_minor[@]}"; do
+  aliases[${major_to_minor[$major]}]="$major"
+done
 
 # get the most recent commit which modified any of "$@"
 fileCommit() {
@@ -35,13 +38,13 @@ dirCommit() {
 		cd "$dir"
 		fileCommit \
 			Dockerfile \
-			$(git show HEAD:./Dockerfile | awk '
+			"$(git show HEAD:./Dockerfile | awk '
 				toupper($1) == "COPY" {
 					for (i = 2; i < NF; i++) {
 						print $i
 					}
 				}
-			')
+			')"
 	)
 }
 
@@ -50,7 +53,7 @@ getArches() {
 	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
 
 		eval "declare -g -A parentRepoToArches=( $(
-		find -path ./builder -prune -o -name 'Dockerfile' -exec awk '
+		find . -path ./builder -prune -o -name 'Dockerfile' -exec awk '
 				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|microsoft\/[^:]+)(:|$)/ {
 					print "'"$officialImagesUrl"'" $2
 				}
@@ -69,13 +72,6 @@ Maintainers: Martijn Koster <mak-github@greenhills.co.uk> (@makuk66),
 GitRepo: https://github.com/docker-solr/docker-solr.git
 EOH
 
-# prints "$2$1$3$1...$N"
-join() {
-	local sep="$1"; shift
-	local out; printf -v out "${sep//%/%%}%s" "$@"
-	echo "${out#$sep}"
-}
-
 for version in "${versions[@]}"; do
 	for variant in '' alpine slim; do
 		dir="$version${variant:+/$variant}"
@@ -84,24 +80,31 @@ for version in "${versions[@]}"; do
 		commit="$(dirCommit "$dir")"
 
     # grep the full version from the Dockerfile, eg: SOLR_VERSION="6.6.1"
-		fullVersion="$(git show "$commit":"$dir/Dockerfile" | \
-      egrep 'SOLR_VERSION="[^"]+"' | \
+		fullVersion="$(git show "$commit:$dir/Dockerfile" | \
+      grep -E 'SOLR_VERSION="[^"]+"' | \
       sed -E -e 's/.*SOLR_VERSION="([^"]+)".*$/\1/')"
     if [[ -z $fullVersion ]]; then
       echo "Cannot determine full version from $dir/Dockerfile"
       exit 1
     fi
 		versionAliases=(
-			$fullVersion
-			$version
-			${aliases[$version]:-}
+			"$fullVersion"
+			"$version"
 		)
 
+		if [[ ! -z "${aliases[$version]:-}" ]]; then
+            versionAliases=( "${versionAliases[@]}"  "${aliases[$version]:-}" )
+		fi
 		if [ -z "$variant" ]; then
 			variantAliases=( "${versionAliases[@]}" )
+        	if [[ $version == "$latest_version" ]]; then
+                variantAliases=( "${variantAliases[@]}"  "latest" )
+            fi
 		else
 			variantAliases=( "${versionAliases[@]/%/-$variant}" )
-			variantAliases=( "${variantAliases[@]//latest-/}" )
+            if [[ $version == "$latest_version" ]]; then
+                    variantAliases=( "${variantAliases[@]}"  "$variant" )
+             fi
 		fi
 
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
@@ -109,8 +112,8 @@ for version in "${versions[@]}"; do
 
 		echo
 		cat <<-EOE
-			Tags: $(join ', ' "${variantAliases[@]}")
-			Architectures: $(join ', ' $variantArches)
+			Tags: $(sed -E 's/ +/, /g' <<<"${variantAliases[@]}")
+			Architectures: $(sed -E 's/ +/, /g' <<<"$variantArches")
 			GitCommit: $commit
 			Directory: $dir
 		EOE
