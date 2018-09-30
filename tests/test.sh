@@ -2,10 +2,10 @@
 
 set -euo pipefail
 
-cd "$(dirname "$BASH_SOURCE")"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 if (( $# == 0 )); then
-  echo "Usage: $BASH_SOURCE tag"
+  echo "Usage: ${[BASH_SOURCE[0]]} tag"
   exit
 fi
 
@@ -14,7 +14,7 @@ if [[ -z "${IMAGE_NAME:-}" ]]; then
 fi
 
 tag=$1
-if ! grep -q : <<<$tag; then
+if ! grep -q : <<<"$tag"; then
   tag="$IMAGE_NAME:$tag"
 fi
 

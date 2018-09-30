@@ -5,7 +5,7 @@
 # Usage: build_all.sh
 
 set -euo pipefail
-TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "$BASH_SOURCE")")/..")"
+TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 cd "$TOP_DIR"
 
 build_dirs=$(awk --field-separator ':' '{print $1}' "$TOP_DIR/TAGS")

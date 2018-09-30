@@ -5,7 +5,7 @@ set -euo pipefail
 TEST_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE-$0}")")"
 
 if (( $# == 0 )); then
-  echo "Usage: $BASH_SOURCE tag"
+  echo "Usage: ${BASH_SOURCE[0]} tag"
   exit
 fi
 
@@ -46,11 +46,11 @@ else
 fi
 
 # check that the version of Solr matches the tag
-changelog_version=$(docker exec --user=solr "$container_name" bash -c "egrep '^==========* ' /opt/solr/CHANGES.txt | head -n 1 | tr -d '= '")
+changelog_version=$(docker exec --user=solr "$container_name" bash -c "grep -E '^==========* ' /opt/solr/CHANGES.txt | head -n 1 | tr -d '= '")
 echo "Solr version $changelog_version"
 solr_version_from_tag=$(echo "$tag" | sed -e 's/^.*://' -e 's/-.*//')
 
-if [[ $changelog_version != $solr_version_from_tag ]]; then
+if [[ $changelog_version != "$solr_version_from_tag" ]]; then
   echo "Solr version mismatch"
   container_cleanup "$container_name"
   exit 1

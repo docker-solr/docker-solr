@@ -9,7 +9,7 @@
 # We also write a TAGS file with the docker tags for the image.
 set -euo pipefail
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
+cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
 TOP_DIR=$PWD
 OWNERTRUSTFILE="ownertrust.txt"
@@ -18,8 +18,8 @@ KEYSERVERS=(hkp://keyserver.ubuntu.com:80
       pgp.mit.edu)
 
 if (( $# == 0 )); then
-  x_y_dirs=($(find . -maxdepth 1 -print | sed 's,^\./,,' | \
-            grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort))
+  readarray -t x_y_dirs < <(find . -maxdepth 1 -print | sed 's,^\./,,' | \
+            grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
   set -- "${x_y_dirs[@]}"
   all_dirs=true
 else
@@ -86,7 +86,7 @@ function write_files {
       # The TAGS file will list build_dir:full_version:tags
       # Other scripts in ./tools/ will parse the TAGS file.
       # This is only for local/Travis use; the official library does not use the TAGS file.
-      echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<$extra_tags | sed 's/ $//')" >> "$TOP_DIR/TAGS"
+      echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<"$extra_tags" | sed 's/ $//')" >> "$TOP_DIR/TAGS"
     fi
 }
 
@@ -97,7 +97,7 @@ function load_keys {
       rm -fr "$GNUPGHOME"
     fi
     # we have a local record with key:owner lines
-    while IFS=: read key owner; do
+    while IFS=: read -r key owner; do
         if gpg --list-keys "$key"  >/dev/null 2>&1; then
           echo "already have key $key"
           continue
@@ -117,7 +117,7 @@ function load_keys {
     done < known_keys.txt
     # create ownertrust to make the warning go away
     true > $OWNERTRUSTFILE
-    while IFS=: read key owner; do
+    while IFS=: read -r key owner; do
         echo "$key:6:" >> $OWNERTRUSTFILE
     done < known_keys.txt
     gpg --import-ownertrust $OWNERTRUSTFILE
@@ -190,20 +190,20 @@ function verify_signature {
     KEYS=$(awk 'BEGIN { ORS=" "} $1 == "[GNUPG:]" && $2 == "VALIDSIG" { print $3 }' gpg.status|sed '-e s/ $//')
   else
     echo "signature verification failed!"
-    if egrep '\[GNUPG:\] NO_PUBKEY' gpg.status; then
+    if grep -E '\[GNUPG:\] NO_PUBKEY' gpg.status; then
       # there was at least one missing key. Help the admin by fetching it from the keyservers
-      missing_keys=$(egrep '\[GNUPG:\] NO_PUBKEY' gpg.status|sed -e 's/\[GNUPG:\] NO_PUBKEY //'|sort|uniq)
+      missing_keys=$(grep -E '\[GNUPG:\] NO_PUBKEY' gpg.status|sed -e 's/\[GNUPG:\] NO_PUBKEY //'|sort|uniq)
       for missing_key in $missing_keys; do
         echo "looks like a unknown key was used: $missing_key"
         fingerprint=""
         for keyserver in "${KEYSERVERS[@]}"; do
           echo "trying keyserver $keyserver"
           if 5>gpg-import.status gpg --keyserver "$keyserver" --keyserver-options timeout=10 --recv-key "$missing_key"; then
-            fingerprint=$(gpg --fingerprint -k "$missing_key" | egrep -A 1 '^pub'| tail -n 1|sed -e 's/^.* = //' -e 's/ //g')
+            fingerprint=$(gpg --fingerprint -k "$missing_key" | grep -E -A 1 '^pub'| tail -n 1|sed -e 's/^.* = //' -e 's/ //g')
             if [[ -z $fingerprint ]]; then
               echo "Could not get fingerprint for $missing_key"
             else
-              owner=$(gpg --export "$missing_key" | gpg --list-packets | egrep '^:user ID packet'| cut -d : -f 3 | sed -e 's/^ //' -e 's/"//g')
+              owner=$(gpg --export "$missing_key" | gpg --list-packets | grep -E '^:user ID packet'| cut -d : -f 3 | sed -e 's/^ //' -e 's/"//g')
               if [[ -z $owner ]]; then
                 echo "Could not get owner for $missing_key"
               else
@@ -212,7 +212,7 @@ function verify_signature {
               fi
             fi
           else
-            if egrep '\[GNUPG:\] NO_DATA' gpg-import.status; then
+            if grep -E '\[GNUPG:\] NO_DATA' gpg-import.status; then
               echo "and that key appears not to exist on keyserver $keyserver"
             else
               echo "failed to get the key from $keyserver"
@@ -313,5 +313,5 @@ tools/write_travis.sh > .travis.yml
 
 if [[ "$all_dirs" == "false" ]]; then
   echo "WARNING: TAGS was not updated, because directories were specified"
-  echo "To update tags, run: ./tools/$(basename "$BASH_SOURCE")"
+  echo "To update tags, run: ./tools/$(basename "${BASH_SOURCE[0]}")"
 fi

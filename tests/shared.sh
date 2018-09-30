@@ -47,7 +47,7 @@ function wait_for_container_and_solr {
 
   printf '\nChecking Solr is running\n'
   status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
-  if ! grep -E -q 'solr is running' <<<$status; then
+  if ! grep -E -q 'solr is running' <<<"$status"; then
     echo "solr did not start"
     container_cleanup "$container_name"
     exit 1

@@ -5,7 +5,7 @@
 # Usage: build.sh dir
 
 set -euo pipefail
-TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "$BASH_SOURCE")")/..")"
+TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 
 if (( $# != 1 )); then
   echo "Usage: $0 build-dir"
@@ -19,7 +19,7 @@ if [[ ! -f "$build_dir/Dockerfile" ]]; then
   exit 1
 fi
 build_dir="$(readlink -f "$build_dir")"
-relative_dir="$(sed -e "s,$TOP_DIR/,," <<< $build_dir)"
+relative_dir="$(sed -e "s,$TOP_DIR/,," <<< "$build_dir")"
 cd "$build_dir"
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then

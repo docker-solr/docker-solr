@@ -69,20 +69,20 @@ EOM
   esac
 done
 
-grep -q -E '^[0-9]+$' <<<$max_attempts || usage "--max-attempts $max_attempts: not a number"
+grep -q -E '^[0-9]+$' <<<"$max_attempts" || usage "--max-attempts $max_attempts: not a number"
 if (( max_attempts == 0 )); then
   echo "--max-attempts should be >0"
   exit 1
 fi
-grep -q -E '^[0-9]+$' <<<$wait_seconds || usage "--wait-seconds $wait_seconds: not a number"
-grep -q -E '^https?://' <<<$solr_url || usage "--solr-url $solr_url: not a URL"
+grep -q -E '^[0-9]+$' <<<"$wait_seconds" || usage "--wait-seconds $wait_seconds: not a number"
+grep -q -E '^https?://' <<<"$solr_url" || usage "--solr-url $solr_url: not a URL"
 
-let attempts_left=$max_attempts
+((attempts_left=max_attempts))
 while (( attempts_left > 0 )); do
   if wget -q -O - "$solr_url" | grep -q -i solr; then
     break
   fi
-  let "attempts_left--"
+  (( attempts_left-- ))
   if (( attempts_left == 0 )); then
     echo "solr is still not running; giving up"
     exit 1
