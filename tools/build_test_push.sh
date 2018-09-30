@@ -28,5 +28,5 @@ docker pull "$parent" >/dev/null 2>&1
 "$TOP_DIR/tools/build.sh" "$build_dir"
 full_version=$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $2}' "$TOP_DIR/TAGS")
 "$TOP_DIR/tests/test.sh" "$full_version"
-readarray -r tags < <(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")
+readarray -t tags < <(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")
 "$TOP_DIR/tools/push.sh" "$full_version" "${tags[@]}"
