@@ -2,7 +2,7 @@
 #
 set -euo pipefail
 
-TEST_DIR="$(dirname -- $(readlink -f "${BASH_SOURCE-$0}"))"
+TEST_DIR="$(dirname -- "$(readlink -f "${BASH_SOURCE-$0}")")"
 
 if (( $# == 0 )); then
   echo "Usage: $BASH_SOURCE tag"
@@ -49,10 +49,17 @@ if [[ ! -z "$data" ]]; then
   exit 1
 fi
 echo "Checking docker logs"
-if ! docker logs "$container_name" | grep 'ignoring /docker-entrypoint-initdb.d/ignore-me'; then
+log=docker.log
+if ! docker logs "$container_name" >"$log" 2>&1; then
+  echo "Could not get logs for $container_name"
+  exit
+fi
+if ! grep -q 'ignoring /docker-entrypoint-initdb.d/ignore-me' "$log"; then
   echo "missing ignoring message"
+  cat "$log"
   exit 1
 fi
+rm "$log"
 
 rm -fr initdb.d
 container_cleanup "$container_name"
