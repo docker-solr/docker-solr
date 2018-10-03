@@ -6,6 +6,10 @@ MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
+ARG ADD_JDBC_PSQL_DRIVER
+
+ENV JDBC_PSQL_VERSION 42.2.5
+
 RUN apt-get update && \
   apt-get -y install lsof procps wget gpg && \
   rm -rf /var/lib/apt/lists/*
@@ -73,6 +77,10 @@ RUN set -e; \
 
 COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
+
+RUN [ ! -z "$ADD_JDBC_PSQL_DRIVER" ] \
+    && mkdir /opt/solr/contrib/dataimporthandler/lib \
+    && wget -O /opt/solr/contrib/dataimporthandler/lib/postgresql-$JDBC_PSQL_VERSION.jar "http://jdbc.postgresql.org/download/postgresql-$JDBC_PSQL_VERSION.jar"
 
 EXPOSE 8983
 WORKDIR /opt/solr
