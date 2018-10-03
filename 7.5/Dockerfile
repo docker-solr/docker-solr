@@ -79,7 +79,8 @@ COPY scripts /opt/docker-solr/scripts
 RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
 RUN [ ! -z "$ADD_JDBC_PSQL_DRIVER" ] \
-    && wget -O /opt/solr/dist/postgresql-$JDBC_PSQL_VERSION.jar "http://jdbc.postgresql.org/download/postgresql-$JDBC_PSQL_VERSION.jar"
+    && mkdir /opt/solr/contrib/dataimporthandler/lib \
+    && wget -O /opt/solr/contrib/dataimporthandler/lib/postgresql-$JDBC_PSQL_VERSION.jar "http://jdbc.postgresql.org/download/postgresql-$JDBC_PSQL_VERSION.jar"
 
 EXPOSE 8983
 WORKDIR /opt/solr
