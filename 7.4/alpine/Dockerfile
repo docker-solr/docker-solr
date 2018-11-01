@@ -52,7 +52,7 @@ RUN set -e; \
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
-  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/')"; \
+  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
   wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
   wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
