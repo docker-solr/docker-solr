@@ -39,7 +39,7 @@ RUN set -e; \
       pgp.mit.edu \
     ; do \
       echo "  trying $server for $key"; \
-      gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
+      gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
     done; \
     test -z "$found" && echo >&2 "error: failed to fetch $key from several disparate servers -- network issues?" && exit 1; \
   done; \
