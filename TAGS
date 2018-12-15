@@ -16,6 +16,9 @@
 7.4:7.4.0:7.4
 7.4/alpine:7.4.0-alpine:7.4-alpine
 7.4/slim:7.4.0-slim:7.4-slim
-7.5:7.5.0:7.5 7 latest
-7.5/alpine:7.5.0-alpine:7.5-alpine 7-alpine latest-alpine
-7.5/slim:7.5.0-slim:7.5-slim 7-slim latest-slim
+7.5:7.5.0:7.5
+7.5/alpine:7.5.0-alpine:7.5-alpine
+7.5/slim:7.5.0-slim:7.5-slim
+7.6:7.6.0:7.6 7 latest
+7.6/alpine:7.6.0-alpine:7.6-alpine 7-alpine latest-alpine
+7.6/slim:7.6.0-slim:7.6-slim 7-slim latest-slim
