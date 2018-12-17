@@ -59,14 +59,14 @@ function write_files {
     fi
 
     if [[ "$dash_variant" = "-alpine" ]]; then
-        # No Java 9/10 on Alpine; see https://github.com/docker-library/openjdk/issues/177
+        # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
         FROM=openjdk:8-jre-alpine
     else
         major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
         minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
         # Use Java 9 for Solr >= 7.3
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7)); then
-            FROM=openjdk:10-jre$dash_variant
+            FROM=openjdk:11-jre$dash_variant
         else
             FROM=openjdk:8-jre$dash_variant
         fi
