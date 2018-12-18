@@ -63,15 +63,18 @@ RUN sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.ne
 
 COPY scripts /opt/docker-solr/scripts
 
+RUN sed -i -e 's/\$SOLR_VERSION/'"$SOLR_VERSION/" /opt/docker-solr/scripts/solr-foreground
+
+
 # Now prepare the solr image efficiently
 FROM openjdk:11-jre-slim
 
-ENV SOLR_USER="solr" \
-    SOLR_UID="8983" \
-    SOLR_GROUP="solr" \
-    SOLR_GID="8983" \
-    SOLR_VERSION="7.6.0" \
-    PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
+ARG SOLR_USER="solr"
+ARG SOLR_UID="8983"
+ARG SOLR_GROUP="solr"
+ARG SOLR_GID="8983"
+
+ENV PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN set -e; \
   apt-get update; \
