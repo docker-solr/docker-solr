@@ -178,10 +178,10 @@ Used together, you can implement static addresses. See [this example](docs/docke
 Can I run ZooKeeper and Solr with Docker Links?
 -----------------------------------------------
 
-Docker's [Legacy container links](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) provide a way to 
+Docker's [Legacy container links](https://docs.docker.com/engine/userguide/networking/default_network/dockerlinks/) provide a way to
 pass connection configuration between containers. It only works on a single machine, on the default bridge.
 It provides no facilities for static IPs.
-Note: this feature is expected to be deprecated and removed in a future release. 
+Note: this feature is expected to be deprecated and removed in a future release.
 So really, see the "Can I run ZooKeeper and Solr clusters under Docker?" option above instead.
 
 But for some use-cases, such as quick demos or one-shot automated testing, it can be convenient.

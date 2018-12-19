@@ -159,7 +159,7 @@ git push
 We'll use the output provided by `generate-stackbrew-library.sh` earlier:
 
 ```bash
-cat ../new-versions > library/solr 
+cat ../new-versions > library/solr
 git diff
 ```
 
