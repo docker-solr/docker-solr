@@ -34,7 +34,7 @@ RUN bash /builder_tools/get-gosu.sh $GOSU_VERSION
 
 
 ### Now prepare the solr image
-FROM openjdk:11-jre-slim
+FROM openjdk:11-jre
 
 LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
 LABEL repository="https://github.com/docker-solr/docker-solr"
