@@ -19,6 +19,7 @@ RUN bash /builder_tools/get-solr.sh $SOLR_URL $SOLR_SHA256
 
 COPY scripts /opt/docker-solr/scripts
 
+
 ### get and check gosu
 FROM debian:stretch-slim as GOSU_BUILDER
 

@@ -1,83 +1,74 @@
-
-FROM $REPLACE_FROM
-MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+### get, check and install solr and our scripts
+FROM alpine as SOLR_BUILDER
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN apk add --no-cache \
-        lsof \
-        gnupg \
-        procps \
-        tar \
-        bash
+RUN apk add --no-cache bash
+RUN apk add --no-cache gnupg
+RUN apk add --no-cache lsof
+RUN apk add --no-cache procps
+RUN apk add --no-cache tar
+
 RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
 
-ENV SOLR_USER="solr" \
-    SOLR_UID="8983" \
-    SOLR_GROUP="solr" \
-    SOLR_GID="8983" \
-    SOLR_VERSION="$REPLACE_SOLR_VERSION" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz" \
-    SOLR_SHA256="$REPLACE_SOLR_SHA256" \
-    SOLR_KEYS="$REPLACE_SOLR_KEYS" \
-    PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
+ENV SOLR_VERSION="$REPLACE_SOLR_VERSION"
+ENV SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz"
+ENV SOLR_SHA256="$REPLACE_SOLR_SHA256"
+ENV SOLR_KEY="$REPLACE_SOLR_KEYS"
 
-ENV GOSU_VERSION 1.10
-ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
-
-RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
-    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
-
-RUN set -e; \
-  export GNUPGHOME="/tmp/gnupg_home" && \
-  mkdir -p "$GNUPGHOME" && \
-  chmod 700 "$GNUPGHOME" && \
-  for key in $SOLR_KEYS $GOSU_KEY; do \
-    found=''; \
-    for server in \
-      ha.pool.sks-keyservers.net \
-      hkp://keyserver.ubuntu.com:80 \
-      hkp://p80.pool.sks-keyservers.net:80 \
-      pgp.mit.edu \
-    ; do \
-      echo "  trying $server for $key"; \
-      gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
-    done; \
-    test -z "$found" && echo >&2 "error: failed to fetch $key from several disparate servers -- network issues?" && exit 1; \
-  done; \
-  exit 0
-
-RUN set -e; \
-  export GNUPGHOME="/tmp/gnupg_home" && \
-  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
-  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
-  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
-  gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
-  rm /usr/local/bin/gosu.asc && \
-  chmod +x /usr/local/bin/gosu && \
-  gosu nobody true && \
-  mkdir -p /opt/solr && \
-  echo "downloading $SOLR_URL" && \
-  wget -q $SOLR_URL -O /opt/solr.tgz && \
-  echo "downloading $SOLR_URL.asc" && \
-  wget -q $SOLR_URL.asc -O /opt/solr.tgz.asc && \
-  echo "$SOLR_SHA256 */opt/solr.tgz" | sha256sum -c - && \
-  (>&2 ls -l /opt/solr.tgz /opt/solr.tgz.asc) && \
-  gpg --batch --verify /opt/solr.tgz.asc /opt/solr.tgz && \
-  tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
-  rm /opt/solr.tgz* && \
-  rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr /opt/mysolrhome && \
-  sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
-  sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
+COPY builder_tools/* /builder_tools/
+RUN bash /builder_tools/get-gpg-keys.sh $SOLR_KEY
+RUN bash /builder_tools/get-solr.sh $SOLR_URL $SOLR_SHA256
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr /opt/mysolrhome
+
+
+### get and check gosu
+FROM alpine as GOSU_BUILDER
+
+RUN apk add --no-cache bash
+RUN apk add --no-cache gnupg
+RUN apk add --no-cache ca-certificates wget && \
+        update-ca-certificates
+
+ENV GOSU_VERSION 1.11
+ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
+
+COPY builder_tools/* /builder_tools/
+RUN bash /builder_tools/get-gpg-keys.sh $GOSU_KEY
+RUN bash /builder_tools/get-gosu.sh $GOSU_VERSION
+
+
+### Now prepare the solr image
+FROM $REPLACE_FROM
+
+LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
+LABEL repository="https://github.com/docker-solr/docker-solr"
+
+ARG SOLR_USER="solr"
+ARG SOLR_UID="8983"
+ARG SOLR_GROUP="solr"
+ARG SOLR_GID="8983"
+
+ENV PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
+
+RUN set -e; \
+  apk add --no-cache \
+        bash \
+        lsof \
+        procps; \
+  apk add --no-cache ca-certificates wget && \
+        update-ca-certificates; \
+  addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+  adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
+
+COPY --from=SOLR_BUILDER --chown=solr:solr /opt /opt
+COPY --from=SOLR_BUILDER --chown=solr:solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
+
+COPY --from=GOSU_BUILDER /usr/local/bin/gosu /usr/local/bin/gosu
 
 EXPOSE 8983
 WORKDIR /opt/solr
