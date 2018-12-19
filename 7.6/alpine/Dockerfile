@@ -1,18 +1,18 @@
 ### get, check and install solr and our scripts
-FROM alpine as SOLR_BUILDER
-
-# Override the solr download location with e.g.:
-#   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
-ARG SOLR_DOWNLOAD_SERVER
+FROM alpine:3.8 as our_alpine
 
 RUN apk add --no-cache bash
 RUN apk add --no-cache gnupg
-RUN apk add --no-cache lsof
-RUN apk add --no-cache procps
 RUN apk add --no-cache tar
 
 RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
+
+FROM our_alpine as solr_builder
+
+# Override the solr download location with e.g.:
+#   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
+ARG SOLR_DOWNLOAD_SERVER
 
 ENV SOLR_VERSION="7.6.0"
 ENV SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.6.0/solr-7.6.0.tgz"
@@ -27,12 +27,7 @@ COPY scripts /opt/docker-solr/scripts
 
 
 ### get and check gosu
-FROM alpine as GOSU_BUILDER
-
-RUN apk add --no-cache bash
-RUN apk add --no-cache gnupg
-RUN apk add --no-cache ca-certificates wget && \
-        update-ca-certificates
+FROM our_alpine AS gosu_builder
 
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
@@ -65,10 +60,10 @@ RUN set -e; \
   addgroup -S -g $SOLR_GID $SOLR_GROUP && \
   adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
-COPY --from=SOLR_BUILDER --chown=solr:solr /opt /opt
-COPY --from=SOLR_BUILDER --chown=solr:solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
+COPY --from=solr_builder --chown=solr:solr /opt /opt
+COPY --from=solr_builder --chown=solr:solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 
-COPY --from=GOSU_BUILDER /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=gosu_builder /usr/local/bin/gosu /usr/local/bin/gosu
 
 EXPOSE 8983
 WORKDIR /opt/solr

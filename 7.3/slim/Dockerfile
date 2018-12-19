@@ -1,19 +1,24 @@
+### get debian with wget
+FROM debian:stretch-slim as our_debian
+
+RUN apt-get update
+RUN apt-get -y install wget gpg
+
+COPY builder_tools/* /builder_tools/
+
+
 ### get, check and install solr and our scripts
-FROM debian:stretch-slim as SOLR_BUILDER
+FROM our_debian AS solr_builder
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
-
-RUN apt-get update
-RUN apt-get -y install wget gpg
 
 ENV SOLR_VERSION="7.3.1"
 ENV SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.3.1/solr-7.3.1.tgz"
 ENV SOLR_SHA256="0cd8953cf7c85bc0d9a533429200c531822f18807f9fc9fb792c0b149dbd0c4d"
 ENV SOLR_KEY="A72C08F85D7666C3980C35DD1A3859BBABBDB295"
 
-COPY builder_tools/* /builder_tools/
 RUN bash /builder_tools/get-gpg-keys.sh $SOLR_KEY
 RUN bash /builder_tools/get-solr.sh $SOLR_URL $SOLR_SHA256
 
@@ -21,15 +26,11 @@ COPY scripts /opt/docker-solr/scripts
 
 
 ### get and check gosu
-FROM debian:stretch-slim as GOSU_BUILDER
-
-RUN apt-get update
-RUN apt-get -y install wget gpg
+FROM our_debian AS gosu_builder
 
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
-COPY builder_tools/* /builder_tools/
 RUN bash /builder_tools/get-gpg-keys.sh $GOSU_KEY
 RUN bash /builder_tools/get-gosu.sh $GOSU_VERSION
 
@@ -54,10 +55,10 @@ RUN set -e; \
   groupadd -r --gid $SOLR_GID $SOLR_GROUP; \
   useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER
 
-COPY --from=SOLR_BUILDER --chown=solr:solr /opt /opt
-COPY --from=SOLR_BUILDER --chown=solr:solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
+COPY --from=solr_builder --chown=solr:solr /opt /opt
+COPY --from=solr_builder --chown=solr:solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 
-COPY --from=GOSU_BUILDER /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=gosu_builder /usr/local/bin/gosu /usr/local/bin/gosu
 
 EXPOSE 8983
 WORKDIR /opt/solr
