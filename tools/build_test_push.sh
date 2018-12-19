@@ -21,9 +21,10 @@ fi
 build_dir="$(readlink -f "$build_dir")"
 relative_dir="$(sed "s,$TOP_DIR/,," <<< "$build_dir")"
 
-parent="$(grep '^FROM' "$build_dir/Dockerfile" | sed -E 's/^.*FROM *//')"
-echo "pulling $parent"
-docker pull "$parent" >/dev/null 2>&1
+while read -r base_image; do
+  echo "pulling $base_image"
+  docker pull "$base_image" >/dev/null 2>&1
+done < <(grep '^FROM' "$build_dir/Dockerfile" | sed -E 's/^.*FROM *//' | sed 's/ .*$//' | sort | uniq)
 
 "$TOP_DIR/tools/build.sh" "$build_dir"
 full_version=$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $2}' "$TOP_DIR/TAGS")
