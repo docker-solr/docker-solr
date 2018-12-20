@@ -5,12 +5,19 @@
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." || exit 1
 
 cat <<EOM
+dist: xenial
+
 sudo: required
 
 language: generic
 
 services:
 - docker
+
+addons:
+  apt:
+    packages:
+      - docker-ce
 
 before_install:
 - docker info
