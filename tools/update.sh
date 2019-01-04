@@ -81,6 +81,7 @@ function write_files {
       -e "s/\\\$REPLACE_SOLR_KEYS/$KEYS/g" \
       > "$target_dir/Dockerfile"
     cp -r scripts "$target_dir"
+    cp -r builder_tools "$target_dir"
 
     if [[ "$all_dirs" == "true" ]]; then
       # The TAGS file will list build_dir:full_version:tags
