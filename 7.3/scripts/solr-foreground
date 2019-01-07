@@ -14,6 +14,6 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT}"; then
   exit 1
 fi
 
-echo "Starting Solr"
+echo "Starting Solr $SOLR_VERSION"
 
 exec solr -f "$@"
