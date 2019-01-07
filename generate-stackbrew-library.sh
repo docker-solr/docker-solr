@@ -107,7 +107,7 @@ for version in "${versions[@]}"; do
              fi
 		fi
 
-		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile" | head -n 1)"
+		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 		variantArches="${parentRepoToArches[$variantParent]}"
 
 		echo
