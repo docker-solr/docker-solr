@@ -9,7 +9,7 @@ LABEL repository="https://github.com/docker-solr/docker-solr"
 ARG SOLR_DOWNLOAD_SERVER
 
 RUN apt-get update && \
-  apt-get -y install lsof procps wget gpg && \
+  apt-get -y install lsof procps wget gpg dirmngr && \
   rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
