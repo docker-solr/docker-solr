@@ -32,6 +32,7 @@ RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
   mkdir -p "$GNUPGHOME" && \
   chmod 700 "$GNUPGHOME" && \
+  echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf" && \
   for key in $SOLR_KEYS $GOSU_KEY; do \
     found=''; \
     for server in \
