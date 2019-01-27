@@ -18,22 +18,42 @@ if [[ ! -z "${DEBUG:-}" ]]; then
   set -x
 fi
 
+# mycores is not supported in images
+# that have been installed by install_solr_service.sh.
+# Detect that based on tag (TODO: determine this dynamically
+# based on a "docker run")
+if grep -q 'installer' <<<"$tag"; then
+  echo "Test $TEST_DIR $tag skipped"
+  exit 0
+fi
+
 source "$TEST_DIR/../shared.sh"
 
 echo "Test $TEST_DIR $tag"
 container_name='test_'$(echo "$tag" | tr ':/-' '_')
 
+MYCORES_DIR=mycores
+
 cd "$TEST_DIR"
-rm -fr mycores
-mkdir mycores
+if [ -d mycores ]; then
+  # remove any leftovers
+  docker run --rm --user 0:0 --rm \
+    -v "$PWD/$MYCORES_DIR:/mycores" "$tag" \
+    bash -c "rm -fr /mycores/*"
+fi
+
+rm -fr "$MYCORES_DIR"
+mkdir "$MYCORES_DIR"
 
 echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 
+ROOT_TEST_FILENAME=root_was_here
+
 echo "Running $container_name"
 docker run --user 0:0 --name "$container_name" -d -e VERBOSE=yes \
-  -v  "$PWD/mycores:/opt/solr/server/solr/mycores" "$tag" \
-  bash -c "chown -R solr:solr /opt/solr/server/solr/mycores; touch /opt/solr/server/solr/mycores/root_was_here; exec gosu solr:solr solr-precreate gettingstarted"
+  -v  "$PWD/$MYCORES_DIR:/opt/solr/server/solr/mycores" "$tag" \
+  bash -c "chown -R solr:solr /opt/solr/server/solr/mycores; touch /opt/solr/server/solr/mycores/$ROOT_TEST_FILENAME; exec gosu solr:solr solr-precreate gettingstarted"
 
 wait_for_server_started "$container_name"
 
@@ -49,30 +69,30 @@ fi
 container_cleanup "$container_name"
 
 # check test file was created by root
-if [[ ! -f mycores/root_was_here ]]; then
-  echo "Missing mycores/root_was_here"
+if [[ ! -f "$MYCORES_DIR/$ROOT_TEST_FILENAME" ]]; then
+  echo "Missing $MYCORES_DIR/$ROOT_TEST_FILENAME"
   exit 1
 fi
-if [[ "$(stat -c %U mycores/root_was_here)" != root ]]; then
-  echo "tmp/f is owned by $(stat -c %U mycores/root_was_here)"
+if [[ "$(stat -c %U "$MYCORES_DIR/$ROOT_TEST_FILENAME")" != root ]]; then
+  echo "$ROOT_TEST_FILENAME is owned by $(stat -c %U "$MYCORES_DIR/$ROOT_TEST_FILENAME")"
   exit 1
 fi
 
 # check core is created by solr
-if [[ ! -f mycores/gettingstarted/core.properties ]]; then
-  echo "Missing mycores/gettingstarted/core.properties"
+if [[ ! -f "$MYCORES_DIR/gettingstarted/core.properties" ]]; then
+  echo "Missing $MYCORES_DIR/gettingstarted/core.properties"
   exit 1
 fi
-if [[ "$(stat -c %u mycores/gettingstarted/core.properties)" != 8983 ]]; then
-  echo "mycores/gettingstarted/core.properties is owned by $(stat -c %u mycores/gettingstarted/core.properties)"
+if [[ "$(stat -c %u "$MYCORES_DIR/gettingstarted/core.properties")" != 8983 ]]; then
+  echo "$MYCORES_DIR/gettingstarted/core.properties is owned by $(stat -c %u "$MYCORES_DIR/gettingstarted/core.properties")"
   exit 1
 fi
 
 # chown it back
 docker run --rm --user 0:0 -d -e VERBOSE=yes \
-  -v "$PWD/mycores:/opt/solr/server/solr/mycores" "$tag" \
+  -v "$PWD/$MYCORES_DIR:/opt/solr/server/solr/mycores" "$tag" \
   bash -c "chown -R $(id -u):$(id -g) /opt/solr/server/solr/mycores; ls -ld /opt/solr/server/solr/mycores"
 
-rm -fr mycores
+rm -fr $MYCORES_DIR
 
 echo "Test $TEST_DIR $tag succeeded"

@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+# A helper script to initialise an empty /var/solr/data
+
+set -e
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+if [ ! -d /var/solr/data ]; then
+    exit
+fi
+
+if [ ! -f /var/solr/data/solr.xml ]; then
+    cp -a /opt/solr/server/solr/solr.xml /var/solr/data/solr.xml
+fi
+
+if [ ! -f /var/solr/data/zoo.cfg ]; then
+    cp -a /opt/solr/server/solr/zoo.cfg /var/solr/data/zoo.cfg
+fi

@@ -10,3 +10,4 @@
 7.6:7.6.0:7.6 7 latest
 7.6/alpine:7.6.0-alpine:7.6-alpine 7-alpine latest-alpine
 7.6/slim:7.6.0-slim:7.6-slim 7-slim latest-slim
+7.6/installer:7.6.0-installer:7.6-installer 7-installer latest-installer

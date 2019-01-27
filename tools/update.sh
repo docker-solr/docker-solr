@@ -61,6 +61,8 @@ function write_files {
     if [[ "$dash_variant" = "-alpine" ]]; then
         # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
         FROM=openjdk:8-jre-alpine
+    elif [[ "$dash_variant" = "-installer" ]]; then
+        FROM=openjdk:11-jre-slim
     else
         major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
         minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
@@ -310,6 +312,10 @@ for version in "${versions[@]}"; do
     write_files "$full_version"
     write_files "$full_version" 'alpine'
     write_files "$full_version" 'slim'
+    if (( this_major == 7 && this_minor >= 6 )) || (( this_major > 8 )); then
+        write_files "$full_version" 'installer'
+    fi
+
     echo
 done
 

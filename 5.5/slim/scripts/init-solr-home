@@ -27,6 +27,17 @@ if [[ "$INIT_SOLR_HOME" != "yes" ]]; then
   exit
 fi
 
+if [ -f /etc/default/solr.in.sh ]; then
+    # The /etc/default/solr.in.sh installed by install_solr_service.sh
+    # will override your SOLR_HOME, so the core will end up on /var/solr/data
+    # instead of in your SOLR_HOME.
+    # Now, we _could_ go an edit the /etc/default/solr.in.sh, but that is
+    # brittle. Besides, the hope is that with install_solr_service.sh we
+    # don't need INIT_SOLR_HOME any more
+    echo "INIT_SOLR_HOME is not supported on this image"
+    exit 1
+fi
+
 # check the directory exists.
 if [ ! -d "$SOLR_HOME" ]; then
     echo "SOLR_HOME $SOLR_HOME does not exist"

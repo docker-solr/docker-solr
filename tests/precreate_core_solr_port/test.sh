@@ -15,6 +15,15 @@ if [[ ! -z "${DEBUG:-}" ]]; then
   set -x
 fi
 
+# The SOLR_PORT mechanism is not supported in images
+# that have been installed by install_solr_service.sh.
+# Detect that based on tag (TODO: determine this dynamically
+# based on a "docker run")
+if grep -q 'installer' <<<"$tag"; then
+  echo "Test $TEST_DIR $tag skipped"
+  exit 0
+fi
+
 source "$TEST_DIR/../shared.sh"
 
 MY_SOLR_PORT=7777
