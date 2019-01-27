@@ -4,3 +4,6 @@ upstream_versions
 tests/tests_to_run
 mycores
 scripts.old
+build.log
+test.log
+tests_to_run.*
