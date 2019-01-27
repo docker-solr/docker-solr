@@ -40,6 +40,8 @@ function write_files {
         dash_variant=""
         target_dir="$short_version"
         template=Dockerfile.template
+    elif [[ "$dash_variant" = "-openshift" ]]; then
+        FROM=openjdk:11-jre
     else
         dash_variant="-$variant"
         target_dir="$short_version/$variant"
@@ -61,6 +63,8 @@ function write_files {
     if [[ "$dash_variant" = "-alpine" ]]; then
         # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
         FROM=openjdk:8-jre-alpine
+    elif [[ "$dash_variant" = "-openshift" ]]; then
+        FROM=openjdk:11-jre
     else
         major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
         minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
@@ -310,6 +314,9 @@ for version in "${versions[@]}"; do
     write_files "$full_version"
     write_files "$full_version" 'alpine'
     write_files "$full_version" 'slim'
+    if (( this_major == 7 && this_minor >= 6 )) || (( this_major > 8 )); then
+        write_files "$full_version" 'openshift'
+    fi
     echo
 done
 
