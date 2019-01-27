@@ -23,7 +23,7 @@ relative_dir="$(sed -e "s,$TOP_DIR/,," <<< "$build_dir")"
 cd "$build_dir"
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then
-  IMAGE_NAME="docker-solr/docker-solr"
+  IMAGE_NAME="dockersolr/docker-solr"
 fi
 full_tag="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $2}' "$TOP_DIR/TAGS")"
 

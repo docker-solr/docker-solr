@@ -6,4 +6,4 @@ docker run -it \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$PWD:$PWD" \
   --user "$(id -u):$(id -g)" \
-  -w "$PWD" docker-solr/builder bash "$@"
+  -w "$PWD" dockersolr/builder bash "$@"

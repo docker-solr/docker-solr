@@ -10,7 +10,7 @@ if (( $# == 0 )); then
 fi
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then
-  IMAGE_NAME="docker-solr/docker-solr"
+  IMAGE_NAME="dockersolr/docker-solr"
 fi
 
 tag=$1
