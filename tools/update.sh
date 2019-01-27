@@ -242,6 +242,13 @@ function verify_signature {
   fi
 }
 
+function shellcheck_scripts {
+  find scripts -type f -exec shellcheck -e SC1090,SC1091 {} \;
+  find tools -type f -exec shellcheck -e SC1090,SC1091 {} \;
+}
+
+shellcheck_scripts
+
 # Download the checksums/keys from the archive
 # You can override this by e.g.: export archiveUrl='http://www-eu.apache.org/dist/lucene/solr'
 archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
