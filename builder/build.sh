@@ -1,3 +1,3 @@
 #!/bin/bash
 set -euo pipefail
-docker build -t docker-solr/builder .
+docker build -t dockersolr/builder .

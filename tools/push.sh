@@ -15,8 +15,8 @@ function check_master {
     for e in TRAVIS_BRANCH TRAVIS_COMMIT TRAVIS_PULL_REQUEST TRAVIS_PULL_REQUEST_BRANCH TRAVIS_PULL_REQUEST_SHA TRAVIS_REPO_SLUG; do
       eval "echo $e=\${$e}"
     done
-    if [[ $TRAVIS_REPO_SLUG != 'docker-solr/docker-solr' ]]; then
-      echo "Not pushing because this is not the docker-solr/docker-solr repo"
+    if [[ $TRAVIS_REPO_SLUG != 'dockersolr/docker-solr' ]]; then
+      echo "Not pushing because this is not the dockersolr/docker-solr repo"
       exit 0
     fi
     if [[ $TRAVIS_PULL_REQUEST != 'false' ]]; then
@@ -41,10 +41,11 @@ function push {
   # It should really have been "docker-solr" for consistency with the organisation
   # on github but currently dashes are not allowed, see https://github.com/docker/hub-feedback/issues/373
   # The hub user is "dockersolrbuilder".
-  if ! grep -E -q '^docker-solr/docker-solr:' <<<"$tag"; then
-   tag="docker-solr/docker-solr:$tag"
+  if grep -E -q '^dockersolr/docker-solr:' <<<"$tag"; then
+    push_tag="$tag"
+  else
+    push_tag="dockersolr/docker-solr:$tag"
   fi
-  push_tag=$(sed 's,^docker-solr/,dockersolr/,' <<<"$tag")
   # pushing to the docker registry sometimes fails, so retry
   local max_try=3
   local wait_seconds=15

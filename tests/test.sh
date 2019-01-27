@@ -17,7 +17,7 @@ if [ -d "../$tag" ]; then
 fi
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then
-  IMAGE_NAME="docker-solr/docker-solr"
+  IMAGE_NAME="dockersolr/docker-solr"
 fi
 
 if ! grep -q : <<<"$tag"; then
