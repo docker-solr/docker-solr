@@ -134,7 +134,7 @@ function download_solr  {
     fi
     partial_url=$full_version/solr-$full_version.tgz
     download_urls=()
-    if [[ ! -z "${SOLR_DOWNLOAD_SERVER:-}" ]]; then
+    if [[ -n "${SOLR_DOWNLOAD_SERVER:-}" ]]; then
         download_urls+=("$SOLR_DOWNLOAD_SERVER/$partial_url")
     fi
     download_urls+=("$archiveUrl/$partial_url")

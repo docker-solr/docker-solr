@@ -22,7 +22,7 @@ set -e
 /opt/docker-solr/scripts/init-solr-home
 
 # execute files in /docker-entrypoint-initdb.d before starting solr
-while read f; do
+while read -r f; do
     case "$f" in
         *.sh)     echo "$0: running $f"; . "$f" ;;
         *)        echo "$0: ignoring $f" ;;

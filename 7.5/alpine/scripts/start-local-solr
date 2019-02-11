@@ -10,7 +10,7 @@ fi
 # determine the solr logs dir, set by SOLR_LOGS_DIR in the environment or in solr.in.sh.
 # let bash parse it, then prefix MY_ so we don't polute the environment used by Solr.
 MY_SOLR_INCLUDE="${SOLR_INCLUDE:-/opt/solr/bin/solr.in.sh}"
-eval "$( set +e +u +o pipefail; . "$MY_SOLR_INCLUDE"; set -o posix; set | egrep '^SOLR_(LOGS_DIR|OPTS)=' | sed 's/^SOLR_/MY_SOLR_/')"
+eval "$( set +e +u +o pipefail; . "$MY_SOLR_INCLUDE"; set -o posix; set | grep -E '^SOLR_(LOGS_DIR|OPTS)=' | sed 's/^SOLR_/MY_SOLR_/')"
 
 MY_SOLR_LOGS_DIR="${MY_SOLR_LOGS_DIR:-/opt/solr/server/logs}"
 MY_SOLR_OPTS="${MY_SOLR_OPTS:-} -Djetty.host=${SOLR_LOCAL_HOST:-localhost}"
