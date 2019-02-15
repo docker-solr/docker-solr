@@ -34,7 +34,7 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT:-}"; then
 fi
 
 echo "Running solr in the background. Logs are in $MY_SOLR_LOGS_DIR"
-SOLR_OPTS=$MY_SOLR_OPTS solr start
+SOLR_OPTS=$MY_SOLR_OPTS solr start "$@"
 max_try=${MAX_TRY:-12}
 wait_seconds=${WAIT_SECONDS:-5}
 if ! /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts "$max_try" --wait-seconds "$wait_seconds"; then
