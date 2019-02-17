@@ -1,0 +1,48 @@
+#!/bin/bash
+#
+# Create a core on disk
+# arguments are: corename configdir
+
+set -e
+
+echo "Executing $0" "$@"
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
+    set -x
+fi
+
+CORE=${1:-gettingstarted}
+CONFIG_SOURCE="${2:-}"
+if [[ -z "$CONFIG_SOURCE" ]]; then
+    DEFAULT_CONFIGS=(_default data_driven_schema_configs)
+    for config_dir in "${DEFAULT_CONFIGS[@]}"; do
+        config_dir="/opt/solr/server/solr/configsets/$config_dir"
+        if [ -d "$config_dir" ]; then
+           CONFIG_SOURCE="$config_dir"
+           break
+        fi
+    done
+    if [[ -z $CONFIG_SOURCE ]]; then
+        echo "Cannot find default config"
+        exit 1
+    fi
+fi
+
+if [[ ! -z $SOLR_HOME ]]; then
+    # assume user knows what they are doing. This only works in the old layout.
+    coresdir=$SOLR_HOME
+elif [ -d /var/solr/data ]; then
+    # new install_solr_service layout
+    coresdir=/var/solr/data
+else
+    # old layout, separate mycores
+    coresdir=/opt/solr/server/solr/mycores
+fi
+coredir="$coresdir/$CORE"
+if [[ ! -d $coredir ]]; then
+    cp -r "$CONFIG_SOURCE/" "$coredir"
+    touch "$coredir/core.properties"
+    echo created "$CORE"
+else
+    echo "core $CORE already exists"
+fi

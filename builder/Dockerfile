@@ -1,17 +1,27 @@
 FROM debian
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
-ENV DOCKER_VERSION=17.06.2-ce
+ARG BASHBREW_URL=https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
 
 RUN apt-get update && \
-  apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git && \
-  rm -rf /var/lib/apt/lists/*
+  apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git
 
-RUN URL=https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz && \
-  echo "Downloading $URL" && \
-  wget -nv "--output-document=/tmp/docker-${DOCKER_VERSION}.tgz" "$URL" && \
-  tar -C /usr/local/bin --extract --file "/tmp/docker-$DOCKER_VERSION.tgz" --strip-components=1 && \
-  rm /tmp/docker-$DOCKER_VERSION.tgz
+RUN apt-get -y install apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
+    add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/debian \
+       $(lsb_release -cs) \
+       stable" && \
+    apt-get update && \
+    apt-get -y install docker-ce docker-ce-cli containerd.io
+
+RUN wget -nv --output-document=/usr/local/bin/bashbrew "$BASHBREW_URL" && \
+  chmod a+x /usr/local/bin/bashbrew
 
 ADD my-bash-prompt.sh /tmp/my-bash-prompt.sh
 RUN cat /tmp/my-bash-prompt.sh >> /etc/bash.bashrc

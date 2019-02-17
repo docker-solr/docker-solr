@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-if [[ ! -z "${DEBUG:-}" ]]; then
+if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 

@@ -1,0 +1,64 @@
+#!/bin/bash
+# configure Solr to run on the local interface, and start it running in the background
+
+set -euo pipefail
+
+if [[ "${VERBOSE:-}" = "yes" ]]; then
+    set -x
+fi
+
+# determine the solr logs dir, set by SOLR_LOGS_DIR in the environment or in solr.in.sh.
+# let bash parse it, then prefix MY_ so we don't pollute the environment used by Solr.
+if [[ -n "${SOLR_INCLUDE:-}" ]]; then
+    MY_SOLR_INCLUDE=$SOLR_INCLUDE
+elif [ -f /etc/default/solr.in.sh ]; then
+    # default for install_solr_service.sh
+    MY_SOLR_INCLUDE=/etc/default/solr.in.sh
+elif [ -f /opt/solr/bin/solr.in.sh ]; then
+    # default for Solr
+    MY_SOLR_INCLUDE=/opt/solr/bin/solr.in.sh
+fi
+if [[ -n "${MY_SOLR_INCLUDE:-}" ]]; then
+  eval "$( set +e +u +o pipefail; . "$MY_SOLR_INCLUDE"; set -o posix; set | grep -E '^SOLR_(LOGS_DIR|OPTS)=' | sed 's/^SOLR_/MY_SOLR_/')"
+fi
+
+if [[ -z "${MY_SOLR_LOGS_DIR:-}" ]]; then
+    if [ -d /var/solr/logs ]; then
+        # new install_solr_service layout
+        MY_SOLR_LOGS_DIR=/var/solr/logs
+    elif [ -d /opt/solr/server/logs ]; then
+        # default for Solr
+	    MY_SOLR_LOGS_DIR=/opt/solr/server/logs
+    fi
+fi
+
+MY_SOLR_OPTS="${MY_SOLR_OPTS:-} -Djetty.host=${SOLR_LOCAL_HOST:-localhost}"
+
+if [ ! -w "$MY_SOLR_LOGS_DIR" ]; then
+    echo "Log directory $MY_SOLR_LOGS_DIR is not writable by $(id -u):$(id -g)"
+    exit 1
+fi
+
+# Note: we don't mess with the pid. In Solr, that can end up in
+# bin/, or SOLR_HOME, or as set by SOLR_PID_DIR environment variable in
+# either the environment or a solr.in.sh which can be in various places
+# (bin, /etc/default); and trying to emulate all that is too much work
+# and brittle. And it should not be required
+
+if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT:-}"; then
+  echo "Invalid SOLR_PORT=$SOLR_PORT environment variable specified"
+  exit 1
+fi
+
+echo "Running solr in the background. Logs are in $MY_SOLR_LOGS_DIR"
+SOLR_OPTS=$MY_SOLR_OPTS solr start
+max_try=${MAX_TRY:-12}
+wait_seconds=${WAIT_SECONDS:-5}
+if ! /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts "$max_try" --wait-seconds "$wait_seconds"; then
+    echo "Could not start Solr."
+    if [ -f "$MY_SOLR_LOGS_DIR/solr.log" ]; then
+        echo "Here is the log:"
+        cat "$MY_SOLR_LOGS_DIR/solr.log"
+    fi
+    exit 1
+fi

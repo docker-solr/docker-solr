@@ -3,7 +3,7 @@
 # Usage: build_and_tesh.sh
 set -euo pipefail
 
-if [[ ! -z "${DEBUG:-}" ]]; then
+if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 
