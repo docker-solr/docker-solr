@@ -138,7 +138,7 @@ function download_solr  {
     fi
     partial_url=$full_version/solr-$full_version.tgz
     download_urls=()
-    if [[ ! -z "${SOLR_DOWNLOAD_SERVER:-}" ]]; then
+    if [[ -n "${SOLR_DOWNLOAD_SERVER:-}" ]]; then
         download_urls+=("$SOLR_DOWNLOAD_SERVER/$partial_url")
     fi
     download_urls+=("$archiveUrl/$partial_url")
@@ -314,7 +314,7 @@ for version in "${versions[@]}"; do
     write_files "$full_version"
     write_files "$full_version" 'alpine'
     write_files "$full_version" 'slim'
-    if (( this_major == 7 && this_minor >= 6 )) || (( this_major > 8 )); then
+    if (( this_major == 7 && this_minor >= 7 )) || (( this_major > 8 )); then
         write_files "$full_version" 'openshift'
     fi
     echo
