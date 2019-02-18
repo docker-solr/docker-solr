@@ -11,7 +11,7 @@ fi
 
 tag=$1
 
-if [[ ! -z "${DEBUG:-}" ]]; then
+if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 

@@ -11,7 +11,7 @@ fi
 
 tag=$1
 
-if [[ ! -z "${DEBUG:-}" ]]; then
+if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 
@@ -44,7 +44,7 @@ if [[ "$data" != /opt/docker-solr/initdb-was-here ]]; then
   exit 1
 fi
 data=$(docker exec --user=solr "$container_name" ls /opt/docker-solr/should-not-be; true)
-if [[ ! -z "$data" ]]; then
+if [[ -n "$data" ]]; then
   echo "Test $TEST_DIR $tag failed; should-not-be was"
   exit 1
 fi
