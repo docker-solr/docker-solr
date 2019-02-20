@@ -37,8 +37,17 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
   exit 1
 fi
 
-# cores get created in SOLR_HOME
-CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$CORE_NAME"
+if [[ -n "${SOLR_HOME:-}" ]]; then
+    # assume user knows what they are doing. This only works in the old layout.
+    coresdir="$SOLR_HOME"
+elif [ -d /var/solr/data ]; then
+    coresdir=/var/solr/data
+    # new install_solr_service layout
+else
+    # old layout. Solr's own "create -c" will put cores there
+    coresdir=/opt/solr/server/solr
+fi
+CORE_DIR="$coresdir/$CORE_NAME"
 
 if [[ -d $CORE_DIR ]]; then
     echo "$CORE_DIR exists; skipping core creation"
