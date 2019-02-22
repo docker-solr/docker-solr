@@ -79,7 +79,7 @@ RUN set -ex; \
   mkdir -p /opt/solr/server/solr/lib /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr && \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /etc/default/solr.in.sh && \
+  sed -i -e '/#networkaddress.cache.ttl=-1/ a networkaddress.cache.ttl=10' $(find $(readlink -f $(which java)|sed 's,bin/java,,') -name java.security -print) && \
   chown -R $SOLR_USER:$SOLR_GROUP /opt/solr /var/solr /docker-entrypoint-initdb.d /opt/docker-solr
 
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts
