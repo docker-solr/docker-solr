@@ -34,6 +34,8 @@ function write_files {
     local variant=${2:-}
 
     short_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
+    major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
+    minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
 
     # get the right template and target dir for this version and variant
     if [[ -z $variant ]]; then
@@ -61,15 +63,21 @@ function write_files {
     if [[ "$dash_variant" = "-alpine" ]]; then
         # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
         FROM=openjdk:8-jre-alpine
-    else
-        major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
-        minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
-        # Use Java 9 for Solr >= 7.3
+    elif [[ "$dash_variant" = "-slim" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7)); then
-            FROM=openjdk:11-jre$dash_variant
+            FROM=openjdk:11-jre-slim
         else
-            FROM=openjdk:8-jre$dash_variant
+            FROM=openjdk:8-jre-slim
         fi
+    elif [[ -z "$dash_variant" ]]; then
+        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7)); then
+            FROM=openjdk:11-jre-stretch
+        else
+            FROM=openjdk:8-jre-stretch
+        fi
+    else
+	echo "Unexpected variant: $dash_variant"
+	exit 1
     fi
 
     echo "generating $target_dir"
