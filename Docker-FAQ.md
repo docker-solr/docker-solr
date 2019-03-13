@@ -214,6 +214,12 @@ $ docker exec -i -t solr1 solr create_collection \
 Then go to `http://localhost:8983/solr/#/~cloud` (adjust the hostname for your docker host) to see the two shards and Solr nodes.
 
 
+How can I run ZooKeeper and Solr with Docker Compose?
+-----------------------------------------------------
+
+https://github.com/docker-solr/docker-solr-examples/blob/master/docker-compose/docker-compose.yml
+
+
 I'm confused about the different invocations of solr -- help?
 -------------------------------------------------------------
 
