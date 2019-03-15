@@ -1,6 +1,8 @@
 Example of Zookeeper and Solr cluster with Docker networking
 ------------------------------------------------------------
 
+_Note: this article dates from Jan 2016. While this approach would still work, in Jan 2019 this would typically done with Docker cluster and orchestration tools like Kubernetes. See for example [this blog post](https://lucidworks.com/2019/02/07/running-solr-on-kubernetes-part-1/)._
+
 In this example I'll create a cluster with 3 ZooKeeper nodes and 3 Solr nodes, distributed over 3 machines (trinity10, trinity20, trinity30).
 I'll use an overlay network, specify fixed IP addresses when creating containers, and I'll pass in explicit `/etc/hosts` entries to make sure they are available even when nodes are down.
 I won't show the configuration of the key-value store to configuration to enable networking, see [the docs](https://docs.docker.com/engine/userguide/networking/get-started-overlay/) for that.

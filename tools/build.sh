@@ -33,8 +33,18 @@ fi
 
 if ! diff -r "$TOP_DIR/scripts" "scripts"; then
   echo "Updating scripts (old ones in scripts.old)"
+  if [ -d scripts.old ]; then
+    rm -fr scripts.old
+  fi
   mv scripts scripts.old
   cp -r "$TOP_DIR/scripts" .
+  major_version=$(echo "$full_tag" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
+  # if you add further rm's here, update tools/build.sh accordingly
+  if (( major_version < 8 )); then
+    rm "scripts/init-var-solr"
+  else
+    rm "scripts/init-solr-home"
+  fi
 fi
 
 if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then

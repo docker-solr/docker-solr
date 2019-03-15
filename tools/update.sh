@@ -19,7 +19,7 @@ KEYSERVERS=(hkp://keyserver.ubuntu.com:80
 
 if (( $# == 0 )); then
   readarray -t x_y_dirs < <(find . -maxdepth 1 -print | sed 's,^\./,,' | \
-            grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort)
+            grep -E '^[0-9]+\.[0-9]+$' | sort --version-sort --reverse)
   set -- "${x_y_dirs[@]}"
   all_dirs=true
 else
@@ -37,15 +37,21 @@ function write_files {
     major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
     minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
 
+    if (( this_major >= 8 )); then
+      template_prefix=Dockerfile-installer
+    else
+      template_prefix=Dockerfile
+    fi
+
     # get the right template and target dir for this version and variant
     if [[ -z $variant ]]; then
         dash_variant=""
         target_dir="$short_version"
-        template=Dockerfile.template
+        template="$template_prefix.template"
     else
         dash_variant="-$variant"
         target_dir="$short_version/$variant"
-        template=Dockerfile-$variant.template
+        template="$template_prefix-$variant.template"
     fi
 
     extra_tags="$short_version$dash_variant"
@@ -64,13 +70,13 @@ function write_files {
         # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
         FROM=openjdk:8-jre-alpine
     elif [[ "$dash_variant" = "-slim" ]]; then
-        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7)); then
+        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-jre-slim
         else
             FROM=openjdk:8-jre-slim
         fi
     elif [[ -z "$dash_variant" ]]; then
-        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7)); then
+        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-jre-stretch
         else
             FROM=openjdk:8-jre-stretch
@@ -90,8 +96,14 @@ function write_files {
       > "$target_dir/Dockerfile"
     cp -r scripts "$target_dir"
 
+    if (( major_version < 8 )); then
+      rm "$target_dir/scripts/init-var-solr"
+    else
+      rm "$target_dir/scripts/init-solr-home"
+    fi
+
     if [[ "$all_dirs" == "true" ]]; then
-      # The TAGS file will list build_dir:full_version:tags
+      # The TAGS file will list build_dir:full_version:tags, with lines sorted youngest to oldest
       # Other scripts in ./tools/ will parse the TAGS file.
       # This is only for local/Travis use; the official library does not use the TAGS file.
       echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<"$extra_tags" | sed 's/ $//')" >> "$TOP_DIR/TAGS"

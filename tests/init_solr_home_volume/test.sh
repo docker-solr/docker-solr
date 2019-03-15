@@ -15,6 +15,11 @@ if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 
+if [[ "$(docker run -i "$tag" bash -c 'if test -d /var/solr; then echo yes; else echo no; fi' )" == "yes" ]]; then
+  echo "skipping $TEST_DIR"
+  exit 0
+fi
+
 source "$TEST_DIR/../shared.sh"
 
 echo "Test $TEST_DIR $tag"

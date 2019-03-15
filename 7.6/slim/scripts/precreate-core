@@ -28,11 +28,15 @@ if [[ -z "$CONFIG_SOURCE" ]]; then
     fi
 fi
 
-if [[ -z $SOLR_HOME ]]; then
-    coresdir="/opt/solr/server/solr/mycores"
-    mkdir -p $coresdir
-else
+if [[ -n $SOLR_HOME ]]; then
+    # assume user knows what they are doing. This only works in the old layout.
     coresdir=$SOLR_HOME
+elif [ -d /var/solr/data ]; then
+    # new install_solr_service layout
+    coresdir=/var/solr/data
+else
+    # old layout, separate mycores
+    coresdir=/opt/solr/server/solr/mycores
 fi
 coredir="$coresdir/$CORE"
 if [[ ! -d $coredir ]]; then

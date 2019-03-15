@@ -3,16 +3,41 @@
 To add a new version to [the docker-solr repository](https://github.com/docker-solr) you need to make several changes.
 See the [official-images](https://github.com/docker-solr/official-images) documentation for some high-level overview.
 
-## Updating the docker-solr repository
+## Pre-requisites
 
-First, we need to modify our https://github.com/docker-solr/docker-solr repository for the new version.
-To do that, you need a Linux host that runs Docker, and has `git`, `wget` and `gpg` installed.
+You need a Linux host that runs Docker, and has `git`, `wget` and `gpg` installed.
 
-First, get the repository:
+Install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) so it is available as a command.
+I prefer to [get a binary](https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/) and put it in my `~/bin` directory which is already on my `PATH`:
 
 ```bash
-git clone git@github.com:docker-solr/docker-solr.git
+wget -O ~/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+chmod a+x ~/bin/bashbrew
+```
 
+# Prepare the repositories
+
+We need to have the `docker-solr/docker-solr` repo, and the `docker-solr/official-images` side by side in the same directory:
+
+```bash
+mkdir docker-solr
+cd docker-solr
+git clone git@github.com:docker-solr/official-images.git
+git clone git@github.com:docker-solr/docker-solr.git
+```
+Next, we sync our fork of the official-images repo:
+
+```bash
+cd official-images/
+git remote add upstream https://github.com/docker-library/official-images.git
+git fetch upstream
+git merge upstream/master
+git push
+```
+
+## Updating the docker-solr repository
+
+```bash
 cd docker-solr
 ```
 
@@ -98,7 +123,7 @@ Check in the changes:
 git status
 git add 6.6
 git add -A
-git commit -m "Add Solr 6.6.0"
+git commit -m "Add Solr 8.1.0"
 git push
 git rev-parse HEAD
 ```
@@ -108,10 +133,10 @@ Make note of that git SHA.
 Now that this has been committed, we can run the `generate-stackbrew-library.sh`, and save the output:
 
 ```bash
+BASHBREW_LIBRARY=$PWD/../official-images/library
+export BASHBREW_LIBRARY
 ./generate-stackbrew-library.sh | tee ../new-versions
 ```
-
-This requires https://github.com/docker-library/official-images/tree/master/bashbrew to be installed.
 
 ## Update our README
 
@@ -119,7 +144,7 @@ Our repository has a README https://github.com/docker-solr/docker-solr/blob/mast
 supported tags. This is not consumed by the Docker library team, but is there for the convenience of
 our users to update this section, run:
 
-```
+```bash
 tools/update_readme.sh
 git diff README.md
 ```
@@ -127,7 +152,7 @@ git diff README.md
 Then commit and push that change:
 
 ```bash
-git commit -m "Update README for Solr 6.6.0" README.md
+git commit -m "Update README for Solr 8.1.0" README.md
 git push
 ```
 
@@ -144,21 +169,10 @@ Now we need to tell the Docker library team about this new version so they can m
 by updating the versions in https://github.com/docker-solr/official-images/blob/master/library/solr
 and submitting a Pull Request. We can just make the change on the master branch in our fork.
 
-First we'll sync our fork:
-
-```bash
-cd
-git clone git@github.com:docker-solr/official-images
-cd official-images/
-git remote add upstream https://github.com/docker-library/official-images.git
-git fetch upstream
-git merge upstream/master
-git push
-```
-
 We'll use the output provided by `generate-stackbrew-library.sh` earlier:
 
 ```bash
+cd ../official-images
 cat ../new-versions > library/solr
 git diff
 ```
@@ -166,7 +180,7 @@ git diff
 If that all looks plausible, push to master on our fork:
 
 ```bash
-git commit -m "Update Solr to 6.6.0" library/solr
+git commit -m "Update Solr to 8.1.0" library/solr
 git push
 ```
 
