@@ -19,10 +19,14 @@
 set -e
 
 # init script for handling a custom SOLR_HOME
-/opt/docker-solr/scripts/init-solr-home
+if [ -x /opt/docker-solr/scripts/init-solr-home ]; then
+    /opt/docker-solr/scripts/init-solr-home
+fi
 
 # init script for handling an empty /var/solr
-/opt/docker-solr/scripts/init-var-solr
+if [ -x /opt/docker-solr/scripts/init-var-solr ]; then
+    /opt/docker-solr/scripts/init-var-solr
+fi
 
 # execute files in /docker-entrypoint-initdb.d before starting solr
 while read -r f; do
