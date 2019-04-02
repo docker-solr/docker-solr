@@ -1,5 +1,5 @@
 FROM debian
-MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
 
 ARG BASHBREW_URL=https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
 
