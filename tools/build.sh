@@ -31,9 +31,12 @@ if [[ ! -f "$TOP_DIR/TAGS" ]]; then
   echo "missing TAGS; run update.sh"
 fi
 
-if ! diff -r "$TOP_DIR/scripts" "scripts"; then
-  echo "Updating scripts (old ones in scripts.old)"
-  mv scripts scripts.old
+echo "Updating scripts"
+major_version=$(echo "$full_tag" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
+rm -fr scripts
+if (( major_version < 8 )); then
+  cp -r "$TOP_DIR/scripts-before8" scripts
+else
   cp -r "$TOP_DIR/scripts" .
 fi
 
