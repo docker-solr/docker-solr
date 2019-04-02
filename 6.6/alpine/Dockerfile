@@ -21,9 +21,9 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="6.6.5" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.5/solr-6.6.5.tgz" \
-    SOLR_SHA256="fa65e922bc32d36ef65bee866095da563aa5ddd7e953798c06b6494572d51729" \
+    SOLR_VERSION="6.6.6" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.6/solr-6.6.6.tgz" \
+    SOLR_SHA256="149ec1a7ee950867ab6257a1a96246df79ccda983983389dc639220f3447b6e8" \
     SOLR_KEYS="2085660D9C1FCCACC4A479A3BF160FF14992A24C" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
