@@ -33,9 +33,9 @@ function write_files {
     local full_version=$1
     local variant=${2:-}
 
-    short_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+.[0-9]+).*/\1/')
-    major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
-    minor_version=$(echo "$full_version" | sed -r -e 's/^[0-9]+.([0-9]+).*/\1/')
+    short_version=$(echo "$full_version" | sed -E -e 's/^([0-9]+.[0-9]+).*/\1/')
+    major_version=$(echo "$full_version" | sed -E -e 's/^([0-9]+).[0-9]+.*/\1/')
+    minor_version=$(echo "$full_version" | sed -E -e 's/^[0-9]+.([0-9]+).*/\1/')
 
     if (( this_major >= 8 )); then
       template_prefix=Dockerfile-installer
@@ -58,7 +58,7 @@ function write_files {
 
     for v in $latest_major_versions; do
         if [[ $v == "$full_version" ]]; then
-            major_version=$(echo "$full_version" | sed -r -e 's/^([0-9]+).*/\1/')
+            major_version=$(echo "$full_version" | sed -E -e 's/^([0-9]+).*/\1/')
             extra_tags="$extra_tags $major_version$dash_variant"
         fi
     done
@@ -88,7 +88,7 @@ function write_files {
 
     echo "generating $target_dir"
     mkdir -p "$target_dir"
-    <"$template" sed -r \
+    <"$template" sed -E \
       -e "s/FROM \\\$REPLACE_FROM/FROM $FROM/g" \
       -e "s/\\\$REPLACE_SOLR_VERSION/$full_version/g" \
       -e "s/\\\$REPLACE_SOLR_SHA256/$SHA256/g" \
@@ -270,7 +270,7 @@ archiveUrl=${archiveUrl:-'https://archive.apache.org/dist/lucene/solr'}
 DOWNLOADS=downloads
 
 upstream_versions='upstream-versions'
-curl -sSL "$archiveUrl" | sed -r -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
+curl -sSL "$archiveUrl" | sed -E -e 's,.*<a href="(([0-9])+\.([0-9])+\.([0-9])+)/">.*,\1,' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort --version-sort > "$upstream_versions"
 
 # To ignore a specific version, for when it's not on the mirrors yet, or bad
 #sed -i '/6.6.1/d' "$upstream_versions"

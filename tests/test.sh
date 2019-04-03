@@ -18,7 +18,7 @@ if ! grep -q : <<<"$tag"; then
   tag="$IMAGE_NAME:$tag"
 fi
 
-major_version=$(echo "$tag" | sed -E -r -e 's/^.*:([0-9]+).[0-9]+.*/\1/')
+major_version=$(echo "$tag" | sed -E -e 's/^.*:([0-9]+).[0-9]+.*/\1/')
 if (( major_version > 7 )); then
   test_dir=tests-8
 else
