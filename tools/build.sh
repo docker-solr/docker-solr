@@ -32,7 +32,7 @@ if [[ ! -f "$TOP_DIR/TAGS" ]]; then
 fi
 
 echo "Updating scripts"
-major_version=$(echo "$full_tag" | sed -r -e 's/^([0-9]+).[0-9]+.*/\1/')
+major_version=$(echo "$full_tag" | sed -E -e 's/^([0-9]+).[0-9]+.*/\1/')
 rm -fr scripts
 if (( major_version < 8 )); then
   cp -r "$TOP_DIR/scripts-before8" scripts
