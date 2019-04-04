@@ -25,8 +25,8 @@ ENV SOLR_USER="solr" \
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
-RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
-  useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER
+RUN groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP" && \
+  useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
@@ -51,31 +51,32 @@ RUN set -e; \
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
-  dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" && \
-  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" && \
-  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" && \
+  pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" && \
+  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch" && \
+  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch.asc" && \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
   rm /usr/local/bin/gosu.asc && \
   chmod +x /usr/local/bin/gosu && \
   gosu nobody true && \
-  mkdir -p /opt && \
   echo "downloading $SOLR_URL" && \
-  wget -nv $SOLR_URL -O /opt/solr-$SOLR_VERSION.tgz && \
+  wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz" && \
   echo "downloading $SOLR_URL.asc" && \
-  wget -nv $SOLR_URL.asc -O /opt/solr-$SOLR_VERSION.tgz.asc && \
+  wget -nv "$SOLR_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc" && \
   echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c - && \
-  (>&2 ls -l /opt/solr-$SOLR_VERSION.tgz /opt/solr-$SOLR_VERSION.tgz.asc) && \
-  gpg --batch --verify /opt/solr-$SOLR_VERSION.tgz.asc /opt/solr-$SOLR_VERSION.tgz && \
-  tar -C /opt --extract --file /opt/solr-$SOLR_VERSION.tgz "solr-$SOLR_VERSION/bin/install_solr_service.sh" --strip-components=2 && \
-  /opt/install_solr_service.sh /opt/solr-$SOLR_VERSION.tgz -n && \
+  (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc") && \
+  gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz" && \
+  tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz" "solr-$SOLR_VERSION/bin/install_solr_service.sh" --strip-components=2 && \
+  /opt/install_solr_service.sh "/opt/solr-$SOLR_VERSION.tgz" -n && \
+  rm /opt/install_solr_service.sh && \
   chmod o+r /etc/default/solr.in.sh && \
-  rm /opt/install_solr_service.sh /opt/solr-$SOLR_VERSION.tgz* && \
+  rm "/opt/solr-$SOLR_VERSION.tgz"* && \
   rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr && \
-  sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
+  mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr && \
+  sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /etc/default/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr /var/solr /docker-entrypoint-initdb.d /opt/docker-solr
+  sed -i -e "/-Dsolr.clustering.enabled=true/ a SOLR_OPTS=\"\$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60\"" /etc/default/solr.in.sh && \
+  chown -R "$SOLR_USER:$SOLR_GROUP" /opt/solr /docker-entrypoint-initdb.d /opt/docker-solr && \
+  chown -R "$SOLR_USER:$SOLR_GROUP" /var/solr
 
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
