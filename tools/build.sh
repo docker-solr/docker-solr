@@ -13,6 +13,7 @@ if (( $# != 1 )); then
 fi
 
 build_dir=$1
+echo "build.sh $build_dir"
 
 if [[ ! -f "$build_dir/Dockerfile" ]]; then
   echo "$build_dir is not a build directory"
