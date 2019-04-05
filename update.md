@@ -40,6 +40,9 @@ tools/build_all.sh
 
 Keep an eye out for "This key is not certified with a trusted signature!"; it would be good to verify the fingerprints with ones you have in your PGP keyring.
 
+There are two scripts directories: `./scripts`, used by `solr:8` which uses the Solr installer, and `./scripts-before8` for older versions which were installed by simply untarring the distribution.
+When changing scripts in one of these, remember to review the other directory to see if the same changes apply there.
+
 To run simple automated tests against the images:
 
 ```bash
