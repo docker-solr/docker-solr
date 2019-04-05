@@ -51,7 +51,7 @@ function write_files {
     elif [[ $variant == "slim" ]]; then
         dash_variant="-$variant"
         target_dir="$short_version/$variant"
-        # For -slim use the non-variant template
+        # For slim use the non-variant template
         template="$template_prefix.template"
     else
         dash_variant="-$variant"
