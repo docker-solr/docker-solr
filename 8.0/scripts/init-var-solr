@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# A helper script to initialise an empty $DIR
+# If you use volumes then Docker will copy the $DIR content from the container to the volume.
+# If you use bind mounts, that does not happen, so we do it here.
+
+set -e
+
+if [[ "$VERBOSE" = "yes" ]]; then
+    set -x
+fi
+
+if [[ -n "${NO_INIT_VAR_SOLR:-}" ]]; then
+    exit 0
+fi
+
+DIR=${1:-/var/solr}
+
+if [ ! -d "$DIR" ]; then
+    echo "Missing $DIR"
+    exit 1
+fi
+
+function check_dir_writability {
+    local dir="$1"
+    if [ ! -w "$dir" ]; then
+        echo "Cannot write to $dir as $(id -u):$(id -g)"
+        ls -ld "$dir"
+        exit 1
+    fi
+}
+
+if [ ! -d "$DIR/data" ]; then
+    check_dir_writability "$DIR"
+    mkdir "$DIR/data"
+fi
+
+if [ ! -d "$DIR/logs" ]; then
+    check_dir_writability "$DIR"
+    mkdir "$DIR/logs"
+fi
+
+if [ ! -f "$DIR/data/solr.xml" ]; then
+    cp -a /opt/solr/server/solr/solr.xml "$DIR/data/solr.xml"
+fi
+
+if [ ! -f "$DIR/data/zoo.cfg" ]; then
+    cp -a /opt/solr/server/solr/zoo.cfg "$DIR/data/zoo.cfg"
+fi
+
+if [ ! -f "$DIR/log4j2.xml" ]; then
+    cp -a /opt/solr/server/resources/log4j2.xml "$DIR/log4j2.xml"
+fi
+
