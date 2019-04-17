@@ -105,7 +105,7 @@ RUN set -e; \
   chown -R "root:$SOLR_GROUP" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /var/solr
 
-COPY --chown=solr:solr scripts /opt/docker-solr/scripts
+COPY --chown=root:solr scripts /opt/docker-solr/scripts
 
 VOLUME /var/solr
 EXPOSE 8983
