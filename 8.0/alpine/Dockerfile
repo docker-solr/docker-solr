@@ -82,7 +82,7 @@ RUN set -e; \
   rm "/opt/solr-$SOLR_VERSION.tgz"* && \
   rm -Rf /opt/solr/docs/ && \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr && \
-  chown -R root:solr "/opt/solr-$SOLR_VERSION" && \
+  chown -R 0:0 "/opt/solr-$SOLR_VERSION" && \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755 && \
   find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644 && \
   chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" && \
@@ -92,20 +92,20 @@ RUN set -e; \
   cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh && \
   mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig && \
   mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig && \
-  chown root:solr /etc/default/solr.in.sh && \
-  chmod 0644 /etc/default/solr.in.sh && \
+  chown solr:0 /etc/default/solr.in.sh && \
+  chmod 0664 /etc/default/solr.in.sh && \
   mkdir -p /var/solr/data /var/solr/logs && \
   (cd /opt/solr/server/solr && cp solr.xml zoo.cfg /var/solr/data/) && \
   cp /opt/solr/server/resources/log4j2.xml /var/solr/log4j2.xml && \
-  find /var/solr -type d -print0 | xargs -0 chmod 0750 && \
-  find /var/solr -type f -print0 | xargs -0 chmod 0640 && \
+  find /var/solr -type d -print0 | xargs -0 chmod 0770 && \
+  find /var/solr -type f -print0 | xargs -0 chmod 0660 && \
   sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e "/-Dsolr.clustering.enabled=true/ a SOLR_OPTS=\"\$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60\"" /etc/default/solr.in.sh && \
-  chown -R "root:$SOLR_GROUP" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr && \
-  chown -R "$SOLR_USER:$SOLR_GROUP" /var/solr
+  chown -R "0:0" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr && \
+  chown -R "$SOLR_USER:0" /var/solr
 
-COPY --chown=root:solr scripts /opt/docker-solr/scripts
+COPY --chown=0:0 scripts /opt/docker-solr/scripts
 
 VOLUME /var/solr
 EXPOSE 8983

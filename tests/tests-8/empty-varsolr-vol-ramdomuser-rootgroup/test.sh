@@ -23,21 +23,16 @@ echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
-rm -fr myvarsolr
-mkdir myvarsolr
+docker volume rm myvarsolr >/dev/null 2>&1 || true
+docker volume create myvarsolr
 
-# The /var/solr mountpoint is owned by solr, so when we bind mount our directory,
-# owned by the current user in the host, it will show in the container as owned by solr, and our attempts
-# to write to it as the current user will fail. To deal with that, set the ACL to allow that.
-# If you can't use setfacl, you'll have to chown the directory to 8983, or apply world
-# write permissions
-setfacl -m u:8983:rwx myvarsolr
+# when we mount onto /var/solr, that will be owned by "solr"
 
 echo "Running $container_name"
 docker run \
-  -v "$PWD/myvarsolr:/var/solr" \
+  --user 777:0 \
+  -v "myvarsolr:/var/solr" \
   --name "$container_name" \
-  -u "$(id -u):$(id -g)" \
   -d "$tag" solr-precreate getting-started
 
 wait_for_server_started "$container_name"
@@ -52,14 +47,10 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
   exit 1
 fi
 
-docker exec --user="$(id -u)" "$container_name" ls -lR /var/solr/data
+docker exec --user=7777 "$container_name" ls -l /var/solr/data
 
 container_cleanup "$container_name"
 
-docker run --rm --user 0:0 -d -e VERBOSE=yes \
-  -v "$PWD/myvarsolr:/myvarsolr" "$tag" \
-  bash -c "chown -R $(id -u):$(id -g) /myvarsolr; ls -ld /myvarsolr"
-
-rm -fr myvarsolr
+docker volume rm myvarsolr
 
 echo "Test $TEST_DIR $tag succeeded"

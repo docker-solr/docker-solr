@@ -46,27 +46,30 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
   echo "Test $TEST_DIR $tag failed; data did not load"
   exit 1
 fi
-container_cleanup "$container_name"
 
 # check test file was created by root
-if [[ ! -f myvarsolr/root_was_here ]]; then
-  echo "Missing myvarsolr/root_was_here"
+data=$(docker exec --user=root "$container_name" stat -c %U /var/solr/root_was_here )
+if [[ "$data" == *'No such file or directory' ]]; then
+  echo "Missing /var/solr/root_was_here"
   exit 1
 fi
-if [[ "$(stat -c %U myvarsolr/root_was_here)" != root ]]; then
-  echo "myvarsolr/root_was_here is owned by $(stat -c %U myvarsolr/root_was_here)"
+if [[ "$data" != root ]]; then
+  echo "/var/solr/root_was_here is owned by $data"
   exit 1
 fi
 
 # check core is created by solr
-if [[ ! -f myvarsolr/data/gettingstarted/core.properties ]]; then
-  echo "Missing myvarsolr/data/gettingstarted/core.properties"
+data=$(docker exec --user=root "$container_name" stat -c %U /var/solr/data/gettingstarted/core.properties )
+if [[ "$data" == *'No such file or directory' ]]; then
+  echo "Missing /var/solr/data/gettingstarted/core.properties"
   exit 1
 fi
-if [[ "$(stat -c %u myvarsolr/data/gettingstarted/core.properties)" != 8983 ]]; then
-  echo "myvarsolr/data/gettingstarted/core.properties is owned by $(stat -c %u myvarsolr/data/gettingstarted/core.properties)"
+if [[ "$data" != solr ]]; then
+  echo "/var/solr/data/gettingstarted/core.properties is owned by $data"
   exit 1
 fi
+
+container_cleanup "$container_name"
 
 # chown it back
 docker run --rm --user 0:0 -d -e VERBOSE=yes \
