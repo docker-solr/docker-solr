@@ -18,8 +18,15 @@ if ! grep -q : <<<"$tag"; then
   tag="$IMAGE_NAME:$tag"
 fi
 
+major_version=$(echo "$tag" | sed -E -e 's/^.*:([0-9]+).[0-9]+.*/\1/')
+if (( major_version > 7 )); then
+  test_dir=tests-8
+else
+  test_dir=tests-before8
+fi
+
 echo "Running all tests for $tag"
-find . -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > tests_to_run
+find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > tests_to_run
 while read  -r d; do
   if [ -f "$d/test.sh" ]; then
     echo "Starting $d/test.sh $tag"

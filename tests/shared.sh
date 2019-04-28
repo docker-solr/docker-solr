@@ -5,7 +5,7 @@
 function container_cleanup {
   local container_name=$1
   previous=$(docker inspect "$container_name" --format '{{.ID}}' || true)
-  if [[ ! -z $previous ]]; then
+  if [[ -n $previous ]]; then
     container_status=$(docker inspect --format='{{.State.Status}}' "$previous")
     if [[ $container_status == 'running' ]]; then
       echo "killing $previous"

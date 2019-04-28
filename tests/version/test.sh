@@ -15,7 +15,7 @@ if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 
-source "$TEST_DIR/../shared.sh"
+source "$TEST_DIR/../../shared.sh"
 
 echo "Test $TEST_DIR $tag"
 container_name='test_'$(echo "$tag" | tr ':/-' '_')
