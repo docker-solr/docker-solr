@@ -73,7 +73,7 @@ GitRepo: https://github.com/docker-solr/docker-solr.git
 EOH
 
 for version in "${versions[@]}"; do
-	for variant in '' alpine slim; do
+	for variant in '' slim; do
 		dir="$version${variant:+/$variant}"
 		[ -f "$dir/Dockerfile" ] || continue
 

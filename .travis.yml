@@ -23,20 +23,12 @@ jobs:
       script: tools/build_test_push.sh 8.1/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=8.1/alpine
-      script: tools/build_test_push.sh 8.1/alpine
-    - stage: build, test, deploy
-      env:
       - PROCESS=8.1
       script: tools/build_test_push.sh 8.1
     - stage: build, test, deploy
       env:
       - PROCESS=8.0/slim
       script: tools/build_test_push.sh 8.0/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.0/alpine
-      script: tools/build_test_push.sh 8.0/alpine
     - stage: build, test, deploy
       env:
       - PROCESS=8.0
@@ -47,20 +39,12 @@ jobs:
       script: tools/build_test_push.sh 7.7/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=7.7/alpine
-      script: tools/build_test_push.sh 7.7/alpine
-    - stage: build, test, deploy
-      env:
       - PROCESS=7.7
       script: tools/build_test_push.sh 7.7
     - stage: build, test, deploy
       env:
       - PROCESS=7.6/slim
       script: tools/build_test_push.sh 7.6/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=7.6/alpine
-      script: tools/build_test_push.sh 7.6/alpine
     - stage: build, test, deploy
       env:
       - PROCESS=7.6
@@ -71,10 +55,6 @@ jobs:
       script: tools/build_test_push.sh 7.5/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=7.5/alpine
-      script: tools/build_test_push.sh 7.5/alpine
-    - stage: build, test, deploy
-      env:
       - PROCESS=7.5
       script: tools/build_test_push.sh 7.5
     - stage: build, test, deploy
@@ -83,20 +63,12 @@ jobs:
       script: tools/build_test_push.sh 6.6/slim
     - stage: build, test, deploy
       env:
-      - PROCESS=6.6/alpine
-      script: tools/build_test_push.sh 6.6/alpine
-    - stage: build, test, deploy
-      env:
       - PROCESS=6.6
       script: tools/build_test_push.sh 6.6
     - stage: build, test, deploy
       env:
       - PROCESS=5.5/slim
       script: tools/build_test_push.sh 5.5/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5/alpine
-      script: tools/build_test_push.sh 5.5/alpine
     - stage: build, test, deploy
       env:
       - PROCESS=5.5
