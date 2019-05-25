@@ -1,21 +1,14 @@
+8.1:8.1.0:8.1 8 latest
+8.1/slim:8.1.0-slim:8.1-slim 8-slim latest-slim
 8.0:8.0.0:8.0
-8.0/alpine:8.0.0-alpine:8.0-alpine
 8.0/slim:8.0.0-slim:8.0-slim
 7.7:7.7.1:7.7 7
-7.7/alpine:7.7.1-alpine:7.7-alpine 7-alpine
 7.7/slim:7.7.1-slim:7.7-slim 7-slim
 7.6:7.6.0:7.6
-7.6/alpine:7.6.0-alpine:7.6-alpine
 7.6/slim:7.6.0-slim:7.6-slim
 7.5:7.5.0:7.5
-7.5/alpine:7.5.0-alpine:7.5-alpine
 7.5/slim:7.5.0-slim:7.5-slim
 6.6:6.6.6:6.6 6
-6.6/alpine:6.6.6-alpine:6.6-alpine 6-alpine
 6.6/slim:6.6.6-slim:6.6-slim 6-slim
 5.5:5.5.5:5.5 5
-5.5/alpine:5.5.5-alpine:5.5-alpine 5-alpine
 5.5/slim:5.5.5-slim:5.5-slim 5-slim
-8.1:8.1.0:8.1 8 latest
-8.1/alpine:8.1.0-alpine:8.1-alpine 8-alpine latest-alpine
-8.1/slim:8.1.0-slim:8.1-slim 8-slim latest-slim

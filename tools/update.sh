@@ -72,8 +72,8 @@ function write_files {
     fi
 
     if [[ "$dash_variant" = "-alpine" ]]; then
-        # No Java 11 on Alpine; see https://github.com/docker-library/openjdk/issues/177
-        FROM=openjdk:8-jre-alpine
+        echo "Alpine is no longer supported"
+        exit 1
     elif [[ "$dash_variant" = "-slim" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-jre-slim
@@ -326,7 +326,6 @@ for version in "${versions[@]}"; do
     cd "$TOP_DIR"
 
     write_files "$full_version"
-    write_files "$full_version" 'alpine'
     write_files "$full_version" 'slim'
     echo
 done
