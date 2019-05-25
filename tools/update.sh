@@ -334,6 +334,7 @@ done
 if [ -f "$OWNERTRUSTFILE" ]; then rm "$OWNERTRUSTFILE"; fi
 if [ -f "$upstream_versions" ]; then rm "$upstream_versions"; fi
 
+tools/check_froms.sh
 tools/write_travis.sh > .travis.yml
 
 if [[ "$all_dirs" == "false" ]]; then
