@@ -29,7 +29,6 @@ docker run -it -P docker-solr/docker-solr:latest
 Before checking in, verify the Dockerfile templates look correct:
 
 ```
-diff -du Dockerfile.template Dockerfile-alpine.template
 diff -du Dockerfile.template Dockerfile-slim.template
 ```
 
