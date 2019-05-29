@@ -12,3 +12,6 @@
 6.6/slim:6.6.6-slim:6.6-slim 6-slim
 5.5:5.5.5:5.5 5
 5.5/slim:5.5.5-slim:5.5-slim 5-slim
+8.1:8.1.0:8.1 8 latest
+8.1/alpine:8.1.0-alpine:8.1-alpine 8-alpine latest-alpine
+8.1/slim:8.1.0-slim:8.1-slim 8-slim latest-slim
