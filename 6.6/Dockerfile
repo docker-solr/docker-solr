@@ -76,11 +76,19 @@ RUN set -e; \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/solr /docker-entrypoint-initdb.d /opt/docker-solr && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/mysolrhome
 
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini-static
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static.asc /tini-static.asc
+RUN export GNUPGHOME="/tmp/gnupg_home" && \
+    gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 && \
+    gpg --batch --verify /tini-static.asc /tini-static && \
+    chmod +x /tini-static
+
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
 EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/tini-static", "--", "docker-entrypoint.sh"]
 CMD ["solr-foreground"]
