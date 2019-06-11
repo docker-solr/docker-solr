@@ -16,4 +16,4 @@ fi
 
 echo "Starting Solr $SOLR_VERSION"
 
-exec solr -f "$@"
+exec solr -f -a "-XX:OnOutOfMemoryError=/opt/docker-solr/scripts/oom_solr.sh" "$@"

@@ -25,6 +25,9 @@ ENV SOLR_USER="solr" \
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
+ENV TINI_VERSION v0.18.0
+ENV TINI_SIGN_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
+
 RUN groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP" && \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
@@ -33,7 +36,7 @@ RUN set -e; \
   mkdir -p "$GNUPGHOME" && \
   chmod 700 "$GNUPGHOME" && \
   echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf" && \
-  for key in $SOLR_KEYS $GOSU_KEY; do \
+  for key in $SOLR_KEYS $GOSU_KEY $TINI_SIGN_KEY; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
@@ -76,13 +79,19 @@ RUN set -e; \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/solr /docker-entrypoint-initdb.d /opt/docker-solr && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/mysolrhome
 
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static /tini-static
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static.asc /tini-static.asc
-RUN export GNUPGHOME="/tmp/gnupg_home" && \
-    gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 && \
-    gpg --batch --verify /tini-static.asc /tini-static && \
-    chmod +x /tini-static
+# Add tini based the official docker guide:
+# https://github.com/docker-library/official-images/blob/master/README.md#init
+# We use the static version to avoid introducing further dependencies and use
+# our own pattern do the gpg validation - see above.
+RUN set -eux; \
+  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static"; \
+  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static.asc"; \
+  export GNUPGHOME="/tmp/gnupg_home"; \
+  gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
+  command -v gpgconf && gpgconf --kill all || :; \
+  rm -r "$GNUPGHOME" /usr/local/bin/tini.asc; \
+  chmod +x /usr/local/bin/tini; \
+  tini --version
 
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
@@ -90,5 +99,5 @@ EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 
-ENTRYPOINT ["/tini-static", "--", "docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "docker-entrypoint.sh"]
 CMD ["solr-foreground"]
