@@ -1,43 +1,57 @@
 #!/bin/bash
 #
-# Run the initdb, then start solr in the foreground
+# Start solr prometheus-exporter in the foreground
 set -e
 
 if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
-ARGS=
+# Make sure the prometheus exporter script exists and can be executed
+
+if [[ -z "$EXPORTER_EXEC" ]]; then
+    EXPORTER_EXEC=/opt/solr/contrib/prometheus-exporter/bin/solr-exporter
+fi
+
+if [[ ! -f "$EXPORTER_EXEC" ]]; then
+    echo "Prometheus Exporter executable \"$EXPORTER_EXEC\" does not exist. Make sure that you are running a compatable solr version (>= 7.3.0)."
+    exit 1
+fi
+
+if [[ ! -x "$EXPORTER_EXEC" ]]; then
+    echo "Prometheus Exporter executable \"$EXPORTER_EXEC\" does not have executable permissions."
+    exit 1
+fi
+
+# Set up the command line arguments for the prometheus exporter
 
 if [[ -z "$EXPORTER_CONFIG" ]]; then
     EXPORTER_CONFIG=/opt/solr/contrib/prometheus-exporter/conf/solr-exporter-config.xml
 fi
 
-if [[ ! -z "$EXPORTER_CONFIG" ]]; then
-    ARGS="$ARGS -f $EXPORTER_CONFIG"
+ARGS=("-f $EXPORTER_CONFIG")
+
+if [[ -n "$EXPORTER_PORT" ]]; then
+    ARGS+=("-p $EXPORTER_PORT")
 fi
 
-if [[ ! -z "$EXPORTER_PORT" ]]; then
-    ARGS="$ARGS -p $EXPORTER_PORT"
+if [[ -n "$EXPORTER_SCRAPE_INTERVAL" ]]; then
+    ARGS+=("-s $EXPORTER_SCRAPE_INTERVAL")
 fi
 
-if [[ ! -z "$EXPORTER_SCRAPE_INTERVAL" ]]; then
-    ARGS="$ARGS -s $EXPORTER_SCRAPE_INTERVAL"
+if [[ -n "$EXPORTER_THREADS" ]]; then
+    ARGS+=("-n $EXPORTER_THREADS")
 fi
 
-if [[ ! -z "$EXPORTER_THREADS" ]]; then
-    ARGS="$ARGS -n $EXPORTER_THREADS"
-fi
-
-if [[ ! -z "$EXPORTER_ZOOKEEPER_CNX" ]]; then
-    ARGS="$ARGS -z $EXPORTER_ZOOKEEPER_CNX"
-elif [[ ! -z "$EXPORTER_STANDALONE_HOST" ]]; then
-    ARGS="$ARGS -b $EXPORTER_STANDALONE_HOST"
+if [[ -n "$EXPORTER_ZOOKEEPER_CNX" ]]; then
+    ARGS+=("-z $EXPORTER_ZOOKEEPER_CNX")
+elif [[ -n "$EXPORTER_STANDALONE_HOST" ]]; then
+    ARGS+=("-b $EXPORTER_STANDALONE_HOST")
 else
     echo "EXPORTER_ZOOKEEPER_CNX or EXPORTER_STANDALONE_HOST must be provided to connect to a solr instance, cloud or standalone."
     exit 1
 fi
 
-echo "Starting Solr Prometheus Exporter $SOLR_VERSION"
+echo "Starting Solr Prometheus Exporter: $SOLR_VERSION"
 
-exec /opt/solr/contrib/prometheus-exporter/bin/solr-exporter $ARGS $@
+exec $EXPORTER_EXEC ${ARGS[@]} $@

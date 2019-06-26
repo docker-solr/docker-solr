@@ -34,19 +34,12 @@ fi
 
 echo "Updating scripts"
 major_version=$(echo "$full_tag" | sed -E -e 's/^([0-9]+).[0-9]+.*/\1/')
-minor_version=$(echo "$full_tag" | sed -E -e 's/^[0-9]+.([0-9]+).*/\1/')
 rm -fr scripts
 if (( major_version < 8 )); then
   cp -r "$TOP_DIR/scripts-before8" scripts
 else
   cp -r "$TOP_DIR/scripts" .
 fi
-# Add the prometheus-exporter scripts if the exporter is available in that release of Solr
-if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-  echo "Adding Prometheus Exporter"
-  cp -r "$TOP_DIR/scripts-prometheus-exporter/"* scripts/.
-fi
-
 
 if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then
   build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"

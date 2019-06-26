@@ -107,11 +107,6 @@ function write_files {
       cp -r scripts "$target_dir/scripts"
     fi
 
-    # Add the prometheus-exporter scripts if the exporter is available in that release of Solr
-    if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-      cp -r scripts-prometheus-exporter/* "$target_dir/scripts/."
-    fi
-
     if [[ "$all_dirs" == "true" ]]; then
       # The TAGS file will list build_dir:full_version:tags, with lines sorted youngest to oldest
       # Other scripts in ./tools/ will parse the TAGS file.
