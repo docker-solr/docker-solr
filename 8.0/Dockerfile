@@ -79,6 +79,7 @@ RUN set -e; \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755 && \
   find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644 && \
   chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" && \
+  chmod -R 0755 "/opt/solr-$SOLR_VERSION/contrib/prometheus-exporter/bin" && \
   cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh && \
   mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig && \
   mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig && \
