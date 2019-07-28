@@ -21,4 +21,4 @@ fi
 
 /opt/docker-solr/scripts/precreate-core "$@"
 
-exec solr -f
+exec solr-fg

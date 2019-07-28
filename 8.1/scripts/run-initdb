@@ -18,9 +18,6 @@
 
 set -e
 
-# init script for handling an empty /var/solr
-/opt/docker-solr/scripts/init-var-solr
-
 # execute files in /docker-entrypoint-initdb.d before starting solr
 while read -r f; do
     case "$f" in

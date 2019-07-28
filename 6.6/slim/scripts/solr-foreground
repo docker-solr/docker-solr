@@ -14,31 +14,4 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT}"; then
   exit 1
 fi
 
-EXTRA_ARGS=()
-
-# Allow easy setting of the OOM behaviour
-# Test with: docker run -p 8983:8983 -it -e OOM=script -e SOLR_JAVA_MEM="-Xms25m -Xmx25m" solr
-if [[ -z "${OOM:-}" ]]; then
-  OOM='none'
-fi
-case "$OOM" in
-  'script')
-    EXTRA_ARGS+=(-a '-XX:OnOutOfMemoryError=/opt/docker-solr/scripts/oom_solr.sh')
-    ;;
-  'exit')
-    # recommended
-    EXTRA_ARGS+=(-a '-XX:+ExitOnOutOfMemoryError')
-    ;;
-  'crash')
-    EXTRA_ARGS+=(-a '-XX:+CrashOnOutOfMemoryError')
-    ;;
-  'none'|'')
-    ;;
-  *)
-   echo "Unsupported value in OOM=$OOM"
-   exit 1
-esac
-
-echo "Starting Solr $SOLR_VERSION"
-
-exec solr -f "$@" "${EXTRA_ARGS[@]}"
+exec solr-fg

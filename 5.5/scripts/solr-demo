@@ -33,4 +33,4 @@ else
     fi
 fi
 
-exec solr -f
+exec solr-fg

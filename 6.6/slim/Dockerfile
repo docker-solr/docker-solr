@@ -25,6 +25,9 @@ ENV SOLR_USER="solr" \
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
+ENV TINI_VERSION v0.18.0
+ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
+
 RUN groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP" && \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
@@ -33,7 +36,7 @@ RUN set -e; \
   mkdir -p "$GNUPGHOME" && \
   chmod 700 "$GNUPGHOME" && \
   echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf" && \
-  for key in $SOLR_KEYS $GOSU_KEY; do \
+  for key in $SOLR_KEYS $GOSU_KEY $TINI_KEY; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
@@ -58,6 +61,12 @@ RUN set -e; \
   rm /usr/local/bin/gosu.asc && \
   chmod +x /usr/local/bin/gosu && \
   gosu nobody true && \
+  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" && \
+  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc" && \
+  gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
+  rm /usr/local/bin/tini.asc && \
+  chmod +x /usr/local/bin/tini && \
+  tini --version && \
   echo "downloading $SOLR_URL" && \
   wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz" && \
   echo "downloading $SOLR_URL.asc" && \
@@ -74,7 +83,9 @@ RUN set -e; \
   sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/solr /docker-entrypoint-initdb.d /opt/docker-solr && \
-  chown -R "$SOLR_USER:$SOLR_GROUP" /opt/mysolrhome
+  chown -R "$SOLR_USER:$SOLR_GROUP" /opt/mysolrhome && \
+  command -v gpgconf && gpgconf --kill all || : && \
+  rm -r "$GNUPGHOME"
 
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
