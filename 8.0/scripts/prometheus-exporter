@@ -20,7 +20,11 @@ fi
 
 # Set up the command line arguments for the prometheus exporter
 
-ARGS=(-f "${EXPORTER_CONFIG:-/opt/solr/contrib/prometheus-exporter/conf/solr-exporter-config.xml}")
+ARGS=()
+
+if [[ -n "${EXPORTER_CONFIG:-}" ]]; then
+    ARGS+=(-f "$EXPORTER_CONFIG")
+fi
 
 if [[ -n "${EXPORTER_PORT:-}" ]]; then
     ARGS+=(-p "$EXPORTER_PORT")
@@ -44,4 +48,5 @@ else
 fi
 
 echo "Starting Solr Prometheus Exporter: $SOLR_VERSION"
+cd /opt/solr/contrib/prometheus-exporter
 exec "$EXPORTER_EXEC" "${ARGS[@]}" "${@}"
