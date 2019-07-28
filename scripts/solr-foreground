@@ -7,8 +7,9 @@ if [[ "$VERBOSE" = "yes" ]]; then
     set -x
 fi
 
+# init script for handling an empty /var/solr
+/opt/docker-solr/scripts/init-var-solr
+
 . /opt/docker-solr/scripts/run-initdb
 
-echo "Starting Solr $SOLR_VERSION"
-
-exec solr -f "$@"
+exec solr-fg "$@"

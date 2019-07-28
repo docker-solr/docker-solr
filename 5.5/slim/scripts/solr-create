@@ -28,7 +28,7 @@ CORE_NAME="$(
   done
 )"
 if [[ -z "${CORE_NAME:-}" ]]; then
-  echo "could not determine core name"
+  echo "Could not determine core name"
   exit 1
 fi
 
@@ -41,7 +41,7 @@ fi
 CORE_DIR="${SOLR_HOME:-/opt/solr/server/solr}/$CORE_NAME"
 
 if [[ -d $CORE_DIR ]]; then
-    echo "$CORE_DIR exists; skipping core creation"
+    echo "Directory $CORE_DIR exists; skipping core creation"
 else
     start-local-solr
 
@@ -64,4 +64,4 @@ else
         exit 1
     fi
 fi
-exec solr -f
+exec solr-fg
