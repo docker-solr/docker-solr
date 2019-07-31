@@ -11,7 +11,7 @@
 set -euo pipefail
 echo "Executing $0" "$@"
 
-if [[ "${VERBOSE:-}" = "yes" ]]; then
+if [[ "${VERBOSE:-}" == "yes" ]]; then
     set -x
 fi
 
