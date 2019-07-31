@@ -61,8 +61,8 @@ RUN set -e; \
   rm /usr/local/bin/gosu.asc && \
   chmod +x /usr/local/bin/gosu && \
   gosu nobody true && \
-  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" && \
-  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc" && \
+  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch" && \
+  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch.asc" && \
   gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
   rm /usr/local/bin/tini.asc && \
   chmod +x /usr/local/bin/tini && \
