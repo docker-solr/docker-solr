@@ -262,6 +262,17 @@ Changes:
 - The custom `SOLR_HOME` can no longer be used, because it is configured in `/etc/default/solr`, and various scripts depend on the new locations
 - The `SOLR_PORT` can no longer be overridden, because it is configured in `/etc/default/solr`
 
+# Running under tini
+
+The docker-solr image runs Solr under [tini](https://github.com/krallin/tini), to make signal handling work better; in particular, this allows you to `kill -9` the JVM. If you run `docker run --init`, or use `init: true` in `docker-compose.yml`, or have added `--init` to `dockerd`, docker will start its `tini` and docker-solr will notice it is not PID 1, and just `exec` Solr. If you do not run with `--init`, then the docker entrypoint script detects that it is running as PID 1, and will start the `tini` present in the docker-solr image, and run Solr under that. If you really do not want to run `tini`, and just run Solr as PID 1 instead, then you can set the `TINI=no` environment variable.
+
+# Out of memory handling
+
+You can use the `OOM` environment variable to control the behaviour of the Solr JVM when an out-of-memory error occurs.
+If you specify `OOM=exit`, docker-solr will add `-XX:+ExitOnOutOfMemoryError` to the JVM arguments, so that the JVM will exit.
+If you specify `OOM=crash`, docker-solr will add `-XX:+CrashOnOutOfMemoryError` to the JVM arguments, so the JVM will crash and produces text and binary crash files (if core files are enabled).
+If you specify `OOM=script`, docker-solr will add `-XX:OnOutOfMemoryError=/opt/docker-solr/scripts/oom_solr.sh`, so the JVM will run that script (and if you want to you can mount your own in its place).
+
 # About this repository
 
 This repository is available on [github.com/docker-solr/docker-solr](https://github.com/docker-solr/docker-solr), and the official build is on the [Docker Hub](https://hub.docker.com/_/solr/).
