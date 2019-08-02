@@ -7,7 +7,7 @@ set -e
 
 echo "Executing $0" "$@"
 
-if [[ "${VERBOSE:-}" = "yes" ]]; then
+if [[ "${VERBOSE:-}" == "yes" ]]; then
     set -x
 fi
 

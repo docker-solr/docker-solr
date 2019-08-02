@@ -10,7 +10,7 @@
 
 set -e
 
-if [[ "$VERBOSE" = "yes" ]]; then
+if [[ "$VERBOSE" == "yes" ]]; then
     set -x
 fi
 

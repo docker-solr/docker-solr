@@ -9,7 +9,7 @@ set -euo pipefail
 
 SCRIPT="$0"
 
-if [[ "${VERBOSE:-}" = "yes" ]]; then
+if [[ "${VERBOSE:-}" == "yes" ]]; then
     set -x
 fi
 
