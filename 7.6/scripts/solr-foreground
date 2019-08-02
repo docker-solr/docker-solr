@@ -14,4 +14,4 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"${SOLR_PORT}"; then
   exit 1
 fi
 
-exec solr-fg
+exec solr-fg "$@"
