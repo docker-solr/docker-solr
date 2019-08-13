@@ -41,7 +41,9 @@ dirCommit() {
 			"$(git show HEAD:./Dockerfile | awk '
 				toupper($1) == "COPY" {
 					for (i = 2; i < NF; i++) {
-						print $i
+						if ($i !~ /^--/) {
+							print $i
+						}
 					}
 				}
 			')"
