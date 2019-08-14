@@ -15,8 +15,8 @@ function check_master {
     for e in TRAVIS_BRANCH TRAVIS_COMMIT TRAVIS_PULL_REQUEST TRAVIS_PULL_REQUEST_BRANCH TRAVIS_PULL_REQUEST_SHA TRAVIS_REPO_SLUG; do
       eval "echo $e=\${$e}"
     done
-    if [[ $TRAVIS_REPO_SLUG != 'dockersolr/docker-solr' ]]; then
-      echo "Not pushing because this is not the dockersolr/docker-solr repo"
+    if [[ $TRAVIS_REPO_SLUG != 'docker-solr/docker-solr' ]]; then
+      echo "Not pushing because this is not the docker-solr/docker-solr repo"
       exit 0
     fi
     if [[ $TRAVIS_PULL_REQUEST != 'false' ]]; then
