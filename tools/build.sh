@@ -44,7 +44,10 @@ fi
 if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then
   build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"
 fi
-cmd="docker build --pull --rm=true ${build_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
+if [ "${NOCACHE:-no}" == 'yes' ]; then
+  nocache_arg="--no-cache"
+fi
+cmd="docker build --pull --rm=true ${build_arg:-} ${nocache_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
 echo "running: $cmd"
 $cmd
 extra_tags="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")"

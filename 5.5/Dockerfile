@@ -86,7 +86,7 @@ RUN set -e; \
   chmod -R 0755 /opt/solr/server/scripts/cloud-scripts && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/solr /docker-entrypoint-initdb.d /opt/docker-solr && \
   chown -R "$SOLR_USER:$SOLR_GROUP" /opt/mysolrhome && \
-  command -v gpgconf && gpgconf --kill all || : && \
+  { command -v gpgconf && gpgconf --kill all || :; } && \
   rm -r "$GNUPGHOME"
 
 COPY --chown=solr:solr scripts /opt/docker-solr/scripts

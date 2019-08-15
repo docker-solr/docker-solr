@@ -102,7 +102,7 @@ RUN set -e; \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   chown -R "0:0" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr && \
   chown -R "$SOLR_USER:0" /var/solr && \
-  command -v gpgconf && gpgconf --kill all || : && \
+  { command -v gpgconf && gpgconf --kill all || :; } && \
   rm -r "$GNUPGHOME"
 
 COPY --chown=0:0 scripts /opt/docker-solr/scripts
