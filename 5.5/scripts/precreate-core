@@ -38,7 +38,7 @@ coredir="$coresdir/$CORE"
 if [[ ! -d $coredir ]]; then
     cp -r "$CONFIG_SOURCE/" "$coredir"
     touch "$coredir/core.properties"
-    echo created "$CORE"
+    echo "Created $CORE"
 else
-    echo "core $CORE already exists"
+    echo "Core $CORE already exists"
 fi

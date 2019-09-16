@@ -71,7 +71,7 @@ done
 
 grep -q -E '^[0-9]+$' <<<"$max_attempts" || usage "--max-attempts $max_attempts: not a number"
 if (( max_attempts == 0 )); then
-  echo "--max-attempts should be >0"
+  echo "The --max-attempts argument should be >0"
   exit 1
 fi
 grep -q -E '^[0-9]+$' <<<"$wait_seconds" || usage "--wait-seconds $wait_seconds: not a number"
@@ -84,7 +84,7 @@ while (( attempts_left > 0 )); do
   fi
   (( attempts_left-- ))
   if (( attempts_left == 0 )); then
-    echo "solr is still not running; giving up"
+    echo "Solr is still not running; giving up"
     exit 1
   fi
   if (( attempts_left == 1 )); then
@@ -92,7 +92,7 @@ while (( attempts_left > 0 )); do
   else
     attempts=attempts
   fi
-  echo "solr is not running yet on $solr_url. $attempts_left $attempts left"
+  echo "Solr is not running yet on $solr_url. $attempts_left $attempts left"
   sleep "$wait_seconds"
 done
-echo "solr is running on $solr_url"
+echo "Solr is running on $solr_url"
