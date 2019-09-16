@@ -259,8 +259,7 @@ This is a backwards incompatible change, and means that if you're upgrading from
 Changes:
 
 - The Solr data is now stored in `/var/solr/data` rather than `/opt/solr/server/solr`. The `/opt/solr/server/solr/mycores` no longer exists
-- The custom `SOLR_HOME` can no longer be used, because it is configured in `/etc/default/solr`, and various scripts depend on the new locations
-- The `SOLR_PORT` can no longer be overridden, because it is configured in `/etc/default/solr`
+- The custom `SOLR_HOME` can no longer be used, because various scripts depend on the new locations
 
 # Running under tini
 
