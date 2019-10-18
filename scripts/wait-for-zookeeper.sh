@@ -15,6 +15,10 @@
 # Inspired by https://github.com/helm/charts/blob/9eba7b1c80990233a68dce48f4a8fe0baf9b7fa5/incubator/solr/templates/statefulset.yaml#L60
 #
 # Usage: wait-for-zookeeper.sh [--max-attempts count] [--wait-seconds seconds] zookeeper-service-name
+#
+# If no argument is provided, but a Solr-style ZK_HOST is set,
+# that will be used. If neither is provided, the default
+# name is 'solr-zookeeper-headless', to match the helm chart.
 
 set -euo pipefail
 
@@ -41,7 +45,8 @@ trap cleanup EXIT
 
 function check_zookeeper {
     local host=$1
-    if ! echo srvr | nc "$host" 2181 > $TMP_STATUS; then
+    local port="${2:-2181}"
+    if ! echo srvr | nc "$host" "$port" > $TMP_STATUS; then
         echo "Failed to get status from $host"
         return
     fi
@@ -92,10 +97,10 @@ EOM
      ;;
 
    *)
-    if [ -n "${lookup:-}" ]; then
+    if [ -n "${lookup_arg:-}" ]; then
       usage "Cannot specify multiple zookeeper service names"
     fi
-    lookup=$1;
+    lookup_arg=$1;
     shift;
     break;
     ;;
@@ -110,24 +115,51 @@ if (( max_attempts == 0 )); then
 fi
 grep -q -E '^[0-9]+$' <<<"$wait_seconds" || usage "--wait-seconds $wait_seconds: not a number"
 
-if [ -z "${lookup:-}" ]; then
-  lookup=solr-zookeeper-headless
+if [ -z "${lookup_arg:-}" ]; then
+  if [ -n "$ZK_HOST" ]; then
+    lookup_arg="$ZK_HOST"
+  else
+    lookup_arg=solr-zookeeper-headless
+  fi
 fi
 
-echo "Looking up '$lookup'"
+echo "Looking up '$lookup_arg'"
+# split on commas, for when a ZK_HOST string like zoo1:2181,zoo2:2181 is used
+IFS=',' read -ra lookups <<< "$lookup_arg"
 ((attempts_left=max_attempts))
 while (( attempts_left > 0 )); do
-  if getent hosts "$lookup" > $TMP_HOSTS; then
-    while read -r ip host ; do
-      check_zookeeper "$ip"
-    done <$TMP_HOSTS
-  else
-    echo "Cannot find $lookup yet"
-  fi
+  for lookup in "${lookups[@]}"; do
+    if grep -q -E "^\[[0-9].*\]" <<<"$lookup"; then
+      # looks like an IPv6 address, eg [2001:DB8::1] or [2001:DB8::1]:2181
+      # getent does not support the bracket notation, but does support IPv6 addresses
+      host=$(sed -E 's/\[(.*)\].*/\1/' <<<"$lookup")
+      port=$(sed -E 's/^\[(.*)\]:?//' <<<"$lookup")
+    else
+      # IPv4, just split on :
+      IFS=: read -ra split <<<"$lookup"
+      host="${split[0]}"
+      port="${split[1]:-}"
+    fi
+    if [[ "${VERBOSE:-}" == "yes" ]]; then
+      echo "Parsed host=$host port=${port:-}"
+    fi
+    if getent hosts "$host" > $TMP_HOSTS; then
+      while read -r ip hostname ; do
+        echo "${hostname:-}">/dev/null # consume for shellcheck
+        check_zookeeper "$ip" "$port"
+      done <$TMP_HOSTS
+    else
+      echo "Cannot find $lookup yet"
+    fi
+  done
   (( attempts_left-- ))
-  if (( attempts_left == 0 )); then
-    echo "Still no master found; giving up"
+  if (( attempts_left == 0 )); then echo "Still no master found; giving up"
     exit 1
   fi
   sleep "$wait_seconds"
 done
+
+# To test the parsing:
+#  bash scripts/wait-for-zookeeper.sh foo
+#  bash scripts/wait-for-zookeeper.sh 'ZK_HOST=[2001:DB8::1]:2181,[2001:DB8::1],127.0.0.1:2181,127.0.0.2'
+#  ZK_HOST=[2001:DB8::1]:2181,[2001:DB8::1],127.0.0.1:2181,127.0.0.2 bash scripts/wait-for-zookeeper.sh
