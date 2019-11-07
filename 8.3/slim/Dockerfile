@@ -1,5 +1,5 @@
 
-FROM openjdk:13-slim
+FROM openjdk:11-slim
 
 LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
 LABEL repository="https://github.com/docker-solr/docker-solr"

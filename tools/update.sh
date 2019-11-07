@@ -75,17 +75,13 @@ function write_files {
         echo "Alpine is no longer supported"
         exit 1
     elif [[ "$dash_variant" = "-slim" ]]; then
-        if (( major_version == 8 && minor_version >= 3 )); then
-            FROM=openjdk:13-slim
-        elif (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
+        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-slim
         else
             FROM=openjdk:8-jre-slim
         fi
     elif [[ -z "$dash_variant" ]]; then
-        if (( major_version >= 8 && minor_version >= 3 )); then
-            FROM=openjdk:13-buster
-        elif (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
+        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-stretch
         else
             FROM=openjdk:8-jre-stretch
