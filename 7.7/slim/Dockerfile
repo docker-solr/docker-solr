@@ -33,7 +33,7 @@ RUN set -e; \
   groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP"; \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
-RUN set -e; \
+RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
   mkdir -p "$GNUPGHOME"; \
   chmod 700 "$GNUPGHOME"; \

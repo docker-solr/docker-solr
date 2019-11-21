@@ -8,7 +8,7 @@ LABEL repository="https://github.com/docker-solr/docker-solr"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN set -e; \
+RUN set -ex; \
   apt-get update; \
   apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
   rm -rf /var/lib/apt/lists/*
@@ -34,11 +34,11 @@ ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 ENV TINI_VERSION v0.18.0
 ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
 
-RUN set -x; \
+RUN set -ex; \
   groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP"; \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
-RUN set -e; \
+RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
   mkdir -p "$GNUPGHOME"; \
   chmod 700 "$GNUPGHOME"; \
@@ -59,7 +59,7 @@ RUN set -e; \
   done; \
   exit 0
 
-RUN set -e; \
+RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
   pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
   wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch"; \
