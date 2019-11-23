@@ -71,7 +71,7 @@ RUN set -ex; \
   chmod +x /usr/local/bin/tini; \
   tini --version; \
   if [ -n "$SOLR_DOWNLOAD_SERVER" ]; then \
-    SOLR_DOWNLOAD_URL="$SOLR_DOWNLOAD_SERVER/7.7.2/solr-7.7.2.tgz"; \
+    SOLR_DOWNLOAD_URL="$SOLR_DOWNLOAD_SERVER/$SOLR_VERSION/solr-$SOLR_VERSION.tgz"; \
     echo "downloading $SOLR_DOWNLOAD_URL"; \
     wget -t 10 --max-redirect 1 --retry-connrefused -nv "$SOLR_DOWNLOAD_URL" -O "/opt/solr-$SOLR_VERSION.tgz" || rm -f "/opt/solr-$SOLR_VERSION.tgz"; \
   fi; \
