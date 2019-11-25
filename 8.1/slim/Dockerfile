@@ -18,7 +18,9 @@ ENV SOLR_USER="solr" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
     SOLR_VERSION="8.1.1" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/8.1.1/solr-8.1.1.tgz" \
+    SOLR_CLOSER_URL="http://www.apache.org/dyn/closer.lua?filename=lucene/solr/8.1.1/solr-8.1.1.tgz&action=download" \
+    SOLR_DIST_URL="https://www.apache.org/dist/lucene/solr/8.1.1/solr-8.1.1.tgz" \
+    SOLR_ARCHIVE_URL="https://archive.apache.org/dist/lucene/solr/8.1.1/solr-8.1.1.tgz" \
     SOLR_SHA256="b515598c11f53fe28d682e3d71238642e9f34509194e3c4746e39bb7d7bb46a1" \
     SOLR_KEYS="F23F054D9EC50F2397FF2B814E67A2711D053DDB" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH" \
@@ -74,10 +76,19 @@ RUN set -ex; \
   rm /usr/local/bin/tini.asc; \
   chmod +x /usr/local/bin/tini; \
   tini --version; \
-  echo "downloading $SOLR_URL"; \
-  wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz"; \
-  echo "downloading $SOLR_URL.asc"; \
-  wget -nv "$SOLR_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
+  if [ -n "$SOLR_DOWNLOAD_SERVER" ]; then \
+    SOLR_DOWNLOAD_URL="$SOLR_DOWNLOAD_SERVER/$SOLR_VERSION/solr-$SOLR_VERSION.tgz"; \
+    echo "downloading $SOLR_DOWNLOAD_URL"; \
+    wget -t 10 --max-redirect 1 --retry-connrefused -nv "$SOLR_DOWNLOAD_URL" -O "/opt/solr-$SOLR_VERSION.tgz" || rm -f "/opt/solr-$SOLR_VERSION.tgz"; \
+  fi; \
+  for url in $SOLR_CLOSER_URL $SOLR_DIST_URL $SOLR_ARCHIVE_URL; do \
+    if [ -f "/opt/solr-$SOLR_VERSION.tgz" ]; then break; fi; \
+    echo "downloading $url"; \
+    if wget -t 10 --max-redirect 1 --retry-connrefused -nv "$url" -O "/opt/solr-$SOLR_VERSION.tgz"; then break; else rm -f "/opt/solr-$SOLR_VERSION.tgz"; fi; \
+  done; \
+  if [ ! -f "/opt/solr-$SOLR_VERSION.tgz" ]; then echo "failed all download attempts for solr-$SOLR_VERSION.tgz"; exit 1; fi; \
+  echo "downloading $SOLR_ARCHIVE_URL.asc"; \
+  wget -nv "$SOLR_ARCHIVE_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
   echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c -; \
   (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc"); \
   gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz"; \

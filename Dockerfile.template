@@ -8,7 +8,7 @@ LABEL repository="https://github.com/docker-solr/docker-solr"
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN set -e; \
+RUN set -ex; \
   apt-get update; \
   apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
   rm -rf /var/lib/apt/lists/*
@@ -18,7 +18,9 @@ ENV SOLR_USER="solr" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
     SOLR_VERSION="$REPLACE_SOLR_VERSION" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz" \
+    SOLR_CLOSER_URL="http://www.apache.org/dyn/closer.lua?filename=lucene/solr/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz&action=download" \
+    SOLR_DIST_URL="https://www.apache.org/dist/lucene/solr/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz" \
+    SOLR_ARCHIVE_URL="https://archive.apache.org/dist/lucene/solr/$REPLACE_SOLR_VERSION/solr-$REPLACE_SOLR_VERSION.tgz" \
     SOLR_SHA256="$REPLACE_SOLR_SHA256" \
     SOLR_KEYS="$REPLACE_SOLR_KEYS" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
@@ -29,7 +31,7 @@ ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 ENV TINI_VERSION v0.18.0
 ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
 
-RUN set -e; \
+RUN set -ex; \
   groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP"; \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
 
@@ -54,7 +56,7 @@ RUN set -ex; \
   done; \
   exit 0
 
-RUN set -e; \
+RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
   pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
   wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch"; \
@@ -69,10 +71,19 @@ RUN set -e; \
   rm /usr/local/bin/tini.asc; \
   chmod +x /usr/local/bin/tini; \
   tini --version; \
-  echo "downloading $SOLR_URL"; \
-  wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz"; \
-  echo "downloading $SOLR_URL.asc"; \
-  wget -nv "$SOLR_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
+  if [ -n "$SOLR_DOWNLOAD_SERVER" ]; then \
+    SOLR_DOWNLOAD_URL="$SOLR_DOWNLOAD_SERVER/$SOLR_VERSION/solr-$SOLR_VERSION.tgz"; \
+    echo "downloading $SOLR_DOWNLOAD_URL"; \
+    wget -t 10 --max-redirect 1 --retry-connrefused -nv "$SOLR_DOWNLOAD_URL" -O "/opt/solr-$SOLR_VERSION.tgz" || rm -f "/opt/solr-$SOLR_VERSION.tgz"; \
+  fi; \
+  for url in $SOLR_CLOSER_URL $SOLR_DIST_URL $SOLR_ARCHIVE_URL; do \
+    if [ -f "/opt/solr-$SOLR_VERSION.tgz" ]; then break; fi; \
+    echo "downloading $url"; \
+    if wget -t 10 --max-redirect 1 --retry-connrefused -nv "$url" -O "/opt/solr-$SOLR_VERSION.tgz"; then break; else rm -f "/opt/solr-$SOLR_VERSION.tgz"; fi; \
+  done; \
+  if [ ! -f "/opt/solr-$SOLR_VERSION.tgz" ]; then echo "failed all download attempts for solr-$SOLR_VERSION.tgz"; exit 1; fi; \
+  echo "downloading $SOLR_ARCHIVE_URL.asc"; \
+  wget -nv "$SOLR_ARCHIVE_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
   echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c -; \
   (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc"); \
   gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz"; \
