@@ -9,6 +9,11 @@
 # We also write a TAGS file with the docker tags for the image.
 set -euo pipefail
 
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "This script requires bash 4. You have ${BASH_VERSINFO:-0}"
+  exit 1
+fi
+
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
 TOP_DIR=$PWD
