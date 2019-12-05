@@ -5,9 +5,9 @@
 # See solr-forgeground for how to configure OOM behaviour
 
 if [[ -z "${SOLR_LOGS_DIR:-}" ]]; then
-    if -d /var/solr/logs; then
+    if [ -d /var/solr/logs ]; then
         SOLR_LOGS_DIR=/var/solr/logs
-    elif -d /opt/solr/server/logs; then
+    elif [ -d /opt/solr/server/logs ]; then
         SOLR_LOGS_DIR=/opt/solr/server/logs
     else
         echo "Cannot determine SOLR_LOGS_DIR!"
