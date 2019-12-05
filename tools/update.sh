@@ -160,20 +160,23 @@ function download_solr  {
     local full_version=$1
     output="solr-$full_version.tgz"
     if [ -f "$output" ]; then
+        echo "using $PWD/$output"
         return
     fi
-    partial_url=$full_version/solr-$full_version.tgz
     download_urls=()
     if [[ -n "${SOLR_DOWNLOAD_SERVER:-}" ]]; then
-        download_urls+=("$SOLR_DOWNLOAD_SERVER/$partial_url")
+        download_urls+=("$SOLR_DOWNLOAD_SERVER/$full_version/solr-$full_version.tgz")
     fi
-    download_urls+=("$archiveUrl/$partial_url")
+    download_urls+=("http://www.apache.org/dyn/closer.lua?filename=lucene/solr/$full_version/solr-$full_version.tgz&action=download" \
+                    "https://www.apache.org/dist/lucene/solr/$full_version/solr-$full_version.tgz" \
+                    "https://archive.apache.org/dist/lucene/solr/$full_version/solr-$full_version.tgz")
     for download_url in "${download_urls[@]}"; do
         echo "Fetching $download_url"
-        if wget -nv --output-document="$output" "$download_url"; then
+        if wget -t 10 --max-redirect 1 --retry-connrefused -nv --output-document="$output" "$download_url"; then
             download_url_used="$download_url"
         else
             echo "Failed to fetch $download_url"
+            rm -f "$output"
         fi
     done
     if [[ -z "${download_url_used:-}" ]]; then
