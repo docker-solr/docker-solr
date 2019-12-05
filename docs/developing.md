@@ -23,7 +23,7 @@ scripts etc. Re-build just one container, which takes about 10 seconds:
 
 ```
 tools/build_latest.sh
-docker run -it -P docker-solr/docker-solr:latest
+docker run -it -p 8983:8983 dockersolr/docker-solr:latest
 ```
 
 Before checking in, verify the Dockerfile templates look correct:
