@@ -1,23 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`5.5.5-slim`, `5.5-slim`, `5-slim` (*5.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/5.5/slim/Dockerfile)
-- [`5.5.5`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/5.5/Dockerfile)
-- [`6.6.6-slim`, `6.6-slim`, `6-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/6.6/slim/Dockerfile)
-- [`6.6.6`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/6.6/Dockerfile)
-- [`7.5.0-slim`, `7.5-slim` (*7.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.5/slim/Dockerfile)
-- [`7.5.0`, `7.5` (*7.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.5/Dockerfile)
-- [`7.6.0-slim`, `7.6-slim` (*7.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.6/slim/Dockerfile)
-- [`7.6.0`, `7.6` (*7.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.6/Dockerfile)
-- [`7.7.2-slim`, `7.7-slim`, `7-slim` (*7.7/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.7/slim/Dockerfile)
-- [`7.7.2`, `7.7`, `7` (*7.7/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/7.7/Dockerfile)
-- [`8.0.0-slim`, `8.0-slim` (*8.0/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.0/slim/Dockerfile)
-- [`8.0.0`, `8.0` (*8.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.0/Dockerfile)
-- [`8.1.1-slim`, `8.1-slim` (*8.1/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.1/slim/Dockerfile)
-- [`8.1.1`, `8.1` (*8.1/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.1/Dockerfile)
-- [`8.2.0-slim`, `8.2-slim` (*8.2/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.2/slim/Dockerfile)
-- [`8.2.0`, `8.2` (*8.2/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/e1f14cc65ae720d0db958bc2905e97b776b4f74d/8.2/Dockerfile)
-- [`8.3.0-slim`, `8.3-slim`, `8-slim`, `latest-slim` (*8.3/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/389e7844c8405605a930fc30cc8029eb6027798e/8.3/slim/Dockerfile)
-- [`8.3.0`, `8.3`, `8`, `latest` (*8.3/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/389e7844c8405605a930fc30cc8029eb6027798e/8.3/Dockerfile)
+See [Docker Hub](https://hub.docker.com/_/solr?tab=tags) for a list of image tags available to pull.
+The currently supported tags can be found in [./TAGS](https://github.com/docker-solr/docker-solr/blob/389e7844c8405605a930fc30cc8029eb6027798e/TAGS).
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 

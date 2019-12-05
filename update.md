@@ -116,26 +116,6 @@ Now that this has been committed, we can run the `generate-stackbrew-library.sh`
 
 This requires https://github.com/docker-library/official-images/tree/master/bashbrew to be installed.
 
-## Update our README
-
-Our repository has a README https://github.com/docker-solr/docker-solr/blob/master/README.md which shows
-supported tags. This is not consumed by the Docker library team, but is there for the convenience of
-our users to update this section, run:
-
-```
-tools/update_readme.sh
-git diff README.md
-```
-
-Then commit and push that change:
-
-```bash
-git commit -m "Update README for Solr 6.6.0" README.md
-git push
-```
-
-That is our repository updated.
-
 ## Check the automated build
 
 The check-in will trigger an automated build on https://travis-ci.org/docker-solr/docker-solr.
