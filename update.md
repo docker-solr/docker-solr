@@ -81,16 +81,7 @@ The build and test scripts are designed to run on a modern Linux.
 Your host needs to have `docker`, `git`, `wget` and `gpg` and `bash` >= 4 installed.
 You will also need to install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) such that it is on your `PATH`.
 
-For example, on Ubuntu you would do:
-
-```bash
-sudo apt-get update
-sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git
-sudo apt-get -y install docker.io
-sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
-sudo chmod a+x /usr/local/bin/bashbrew
-sudo adduser $USER docker
-```
+For example, see the [vagrant/README.md](vagrant/README.md) for provisioning a builder with Vagrant and Virtualbox.
 
 
 ## Updating the docker-solr repository
