@@ -6,7 +6,7 @@ Pre-requisites: [VirtualBox](https://www.virtualbox.org/wiki/Downloads) and [Vag
 vagrant up
 vagrant ssh -c "git clone git@github.com:docker-solr/docker-solr.git && \
   cd docker-solr && \
-  ./tools/update.sh &
+  ./tools/update.sh && \
   ./tools/build_all.sh && \
   ./tools/test_all.sh"
-``` 
+```
