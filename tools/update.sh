@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Usage: bash update.sh x.y.z
 #
@@ -14,6 +14,7 @@ if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
   exit 1
 fi
 
+if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
 TOP_DIR=$PWD

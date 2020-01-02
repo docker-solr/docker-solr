@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Report which FROM lines in Dockerfiles rely on tags that no longer exist
 set -euo pipefail
+if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 wget -q -O openjdk-tags.tmp https://raw.githubusercontent.com/docker-library/official-images/master/library/openjdk
 grep -E '^(Tags|SharedTags): ' openjdk-tags.tmp | sed -E 's/^(Tags|SharedTags): //' | sed 's/,/ /g' | sed -E 's/ +/ /g' | tr '[:space:]' '\n' | sort  | uniq > openjdk-tags

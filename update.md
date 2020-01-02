@@ -77,11 +77,11 @@ We don't typically announce the availability of new images.
 
 ## Build environment
 
-The build and test scripts are designed to run on a modern Linux.
-Your host needs to have `docker`, `git`, `wget` and `gpg` and `bash` >= 4 installed.
+The build and test scripts are designed to run on a modern Linux or Mac.
+Your host needs to have `docker`, `git`, `wget`, `gpg` and `bash` >= 4 installed.
 You will also need to install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) such that it is on your `PATH`.
 
-For example, on Ubuntu you would do:
+### Setting up environment on Ubuntu
 
 ```bash
 sudo apt-get update
@@ -92,10 +92,21 @@ sudo chmod a+x /usr/local/bin/bashbrew
 sudo adduser $USER docker
 ```
 
+### Setting up environment on MacOS
+
+Using [Homebrew](https://brew.sh/), install the necessary dependencies for MacOS:
+
+```bash
+brew install coreutils wget gpg gawk shellcheck git bash
+brew install docker
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
+sudo chmod a+x /usr/local/bin/bashbrew
+```
 
 ## Updating the docker-solr repository
 
-Get the docker-solr repository:
+Get the docker-solr repository. Make sure you [add your public SSH key to
+your GitHub profile](https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) first:
 
 ```bash
 git clone git@github.com:docker-solr/docker-solr.git

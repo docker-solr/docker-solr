@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Push all images
 #
@@ -11,6 +11,7 @@ if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
   exit 1
 fi
 
+if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 cd "$TOP_DIR"
 
