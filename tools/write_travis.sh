@@ -2,7 +2,6 @@
 #
 # Write a Travis config file
 
-if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." || exit 1
 
 cat <<EOM

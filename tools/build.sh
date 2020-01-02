@@ -5,7 +5,6 @@
 # Usage: build.sh dir
 
 set -euo pipefail
-if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 
 if (( $# != 1 )); then

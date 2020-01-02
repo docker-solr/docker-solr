@@ -101,6 +101,8 @@ brew install coreutils wget gpg gawk shellcheck git bash
 brew install docker
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
+# Make gnu readlink the default. You may wish to undo this after building 
+ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
 ```
 
 ## Updating the docker-solr repository

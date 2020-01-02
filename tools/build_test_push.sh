@@ -6,7 +6,6 @@ if [[ -n "${DEBUG:-}" ]]; then
   set -x
 fi
 
-if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 IMAGE_NAME="dockersolr/docker-solr"
 if (( $# != 1 )); then

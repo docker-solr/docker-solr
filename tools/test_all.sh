@@ -5,7 +5,6 @@
 # Usage: test_all.sh
 
 set -euo pipefail
-if [[ "$OSTYPE" == "darwin"* ]]; then alias readlink=greadlink; shopt -s expand_aliases; fi
 TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 cd "$TOP_DIR"
 
