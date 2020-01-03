@@ -19,7 +19,7 @@ function container_cleanup {
 
 function wait_for_container_and_solr {
   local container_name=$1
-  wait_for_server_started $container_name 4
+  wait_for_server_started $container_name 0
 
   printf '\nWaiting for Solr...\n'
   local status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
