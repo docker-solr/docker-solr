@@ -27,7 +27,7 @@ if [[ -v SOLR_PORT ]] && ! grep -E -q '^[0-9]+$' <<<"$SOLR_PORT"; then
   exit 1
 fi
 
-solr_url="http://localhost:${SOLR_PORT:-8983}"
+solr_url="http://localhost:${SOLR_PORT:-8983}/admin/info/system"
 
 while (( $# > 0 )); do
   case "$1" in

@@ -19,44 +19,27 @@ function container_cleanup {
 
 function wait_for_container_and_solr {
   local container_name=$1
-  local TIMEOUT_SECONDS=$(( 5 * 60 ))
-  local started=$(date +%s)
-  while /bin/true; do
-    if (( $(date +%s) > started + TIMEOUT_SECONDS )); then
-      echo "giving up after $TIMEOUT_SECONDS seconds"
-      exit 1
-    fi
-    if ! docker inspect "$container_name" >/dev/null 2>&1; then
-      sleep 2
-      continue;
-    fi
-    local container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
-    if [[ $container_status == 'running' ]]; then
-      break
-    elif [[ $container_status == 'exited' ]]; then
-      echo "container $container_name status: $container_status"
-      docker logs "$container_name"
-      exit 1
-    else
-      echo "container $container_name status: $container_status"
-    fi
-    printf '.'
-    SLEEP_SECS=1
-    sleep $SLEEP_SECS
-  done
+  wait_for_server_started $container_name 1
 
-  printf '\nChecking Solr is running\n'
+  printf '\nWaiting for Solr...\n'
   local status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
-  if ! grep -E -q 'solr is running' <<<"$status"; then
-    echo "solr did not start"
+  if ! grep -E -q 'Solr is running' <<<"$status"; then
+    echo "Solr did not start"
     container_cleanup "$container_name"
     exit 1
+  else
+    echo "Solr is running"
   fi
+  sleep 4
 }
 
 function wait_for_server_started {
   local container_name=$1
-  echo "waiting for server start"
+  local sleep_time=5
+  if [ ! -z ${2:-} ]; then
+    sleep_time=$2
+  fi
+  echo "Waiting for container start: $container_name"
   local TIMEOUT_SECONDS=$(( 5 * 60 ))
   local started=$(date +%s)
   local log="tmp-${container_name}.log"
@@ -79,9 +62,9 @@ function wait_for_server_started {
     printf '.'
     sleep 2
   done
-  printf '\nserver started\n'
+  echo "Server started"
   rm "$log"
-  sleep 4
+  sleep $sleep_time
 }
 
 function init_myvarsolr {
