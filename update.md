@@ -98,7 +98,7 @@ Using [Homebrew](https://brew.sh/), install the necessary dependencies for MacOS
 
 ```bash
 brew install coreutils wget gpg gawk shellcheck git bash parallel
-brew install docker
+brew cask install docker
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
 # Make gnu readlink the default. You may wish to undo this after building 
