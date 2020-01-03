@@ -23,12 +23,14 @@ echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
-myvarsolr="myvarsolr-${container_name}"
-init_myvarsolr 8983 $myvarsolr
 mylogs="mylogs-${container_name}"
 init_myvarsolr 8983 $mylogs
 myconf="myconf-${container_name}"
 configsets="configsets-${container_name}"
+mycore="mycore-${container_name}"
+init_myvarsolr 8983 $mycore
+
+rm -fr $myconf $configsets
 
 # create a core by hand:
 docker create --name "$container_name-copier" "$tag"
@@ -52,15 +54,13 @@ if [ ! -f $myconf/solrconfig.xml ]; then
 fi
 
 # create a directory for the core
-mkdir -p $myvarsolr/data/mycore
-mkdir -p $myvarsolr/logs
-touch $myvarsolr/data/mycore/core.properties
+touch $mycore/core.properties
 
 echo "Running $container_name"
 docker run \
-  -v "$PWD/$myvarsolr:/opt/solr/server/solr/mycore" \
+  -v "$PWD/$mycore:/opt/solr/server/solr/mycore" \
   -v "$PWD/$myconf:/opt/solr/server/solr/mycore/conf:ro" \
-  -v "$PWD/$mylogs:/opt/server/logs" \
+  -v "$PWD/$mylogs:/opt/solr/server/logs" \
   --user "$(id -u):$(id -g)" \
   --name "$container_name" \
   -d "$tag"
@@ -78,6 +78,6 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 container_cleanup "$container_name"
 
-rm -fr $myconf $myvarsolr $mylogs $configsets
+rm -fr $myconf $mycore $mylogs $configsets
 
 echo "Test $TEST_DIR $tag succeeded"
