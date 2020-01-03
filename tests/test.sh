@@ -32,9 +32,7 @@ find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > "$tag
 while read  -r d; do
   if [ -f "$d/test.sh" ]; then
     echo "Starting $d/test.sh $tag"
-#    if [[ "$d" == "tests-8/empty-varsolr-vol-ramdomuser-rootgroup" ]]; then
     (cd "$d"; ./test.sh "$tag")
-#    fi
     echo "Finished $d/test.sh $tag"
     echo
   fi
