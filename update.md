@@ -300,27 +300,6 @@ Once the PR is created, the CI system will do some sanity and security checking.
 
 Check [Docker hub](https://hub.docker.com/_/solr/?tab=tags) to see when the images are ready.
 
-## Update our README
-
-Our docker-solr repository has a [README](https://github.com/docker-solr/docker-solr/blob/master/README.md) which shows
-supported tags. This is not consumed by the Docker library team, but is there for the convenience of
-our users looking at the Github repository. We delay making this change until the new images have been created, so users don't complain that they cannot `docker pull` the latest versions.
-
-To update this section, run:
-
-```
-tools/update_readme.sh
-git diff README.md
-```
-
-Then commit and push that change:
-
-```bash
-git commit -m "Update tags in README" README.md
-git push
-```
-
-
 ## The docs repository
 
 The Docker library team maintains documentation at https://github.com/docker-solr/docs/tree/master/solr that includes current tags.
