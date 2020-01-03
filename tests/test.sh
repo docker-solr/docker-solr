@@ -26,14 +26,18 @@ else
 fi
 
 echo "Running all tests for $tag"
-find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > tests_to_run
+tag_norm='tests_to_run_'$(echo "$tag" | tr ':/-.' '_')
+
+find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > "$tag_norm"
 while read  -r d; do
   if [ -f "$d/test.sh" ]; then
     echo "Starting $d/test.sh $tag"
+#    if [[ "$d" == "tests-before8/init_solr_home" ]]; then
     (cd "$d"; ./test.sh "$tag")
+#    fi
     echo "Finished $d/test.sh $tag"
     echo
   fi
-done < tests_to_run
-rm tests_to_run
+done < "$tag_norm"
+rm "$tag_norm"
 echo "Completed all tests for $tag"

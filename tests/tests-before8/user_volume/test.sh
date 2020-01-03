@@ -23,41 +23,44 @@ echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
+myvarsolr="myvarsolr-${container_name}"
+init_myvarsolr 8983 $myvarsolr
+mylogs="mylogs-${container_name}"
+init_myvarsolr 8983 $mylogs
+myconf="myconf-${container_name}"
+configsets="configsets-${container_name}"
+
 # create a core by hand:
-rm -fr myconf configsets
 docker create --name "$container_name-copier" "$tag"
-docker cp "$container_name-copier:/opt/solr/server/solr/configsets" configsets
+docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
 docker rm "$container_name-copier"
 for d in data_driven_schema_configs _default; do
-  if [ -d configsets/$d ]; then
-    cp -r configsets/$d/conf myconf
+  if [ -d $configsets/$d ]; then
+    cp -r $configsets/$d/conf $myconf
     break
   fi
 done
-rm -fr configsets
-if [ ! -d myconf ]; then
+rm -fr $configsets
+if [ ! -d $myconf ]; then
   echo "Could not get config"
   exit 1
 fi
-if [ ! -f myconf/solrconfig.xml ]; then
-  find myconf
+if [ ! -f $myconf/solrconfig.xml ]; then
+  find $myconf
   echo "ERROR: no solrconfig.xml"
   exit 1
 fi
 
 # create a directory for the core
-rm -fr mycore
-mkdir mycore
-touch mycore/core.properties
-
-rm -fr mylogs
-mkdir mylogs
+mkdir -p $myvarsolr/data/mycore
+mkdir -p $myvarsolr/logs
+touch $myvarsolr/data/mycore/core.properties
 
 echo "Running $container_name"
 docker run \
-  -v "$PWD/mycore:/opt/solr/server/solr/mycore" \
-  -v "$PWD/myconf:/opt/solr/server/solr/mycore/conf:ro" \
-  -v "$PWD/mylogs:/opt/solr/server/logs" \
+  -v "$PWD/$myvarsolr:/opt/solr/server/solr/mycore" \
+  -v "$PWD/$myconf:/opt/solr/server/solr/mycore/conf:ro" \
+  -v "$PWD/$mylogs:/opt/server/logs" \
   --user "$(id -u):$(id -g)" \
   --name "$container_name" \
   -d "$tag"
@@ -66,7 +69,7 @@ wait_for_server_started "$container_name"
 
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c mycore example/exampledocs/manufacturers.xml
-sleep 1
+sleep 5
 echo "Checking data"
 data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/mycore/select?q=id%3Adell')
 if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
@@ -75,6 +78,6 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 container_cleanup "$container_name"
 
-rm -fr myconf mycore mylogs
+rm -fr $myconf $myvarsolr $mylogs $configsets
 
 echo "Test $TEST_DIR $tag succeeded"

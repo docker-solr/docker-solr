@@ -4,33 +4,33 @@
 
 function container_cleanup {
   local container_name=$1
-  previous=$(docker inspect "$container_name" --format '{{.ID}}' || true)
+  previous=$(docker inspect "$container_name" --format '{{.ID}}' 2>/dev/null || true)
   if [[ -n $previous ]]; then
-    container_status=$(docker inspect --format='{{.State.Status}}' "$previous")
+    container_status=$(docker inspect --format='{{.State.Status}}' "$previous" 2>/dev/null)
     if [[ $container_status == 'running' ]]; then
       echo "killing $previous"
-      docker kill "$previous" || true
+      docker kill "$previous" 2>/dev/null || true
       sleep 2
     fi
     echo "removing $previous"
-    docker rm "$previous" || true
+    docker rm "$previous" 2>/dev/null || true
   fi
 }
 
 function wait_for_container_and_solr {
   local container_name=$1
-  TIMEOUT_SECONDS=$(( 5 * 60 ))
-  started=$(date +%s)
+  local TIMEOUT_SECONDS=$(( 5 * 60 ))
+  local started=$(date +%s)
   while /bin/true; do
     if (( $(date +%s) > started + TIMEOUT_SECONDS )); then
       echo "giving up after $TIMEOUT_SECONDS seconds"
       exit 1
     fi
     if ! docker inspect "$container_name" >/dev/null 2>&1; then
-      sleep 1
+      sleep 2
       continue;
     fi
-    container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
+    local container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
     if [[ $container_status == 'running' ]]; then
       break
     elif [[ $container_status == 'exited' ]]; then
@@ -46,7 +46,7 @@ function wait_for_container_and_solr {
   done
 
   printf '\nChecking Solr is running\n'
-  status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
+  local status=$(docker exec "$container_name" /opt/docker-solr/scripts/wait-for-solr.sh --max-attempts 60 --wait-seconds 1)
   if ! grep -E -q 'solr is running' <<<"$status"; then
     echo "solr did not start"
     container_cleanup "$container_name"
@@ -57,16 +57,16 @@ function wait_for_container_and_solr {
 function wait_for_server_started {
   local container_name=$1
   echo "waiting for server start"
-  TIMEOUT_SECONDS=$(( 5 * 60 ))
-  started=$(date +%s)
+  local TIMEOUT_SECONDS=$(( 5 * 60 ))
+  local started=$(date +%s)
+  local log="tmp-${container_name}.log"
   while true; do
-    log="tmp-${container_name}.log"
     docker logs "$container_name" > "$log" 2>&1
     if grep -E -q '(o\.e\.j\.s\.Server Started|Started SocketConnector)' "$log" ; then
       break
     fi
 
-    container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
+    local container_status=$(docker inspect --format='{{.State.Status}}' "$container_name")
     if [[ $container_status == 'exited' ]]; then
       echo "container exited"
       exit 1
@@ -77,10 +77,36 @@ function wait_for_server_started {
       exit 1
     fi
     printf '.'
-    SLEEP_SECS=2
-    sleep $SLEEP_SECS
+    sleep 2
   done
   printf '\nserver started\n'
   rm "$log"
   sleep 4
+}
+
+function init_myvarsolr {
+  local userid=8983
+  local folder=myvarsolr
+  if [ ! -z "$1" ]; then
+    userid=$1
+  fi
+  if [ ! -z "$2" ]; then
+    folder=$2
+  fi
+  rm -fr $folder >/dev/null 2>&1
+  mkdir $folder
+  #echo "***** Created varsolr folder $PWD / $folder"
+
+  # The /var/solr mountpoint is owned by solr, so when we bind mount there our directory,
+  # owned by the current user in the host, will show as owned by solr, and our attempts
+  # to write to it as the user will fail. To deal with that, set the ACL to allow that.
+  # If you can't use setfacl (eg on macOS), you'll have to chown the directory to 8983, or apply world
+  # write permissions.
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Workaround for MacOS
+    sudo chmod -R 777 $folder
+    sudo chown -R $userid $folder
+  else
+    setfacl -m u:$userid:rwx $folder
+  fi
 }
