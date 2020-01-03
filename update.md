@@ -168,10 +168,10 @@ When changing scripts in one of these, remember to review the other directory to
 To run simple automated tests against the images:
 
 ```bash
-tools/test_all.sh
+tools/test_all.sh [num-processes]
 ```
 
-Note that this runs all tests serially, and this takes a while.
+By default tests are run in 2 parallel processes. If you run more powerful hardware, you may want to allocate more resources to Docker and specify 5 or 10 parallel processes, e.g. `tools/test_all.sh 10`.
 
 To manually test a container, use the normal commands from the README, using the tag:
 
