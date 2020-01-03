@@ -26,7 +26,7 @@ else
 fi
 
 echo "Running all tests for $tag"
-tag_norm='tests_to_run_'$(echo "$tag" | tr ':/-.' '_')
+tag_norm='tests_to_run_'$(echo "$tag" | tr ':/-' '_')
 
 find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > "$tag_norm"
 while read  -r d; do
