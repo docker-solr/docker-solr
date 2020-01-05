@@ -127,10 +127,7 @@ RUN set -ex; \
   chown -R "0:0" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr; \
   chown -R "$SOLR_USER:0" /var/solr; \
   { command -v gpgconf; gpgconf --kill all || :; }; \
-  rm -r "$GNUPGHOME"; \
-  # Clear some variables that are of no use runtime
-  unset GOSU_KEY GOSU_VERSION TINI_KEY TINI_VERSION SOLR_USER SOLR_UID SOLR_GROUP SOLR_GID \
-        SOLR_CLOSER_URL SOLR_DIST_URL SOLR_ARCHIVE_URL SOLR_DOWNLOAD_URL SOLR_DOWNLOAD_SERVER SOLR_KEYS SOLR_SHA512
+  rm -r "$GNUPGHOME"
 
 COPY --chown=0:0 scripts /opt/docker-solr/scripts
 
