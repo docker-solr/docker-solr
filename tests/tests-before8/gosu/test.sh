@@ -5,7 +5,7 @@
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # TODO: Fix this test on Mac
-  echo "WARNING: Ignoring test 'gosu' on MacOS"
+  echo "WARNING: Ignoring test 'gosu' on macOS"
   exit 0
 fi
 

@@ -31,6 +31,7 @@ myconf="myconf-${container_name}"
 configsets="configsets-${container_name}"
 
 # create a core by hand:
+rm -fr $myconf $myvarsolr $mylogs $configsets 2>/dev/null
 docker create --name "$container_name-copier" "$tag"
 docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
 docker rm "$container_name-copier"

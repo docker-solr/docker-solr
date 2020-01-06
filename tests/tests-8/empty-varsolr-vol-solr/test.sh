@@ -24,7 +24,6 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
-init_myvarsolr 8983 $myvarsolr
 
 docker volume rm $myvarsolr >/dev/null 2>&1 || true
 docker volume create $myvarsolr
@@ -54,6 +53,5 @@ docker exec --user=solr "$container_name" ls -l /var/solr/data
 container_cleanup "$container_name"
 
 docker volume rm $myvarsolr
-rm -fr $myvarsolr
 
 echo "Test $TEST_DIR $tag succeeded"

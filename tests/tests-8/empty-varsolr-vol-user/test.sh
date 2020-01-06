@@ -61,6 +61,4 @@ container_cleanup "$container_name"
 
 docker volume rm $myvarsolr
 
-rm -fr $myvarsolr
-
 echo "Test $TEST_DIR $tag succeeded"

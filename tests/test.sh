@@ -26,16 +26,13 @@ else
 fi
 
 echo "Running all tests for $tag"
-tag_norm='tests_to_run_'$(echo "$tag" | tr ':/-' '_')
 
-find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///' > "$tag_norm"
-while read  -r d; do
+for d in $(find "$test_dir" -mindepth 1 -maxdepth 1 -type d | sed -E -e 's/^\.\///'); do
   if [ -f "$d/test.sh" ]; then
     echo "Starting $d/test.sh $tag"
     (cd "$d"; ./test.sh "$tag")
     echo "Finished $d/test.sh $tag"
     echo
   fi
-done < "$tag_norm"
-rm "$tag_norm"
+done
 echo "Completed all tests for $tag"

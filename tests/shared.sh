@@ -87,7 +87,7 @@ function init_myvarsolr {
   # If you can't use setfacl (eg on macOS), you'll have to chown the directory to 8983, or apply world
   # write permissions.
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Workaround for MacOS
+    # Workaround for macOS
     sudo chmod -R 777 $folder
     sudo chown -R $userid $folder
   else
