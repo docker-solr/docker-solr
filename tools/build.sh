@@ -41,8 +41,18 @@ else
   cp -r "$TOP_DIR/scripts" .
 fi
 
+build_arg=""
 if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then
   build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"
+fi
+if [ -n "${SOLR_DOWNLOAD_URL:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_DOWNLOAD_URL=$SOLR_DOWNLOAD_URL"
+fi
+if [ -n "${SOLR_VERSION:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_VERSION=$SOLR_VERSION"
+fi
+if [ -n "${SOLR_SHA512:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_SHA512=$SOLR_SHA512"
 fi
 if [ "${NOCACHE:-no}" == 'yes' ]; then
   nocache_arg="--no-cache"
