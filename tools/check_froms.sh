@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Report which FROM lines in Dockerfiles rely on tags that no longer exist
 set -euo pipefail
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."

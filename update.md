@@ -77,16 +77,47 @@ We don't typically announce the availability of new images.
 
 ## Build environment
 
-The build and test scripts are designed to run on a modern Linux.
-Your host needs to have `docker`, `git`, `wget` and `gpg` and `bash` >= 4 installed.
+The build and test scripts are designed to run on a modern Linux or Mac. Windows users can use Vagrant virtual machine.
+Your host needs to have `docker`, `git`, `wget`, `gpg` and `bash` >= 4 installed.
 You will also need to install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) such that it is on your `PATH`.
 
-For example, see the [vagrant/README.md](vagrant/README.md) for provisioning a builder with Vagrant and Virtualbox.
+### Setting up environment on Ubuntu
 
+```bash
+sudo apt-get update
+sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git parallel
+sudo apt-get -y install docker.io
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+sudo chmod a+x /usr/local/bin/bashbrew
+sudo adduser $USER docker
+```
+
+### Setting up environment on macOS
+
+Using [Homebrew](https://brew.sh/), install the necessary dependencies for macOS
+
+Above all you need Docker :) If you don't have it you may install with `brew cask install docker`.
+
+```bash
+brew install coreutils wget gpg gawk shellcheck git bash parallel
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
+sudo chmod a+x /usr/local/bin/bashbrew
+# Make gnu readlink the default. You may wish to undo this after building 
+ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
+```
+
+NOTE: If you don't want to symlink readlink permanently you may instead
+create a symbolic link to `/path/to/some/bin/readlink` and put that location
+first in your path when working with this build only.
+
+### Setting up envionment on Windows
+
+See [vagrant/README.md](vagrant/README.md) for provisioning a builder with Vagrant and Virtualbox.
 
 ## Updating the docker-solr repository
 
-Get the docker-solr repository:
+Get the docker-solr repository. Make sure you [add your public SSH key to
+your GitHub profile](https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) first:
 
 ```bash
 git clone git@github.com:docker-solr/docker-solr.git
@@ -146,10 +177,10 @@ When changing scripts in one of these, remember to review the other directory to
 To run simple automated tests against the images:
 
 ```bash
-tools/test_all.sh
+tools/test_all.sh [num-processes]
 ```
 
-Note that this runs all tests serially, and this takes a while.
+By default tests are run in 2 parallel processes. If you run more powerful hardware, you may want to allocate more resources to Docker and specify 5 or 10 parallel processes, e.g. `tools/test_all.sh 10`.
 
 To manually test a container, use the normal commands from the README, using the tag:
 
@@ -277,27 +308,6 @@ Check the Solr release notes for any new versions, and if there are major change
 Once the PR is created, the CI system will do some sanity and security checking. The team will review the changes, and may comment in the PR. This may take a day or two. These comments need to be responded to and dealt with, by updating the PR with further commits, or closing the PR and creating a new one. Once the team is satisfied, the PR will be merged, and the images will be created.
 
 Check [Docker hub](https://hub.docker.com/_/solr/?tab=tags) to see when the images are ready.
-
-## Update our README
-
-Our docker-solr repository has a [README](https://github.com/docker-solr/docker-solr/blob/master/README.md) which shows
-supported tags. This is not consumed by the Docker library team, but is there for the convenience of
-our users looking at the Github repository. We delay making this change until the new images have been created, so users don't complain that they cannot `docker pull` the latest versions.
-
-To update this section, run:
-
-```
-tools/update_readme.sh
-git diff README.md
-```
-
-Then commit and push that change:
-
-```bash
-git commit -m "Update tags in README" README.md
-git push
-```
-
 
 ## The docs repository
 

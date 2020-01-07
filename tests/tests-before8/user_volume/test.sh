@@ -23,46 +23,48 @@ echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
+mylogs="mylogs-${container_name}"
+prepare_dir_to_mount 8983 $mylogs
+myconf="myconf-${container_name}"
+configsets="configsets-${container_name}"
+mycore="mycore-${container_name}"
+prepare_dir_to_mount 8983 $mycore
+
 # create a core by hand:
-rm -fr myconf configsets
+rm -fr $myconf $configsets 2>/dev/null
 docker create --name "$container_name-copier" "$tag"
-docker cp "$container_name-copier:/opt/solr/server/solr/configsets" configsets
+docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
 docker rm "$container_name-copier"
 for d in data_driven_schema_configs _default; do
-  if [ -d configsets/$d ]; then
-    cp -r configsets/$d/conf myconf
+  if [ -d $configsets/$d ]; then
+    cp -r $configsets/$d/conf $myconf
     break
   fi
 done
-rm -fr configsets
-if [ ! -d myconf ]; then
+rm -fr $configsets
+if [ ! -d $myconf ]; then
   echo "Could not get config"
   exit 1
 fi
-if [ ! -f myconf/solrconfig.xml ]; then
-  find myconf
+if [ ! -f $myconf/solrconfig.xml ]; then
+  find $myconf
   echo "ERROR: no solrconfig.xml"
   exit 1
 fi
 
 # create a directory for the core
-rm -fr mycore
-mkdir mycore
-touch mycore/core.properties
-
-rm -fr mylogs
-mkdir mylogs
+touch $mycore/core.properties
 
 echo "Running $container_name"
 docker run \
-  -v "$PWD/mycore:/opt/solr/server/solr/mycore" \
-  -v "$PWD/myconf:/opt/solr/server/solr/mycore/conf:ro" \
-  -v "$PWD/mylogs:/opt/solr/server/logs" \
+  -v "$PWD/$mycore:/opt/solr/server/solr/mycore" \
+  -v "$PWD/$myconf:/opt/solr/server/solr/mycore/conf:ro" \
+  -v "$PWD/$mylogs:/opt/solr/server/logs" \
   --user "$(id -u):$(id -g)" \
   --name "$container_name" \
   -d "$tag"
 
-wait_for_server_started "$container_name"
+wait_for_container_and_solr "$container_name"
 
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c mycore example/exampledocs/manufacturers.xml
@@ -75,6 +77,6 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 container_cleanup "$container_name"
 
-rm -fr myconf mycore mylogs
+rm -fr "$myconf" "$mycore" "$mylogs" "$configsets"
 
 echo "Test $TEST_DIR $tag succeeded"

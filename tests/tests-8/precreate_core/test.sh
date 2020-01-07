@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 echo "Running $container_name"
 docker run --name "$container_name" -d -e VERBOSE=yes "$tag" solr-precreate gettingstarted
 
-wait_for_server_started "$container_name"
+wait_for_container_and_solr "$container_name"
 
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c gettingstarted example/exampledocs/manufacturers.xml

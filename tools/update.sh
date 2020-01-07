@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Usage: bash update.sh x.y.z
 #
@@ -101,7 +101,7 @@ function write_files {
     <"$template" sed -E \
       -e "s/FROM \\\$REPLACE_FROM/FROM $FROM/g" \
       -e "s/\\\$REPLACE_SOLR_VERSION/$full_version/g" \
-      -e "s/\\\$REPLACE_SOLR_SHA256/$SHA256/g" \
+      -e "s/\\\$REPLACE_SOLR_SHA512/$SHA512/g" \
       -e "s/\\\$REPLACE_SOLR_KEYS/$KEYS/g" \
       > "$target_dir/Dockerfile"
 
@@ -326,7 +326,7 @@ for version in "${versions[@]}"; do
     verify_signature "$full_version"
 
     # We will record a stronger SHA256, for write_files
-    SHA256=$(sha256sum "solr-$full_version.tgz" | awk '{print $1}')
+    SHA512=$(sha512sum "solr-$full_version.tgz" | awk '{print $1}')
 
     cd "$TOP_DIR"
 
