@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
-prepare_dir_to_mount 7777 $myvarsolr
+prepare_dir_to_mount 7777 "$myvarsolr"
 
 echo "Running $container_name"
 docker run \
@@ -55,6 +55,6 @@ docker run --rm -e VERBOSE=yes \
   -v "$PWD/$myvarsolr:/myvarsolr" "$tag" \
   bash -c "rm -fr /myvarsolr/*"
 
-rm -fr $myvarsolr
+rm -fr "$myvarsolr"
 
 echo "Test $TEST_DIR $tag succeeded"

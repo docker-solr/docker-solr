@@ -24,38 +24,38 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
-prepare_dir_to_mount 8983 $myvarsolr
+prepare_dir_to_mount 8983 "$myvarsolr"
 mylogs="mylogs-${container_name}"
-prepare_dir_to_mount 8983 $mylogs
+prepare_dir_to_mount 8983 "$mylogs"
 myconf="myconf-${container_name}"
 configsets="configsets-${container_name}"
 
 # create a core by hand:
-rm -fr $myconf $configsets 2>/dev/null
+rm -fr "$myconf" "$configsets" 2>/dev/null
 docker create --name "$container_name-copier" "$tag"
 docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
 docker rm "$container_name-copier"
 for d in data_driven_schema_configs _default; do
-  if [ -d $configsets/$d ]; then
-    cp -r $configsets/$d/conf $myconf
+  if [ -d "$configsets/$d" ]; then
+    cp -r "$configsets/$d/conf" "$myconf"
     break
   fi
 done
-rm -fr $configsets
-if [ ! -d $myconf ]; then
+rm -fr "$configsets"
+if [ ! -d "$myconf" ]; then
   echo "Could not get config"
   exit 1
 fi
-if [ ! -f $myconf/solrconfig.xml ]; then
-  find $myconf
+if [ ! -f "$myconf/solrconfig.xml" ]; then
+  find "$myconf"
   echo "ERROR: no solrconfig.xml"
   exit 1
 fi
 
 # create a directory for the core
-mkdir -p $myvarsolr/data/mycore
-mkdir -p $myvarsolr/logs
-touch $myvarsolr/data/mycore/core.properties
+mkdir -p "$myvarsolr/data/mycore"
+mkdir -p "$myvarsolr/logs"
+touch "$myvarsolr/data/mycore/core.properties"
 
 echo "Running $container_name"
 docker run \
@@ -79,6 +79,6 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 container_cleanup "$container_name"
 
-rm -fr $myconf $myvarsolr $mylogs $configsets
+rm -fr "$myconf" "$myvarsolr" "$mylogs" "$configsets"
 
 echo "Test $TEST_DIR $tag succeeded"

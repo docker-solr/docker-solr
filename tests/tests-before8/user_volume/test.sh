@@ -77,6 +77,6 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 container_cleanup "$container_name"
 
-rm -fr $myconf $mycore $mylogs $configsets
+rm -fr "$myconf" "$mycore" "$mylogs" "$configsets"
 
 echo "Test $TEST_DIR $tag succeeded"

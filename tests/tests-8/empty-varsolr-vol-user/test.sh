@@ -25,8 +25,8 @@ container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
 
-docker volume rm $myvarsolr >/dev/null 2>&1 || true
-docker volume create $myvarsolr
+docker volume rm "$myvarsolr" >/dev/null 2>&1 || true
+docker volume create "$myvarsolr"
 
 # when we mount onto /var/solr, it will be owned by "solr", and it will copy
 # the solr-owned directories and files from the container filesystem onto the
@@ -59,6 +59,6 @@ fi
 
 container_cleanup "$container_name"
 
-docker volume rm $myvarsolr
+docker volume rm "$myvarsolr"
 
 echo "Test $TEST_DIR $tag succeeded"

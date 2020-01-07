@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
-prepare_dir_to_mount 8983 $myvarsolr
+prepare_dir_to_mount 8983 "$myvarsolr"
 
 echo "Running $container_name"
 docker run \
@@ -48,14 +48,14 @@ docker exec --user=solr "$container_name" ls -l /var/solr/data
 
 container_cleanup "$container_name"
 
-ls -l $myvarsolr/
+ls -l "$myvarsolr"/
 
 # remove the solr-owned files from inside a container
 docker run --rm -e VERBOSE=yes \
   -v "$PWD/$myvarsolr:/myvarsolr" "$tag" \
   bash -c "rm -fr /myvarsolr/*"
 
-ls -l $myvarsolr/
-rm -fr $myvarsolr
+ls -l "$myvarsolr/"
+rm -fr "$myvarsolr"
 
 echo "Test $TEST_DIR $tag succeeded"

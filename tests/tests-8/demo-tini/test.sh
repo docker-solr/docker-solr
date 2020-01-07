@@ -34,7 +34,7 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 
 data=$(docker exec --user=solr "$container_name" pgrep tini)
-echo $data
+echo "$data"
 
 #container_cleanup "$container_name"
 

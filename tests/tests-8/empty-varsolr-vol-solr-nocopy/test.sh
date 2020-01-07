@@ -25,8 +25,8 @@ container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
 
-docker volume rm $myvarsolr >/dev/null 2>&1 || true
-docker volume create $myvarsolr
+docker volume rm "$myvarsolr" >/dev/null 2>&1 || true
+docker volume create "$myvarsolr"
 
 # with nocopy, the /var/solr ends up owned by root, so we need to chown it first
 
@@ -58,6 +58,6 @@ docker exec --user=solr "$container_name" ls -l /var/solr/data
 
 container_cleanup "$container_name"
 
-docker volume rm $myvarsolr
+docker volume rm "$myvarsolr"
 
 echo "Test $TEST_DIR $tag succeeded"
