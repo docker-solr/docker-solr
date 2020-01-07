@@ -30,7 +30,7 @@ if [ -d $myvarsolr ]; then
   docker run --rm -v "$PWD/$myvarsolr:/mysolrhome" "$tag" bash -c "rm -fr /mysolrhome/*"
 fi
 
-init_myvarsolr 8983 $myvarsolr
+prepare_dir_to_mount 8983 $myvarsolr
 
 mkdir "$myvarsolr/lost+found"
 chmod a+w $myvarsolr

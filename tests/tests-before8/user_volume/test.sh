@@ -24,11 +24,11 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 mylogs="mylogs-${container_name}"
-init_myvarsolr 8983 $mylogs
+prepare_dir_to_mount 8983 $mylogs
 myconf="myconf-${container_name}"
 configsets="configsets-${container_name}"
 mycore="mycore-${container_name}"
-init_myvarsolr 8983 $mycore
+prepare_dir_to_mount 8983 $mycore
 
 # create a core by hand:
 rm -fr $myconf $configsets 2>/dev/null

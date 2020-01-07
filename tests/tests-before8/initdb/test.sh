@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 
 cd "$TEST_DIR"
 initdb="initdb-$container_name"
-init_myvarsolr 8983 $initdb
+prepare_dir_to_mount 8983 $initdb
 
 cat > $initdb/create-was-here.sh <<EOM
 touch /opt/docker-solr/initdb-was-here

@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 myvarsolr="myvarsolr-${container_name}"
-init_myvarsolr 8983 $myvarsolr
+prepare_dir_to_mount 8983 $myvarsolr
 
 echo "Running $container_name"
 docker run \

@@ -31,7 +31,7 @@ container_name='test_'$(echo "$tag" | tr ':/-' '_')
 
 cd "$TEST_DIR"
 mycores="mycores-${container_name}"
-init_myvarsolr 8983 $mycores
+prepare_dir_to_mount 8983 $mycores
 
 echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"

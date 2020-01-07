@@ -68,7 +68,7 @@ function wait_for_server_started {
   sleep $sleep_time
 }
 
-function init_myvarsolr {
+function prepare_dir_to_mount {
   local userid=8983
   local folder=myvarsolr
   if [ ! -z "$1" ]; then
