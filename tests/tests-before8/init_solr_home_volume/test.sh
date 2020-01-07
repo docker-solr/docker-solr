@@ -30,7 +30,7 @@ echo "Running $container_name"
 
 docker run --name "$container_name" -d -v "$VOLUME_NAME:/opt/mysolrhome" -e SOLR_HOME=/opt/mysolrhome -e INIT_SOLR_HOME=yes -d "$tag" "solr-demo"
 
-wait_for_server_started "$container_name"
+wait_for_container_and_solr "$container_name"
 
 echo "Checking data"
 data=$(docker exec --user=solr "$container_name" wget -O - 'http://localhost:8983/solr/demo/select?q=id%3Adell')

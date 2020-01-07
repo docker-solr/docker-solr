@@ -77,25 +77,43 @@ We don't typically announce the availability of new images.
 
 ## Build environment
 
-The build and test scripts are designed to run on a modern Linux.
-Your host needs to have `docker`, `git`, `wget` and `gpg` and `bash` >= 4 installed.
+The build and test scripts are designed to run on a modern Linux or Mac.
+Your host needs to have `docker`, `git`, `wget`, `gpg` and `bash` >= 4 installed.
 You will also need to install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) such that it is on your `PATH`.
 
-For example, on Ubuntu you would do:
+### Setting up environment on Ubuntu
 
 ```bash
 sudo apt-get update
-sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git
+sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git parallel
 sudo apt-get -y install docker.io
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
 sudo adduser $USER docker
 ```
 
+### Setting up environment on macOS
+
+Using [Homebrew](https://brew.sh/), install the necessary dependencies for macOS
+
+Above all you need Docker :) If you don't have it you may install with `brew cask install docker`.
+
+```bash
+brew install coreutils wget gpg gawk shellcheck git bash parallel
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
+sudo chmod a+x /usr/local/bin/bashbrew
+# Make gnu readlink the default. You may wish to undo this after building 
+ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
+```
+
+NOTE: If you don't want to symlink readlink permanently you may instead
+create a symbolic link to `/path/to/some/bin/readlink` and put that location
+first in your path when working with this build only.
 
 ## Updating the docker-solr repository
 
-Get the docker-solr repository:
+Get the docker-solr repository. Make sure you [add your public SSH key to
+your GitHub profile](https://help.github.com/en/github/authenticating-to-github/adding-a-new-ssh-key-to-your-github-account) first:
 
 ```bash
 git clone git@github.com:docker-solr/docker-solr.git
@@ -155,10 +173,10 @@ When changing scripts in one of these, remember to review the other directory to
 To run simple automated tests against the images:
 
 ```bash
-tools/test_all.sh
+tools/test_all.sh [num-processes]
 ```
 
-Note that this runs all tests serially, and this takes a while.
+By default tests are run in 2 parallel processes. If you run more powerful hardware, you may want to allocate more resources to Docker and specify 5 or 10 parallel processes, e.g. `tools/test_all.sh 10`.
 
 To manually test a container, use the normal commands from the README, using the tag:
 

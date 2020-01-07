@@ -23,18 +23,20 @@ echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
-docker volume rm myvarsolr >/dev/null 2>&1 || true
-docker volume create myvarsolr
+myvarsolr="myvarsolr-${container_name}"
+
+docker volume rm "$myvarsolr" >/dev/null 2>&1 || true
+docker volume create "$myvarsolr"
 
 # when we mount onto /var/solr, that will be owned by "solr"
 
 echo "Running $container_name"
 docker run \
-  -v "myvarsolr:/var/solr" \
+  -v "$myvarsolr:/var/solr" \
   --name "$container_name" \
   -d "$tag" solr-precreate getting-started
 
-wait_for_server_started "$container_name"
+wait_for_container_and_solr "$container_name"
 
 echo "Loading data"
 docker exec --user=solr "$container_name" bin/post -c getting-started example/exampledocs/manufacturers.xml
@@ -50,6 +52,6 @@ docker exec --user=solr "$container_name" ls -l /var/solr/data
 
 container_cleanup "$container_name"
 
-docker volume rm myvarsolr
+docker volume rm "$myvarsolr"
 
 echo "Test $TEST_DIR $tag succeeded"

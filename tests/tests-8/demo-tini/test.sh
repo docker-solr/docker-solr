@@ -24,7 +24,7 @@ container_cleanup "$container_name"
 echo "Running $container_name"
 docker run --name "$container_name" -d -e TINI=yes "$tag" "solr-demo"
 
-wait_for_server_started "$container_name"
+wait_for_container_and_solr "$container_name"
 
 echo "Checking data"
 data=$(docker exec --user=solr "$container_name" wget -q -O - 'http://localhost:8983/solr/demo/select?q=id%3Adell')
@@ -34,7 +34,7 @@ if ! grep -E -q 'One Dell Way Round Rock, Texas 78682' <<<"$data"; then
 fi
 
 data=$(docker exec --user=solr "$container_name" pgrep tini)
-echo $data
+echo "$data"
 
 #container_cleanup "$container_name"
 
