@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
   end
  config.vm.provision "shell", inline: <<-SHELL
    apt-get update
-   apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git
+   apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git parallel
    apt-get -y install docker.io
    wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
    chmod a+x /usr/local/bin/bashbrew
