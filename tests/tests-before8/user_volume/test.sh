@@ -24,36 +24,36 @@ container_cleanup "$container_name"
 container_cleanup "$container_name-copier"
 
 mylogs="mylogs-${container_name}"
-prepare_dir_to_mount 8983 $mylogs
+prepare_dir_to_mount 8983 "$mylogs"
 myconf="myconf-${container_name}"
 configsets="configsets-${container_name}"
 mycore="mycore-${container_name}"
-prepare_dir_to_mount 8983 $mycore
+prepare_dir_to_mount 8983 "$mycore"
 
 # create a core by hand:
-rm -fr $myconf $configsets 2>/dev/null
+rm -fr "$myconf" "$configsets" 2>/dev/null
 docker create --name "$container_name-copier" "$tag"
-docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
+docker cp "$container_name-copier:/opt/solr/server/solr/configsets" "$configsets"
 docker rm "$container_name-copier"
 for d in data_driven_schema_configs _default; do
-  if [ -d $configsets/$d ]; then
-    cp -r $configsets/$d/conf $myconf
+  if [ -d "$configsets/$d" ]; then
+    cp -r "$configsets/$d/conf" "$myconf"
     break
   fi
 done
-rm -fr $configsets
-if [ ! -d $myconf ]; then
+rm -fr "$configsets"
+if [ ! -d "$myconf" ]; then
   echo "Could not get config"
   exit 1
 fi
-if [ ! -f $myconf/solrconfig.xml ]; then
-  find $myconf
+if [ ! -f "$myconf/solrconfig.xml" ]; then
+  find "$myconf"
   echo "ERROR: no solrconfig.xml"
   exit 1
 fi
 
 # create a directory for the core
-touch $mycore/core.properties
+touch "$mycore/core.properties"
 
 echo "Running $container_name"
 docker run \

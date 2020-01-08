@@ -31,7 +31,7 @@ container_name='test_'$(echo "$tag" | tr ':/-' '_')
 
 cd "$TEST_DIR"
 mycores="mycores-${container_name}"
-prepare_dir_to_mount 8983 $mycores
+prepare_dir_to_mount 8983 "$mycores"
 
 echo "Cleaning up left-over containers from previous runs"
 container_cleanup "$container_name"
@@ -59,8 +59,8 @@ if [[ ! -f $mycores/root_was_here ]]; then
   echo "Missing $mycores/root_was_here"
   exit 1
 fi
-if [[ "$(stat -c %U $mycores/root_was_here)" != root ]]; then
-  echo "tmp/f is owned by $(stat -c %U $mycores/root_was_here)"
+if [[ "$(stat -c %U "$mycores/root_was_here")" != root ]]; then
+  echo "tmp/f is owned by $(stat -c %U "$mycores/root_was_here")"
   exit 1
 fi
 
@@ -69,7 +69,7 @@ if [[ ! -f $mycores/gettingstarted/core.properties ]]; then
   echo "Missing $mycores/gettingstarted/core.properties"
   exit 1
 fi
-if [[ "$(stat -c %u $mycores/gettingstarted/core.properties)" != 8983 ]]; then
+if [[ "$(stat -c %u "$mycores/gettingstarted/core.properties")" != 8983 ]]; then
   echo "$mycores/gettingstarted/core.properties is owned by $(stat -c %u mycores/gettingstarted/core.properties)"
   exit 1
 fi
@@ -79,6 +79,6 @@ docker run --rm --user 0:0 -d -e VERBOSE=yes \
   -v "$PWD/$mycores:/opt/solr/server/solr/mycores" "$tag" \
   bash -c "chown -R $(id -u):$(id -g) /opt/solr/server/solr/mycores; ls -ld /opt/solr/server/solr/mycores"
 
-rm -fr $mycores
+rm -fr "$mycores"
 
 echo "Test $TEST_DIR $tag succeeded"
