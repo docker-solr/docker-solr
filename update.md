@@ -77,7 +77,7 @@ We don't typically announce the availability of new images.
 
 ## Build environment
 
-The build and test scripts are designed to run on a modern Linux or Mac.
+The build and test scripts are designed to run on a modern Linux or Mac. Windows users can use Vagrant virtual machine.
 Your host needs to have `docker`, `git`, `wget`, `gpg` and `bash` >= 4 installed.
 You will also need to install [bashbrew](https://github.com/docker-library/official-images/tree/master/bashbrew) such that it is on your `PATH`.
 
@@ -109,6 +109,10 @@ ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
 NOTE: If you don't want to symlink readlink permanently you may instead
 create a symbolic link to `/path/to/some/bin/readlink` and put that location
 first in your path when working with this build only.
+
+### Setting up envionment on Windows
+
+See [vagrant/README.md](vagrant/README.md) for provisioning a builder with Vagrant and Virtualbox.
 
 ## Updating the docker-solr repository
 
