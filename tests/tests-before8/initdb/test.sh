@@ -24,12 +24,12 @@ container_cleanup "$container_name"
 
 cd "$TEST_DIR"
 initdb="initdb-$container_name"
-prepare_dir_to_mount 8983 $initdb
+prepare_dir_to_mount 8983 "$initdb"
 
-cat > $initdb/create-was-here.sh <<EOM
+cat > "$initdb/create-was-here.sh" <<EOM
 touch /opt/docker-solr/initdb-was-here
 EOM
-cat > $initdb/ignore-me <<EOM
+cat > "$initdb/ignore-me" <<EOM
 touch /opt/docker-solr/should-not-be
 EOM
 
@@ -62,7 +62,7 @@ if ! grep -q 'ignoring /docker-entrypoint-initdb.d/ignore-me' "$log"; then
 fi
 rm "$log"
 
-rm -fr $initdb
+rm -fr "$initdb"
 container_cleanup "$container_name"
 
 echo "Test $TEST_DIR $tag succeeded"

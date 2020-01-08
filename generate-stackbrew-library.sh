@@ -94,7 +94,7 @@ for version in "${versions[@]}"; do
 			"$version"
 		)
 
-		if [[ ! -z "${aliases[$version]:-}" ]]; then
+		if [[ -n "${aliases[$version]:-}" ]]; then
             versionAliases=( "${versionAliases[@]}"  "${aliases[$version]:-}" )
 		fi
 		if [ -z "$variant" ]; then

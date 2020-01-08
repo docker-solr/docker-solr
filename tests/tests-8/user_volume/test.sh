@@ -33,7 +33,7 @@ configsets="configsets-${container_name}"
 # create a core by hand:
 rm -fr "$myconf" "$configsets" 2>/dev/null
 docker create --name "$container_name-copier" "$tag"
-docker cp "$container_name-copier:/opt/solr/server/solr/configsets" $configsets
+docker cp "$container_name-copier:/opt/solr/server/solr/configsets" "$configsets"
 docker rm "$container_name-copier"
 for d in data_driven_schema_configs _default; do
   if [ -d "$configsets/$d" ]; then
