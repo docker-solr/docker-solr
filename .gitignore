@@ -5,3 +5,4 @@ tests/tests_to_run*
 mycores
 /tests/logs/*.log
 .idea
+/vagrant/.vagrant/
