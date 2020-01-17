@@ -4,6 +4,10 @@
 
 set -e
 
+# Clear some variables that we don't want runtime
+unset GOSU_KEY GOSU_VERSION TINI_KEY TINI_VERSION SOLR_USER SOLR_UID SOLR_GROUP SOLR_GID \
+      SOLR_CLOSER_URL SOLR_DIST_URL SOLR_ARCHIVE_URL SOLR_DOWNLOAD_URL SOLR_DOWNLOAD_SERVER SOLR_KEYS SOLR_SHA512
+
 if [[ "$VERBOSE" == "yes" ]]; then
     set -x
 fi

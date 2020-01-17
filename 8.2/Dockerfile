@@ -4,6 +4,12 @@ FROM openjdk:11-stretch
 LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
 LABEL repository="https://github.com/docker-solr/docker-solr"
 
+ARG SOLR_VERSION="8.2.0"
+ARG SOLR_SHA512="beb4e37fc21bf483e3b6bae43cb06a49bc420a0f2b920c97909a69a5efeacba1e7d2ff09ae8018446c87bf007f88f06a59de73cd1923f0967e8206629b0509b6"
+ARG SOLR_KEYS="E58A6F4D5B2B48AC66D5E53BD4F181881A42F9E6"
+# If specified, this will override SOLR_DOWNLOAD_SERVER and all ASF mirrors. Typically used downstream for custom builds
+ARG SOLR_DOWNLOAD_URL
+
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
@@ -17,12 +23,9 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="8.2.0" \
-    SOLR_CLOSER_URL="http://www.apache.org/dyn/closer.lua?filename=lucene/solr/8.2.0/solr-8.2.0.tgz&action=download" \
-    SOLR_DIST_URL="https://www.apache.org/dist/lucene/solr/8.2.0/solr-8.2.0.tgz" \
-    SOLR_ARCHIVE_URL="https://archive.apache.org/dist/lucene/solr/8.2.0/solr-8.2.0.tgz" \
-    SOLR_SHA256="bfa4b39b236e5d714f4233138b8b5cb7e1996ddc0aad60052ce83c4b7bf33449" \
-    SOLR_KEYS="E58A6F4D5B2B48AC66D5E53BD4F181881A42F9E6" \
+    SOLR_CLOSER_URL="http://www.apache.org/dyn/closer.lua?filename=lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz&action=download" \
+    SOLR_DIST_URL="https://www.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz" \
+    SOLR_ARCHIVE_URL="https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH" \
     SOLR_INCLUDE=/etc/default/solr.in.sh \
     SOLR_HOME=/var/solr/data \
@@ -76,22 +79,30 @@ RUN set -ex; \
   rm /usr/local/bin/tini.asc; \
   chmod +x /usr/local/bin/tini; \
   tini --version; \
-  if [ -n "$SOLR_DOWNLOAD_SERVER" ]; then \
+  MAX_REDIRECTS=1; \
+  if [ -n "$SOLR_DOWNLOAD_URL" ]; then \
+    # If a custom URL is defined, we download from non-ASF mirror URL and allow more redirects and skip GPG step
+    # This takes effect only if the SOLR_DOWNLOAD_URL build-arg is specified, typically in downstream Dockerfiles
+    MAX_REDIRECTS=4; \
+    SKIP_GPG_CHECK=true; \
+  elif [ -n "$SOLR_DOWNLOAD_SERVER" ]; then \
     SOLR_DOWNLOAD_URL="$SOLR_DOWNLOAD_SERVER/$SOLR_VERSION/solr-$SOLR_VERSION.tgz"; \
-    echo "downloading $SOLR_DOWNLOAD_URL"; \
-    wget -t 10 --max-redirect 1 --retry-connrefused -nv "$SOLR_DOWNLOAD_URL" -O "/opt/solr-$SOLR_VERSION.tgz" || rm -f "/opt/solr-$SOLR_VERSION.tgz"; \
   fi; \
-  for url in $SOLR_CLOSER_URL $SOLR_DIST_URL $SOLR_ARCHIVE_URL; do \
+  for url in $SOLR_DOWNLOAD_URL $SOLR_CLOSER_URL $SOLR_DIST_URL $SOLR_ARCHIVE_URL; do \
     if [ -f "/opt/solr-$SOLR_VERSION.tgz" ]; then break; fi; \
     echo "downloading $url"; \
-    if wget -t 10 --max-redirect 1 --retry-connrefused -nv "$url" -O "/opt/solr-$SOLR_VERSION.tgz"; then break; else rm -f "/opt/solr-$SOLR_VERSION.tgz"; fi; \
+    if wget -t 10 --max-redirect $MAX_REDIRECTS --retry-connrefused -nv "$url" -O "/opt/solr-$SOLR_VERSION.tgz"; then break; else rm -f "/opt/solr-$SOLR_VERSION.tgz"; fi; \
   done; \
   if [ ! -f "/opt/solr-$SOLR_VERSION.tgz" ]; then echo "failed all download attempts for solr-$SOLR_VERSION.tgz"; exit 1; fi; \
-  echo "downloading $SOLR_ARCHIVE_URL.asc"; \
-  wget -nv "$SOLR_ARCHIVE_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
-  echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c -; \
-  (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc"); \
-  gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz"; \
+  if [ -z "$SKIP_GPG_CHECK" ]; then \
+    echo "downloading $SOLR_ARCHIVE_URL.asc"; \
+    wget -nv "$SOLR_ARCHIVE_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
+    echo "$SOLR_SHA512 */opt/solr-$SOLR_VERSION.tgz" | sha512sum -c -; \
+    (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc"); \
+    gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz"; \
+  else \
+    echo "Skipping GPG validation due to non-Apache build"; \
+  fi; \
   tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
   (cd /opt; ln -s "solr-$SOLR_VERSION" solr); \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
