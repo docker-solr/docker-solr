@@ -108,7 +108,7 @@ ln -s /usr/local/bin/gfind /usr/local/bin/find
 ```
 
 NOTE: If you don't want to symlink readlink and gfind permanently you may instead
-create symbolic links to `/path/to/some/bin/readlink` and `/path/to/somr/bin/find` and put that location
+create symbolic links to `/path/to/some/bin/readlink` and `/path/to/some/bin/find` and put that location
 first in your path when working with this build only.
 
 ### Setting up envionment on Windows
