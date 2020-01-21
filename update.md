@@ -168,6 +168,16 @@ tools/build_all.sh
 This can take a long time, because the builds download the base image, and download the Solr packages again,
 for each image. Subsequent builds can be faster due to Docker's layer caching.
 
+To speed up the build by re-using all the Solr tarballs you have locally in ./downloads already, you can start a local
+webserver serving these binaries and tell the build to use that server instead of the official ASF ones. First, start
+a small webserver in the background, then run the build:
+
+```bash
+tools/serve_local.py &
+SOLR_DOWNLOAD_SERVER="http://host.docker.internal:8083" tools/build_all.sh
+wget -t 1 http://localhost:8083/quit >/dev/null 2>&1
+```
+
 Keep an eye out for "This key is not certified with a trusted signature!"; it would be good to verify the fingerprints with ones you have in your PGP keyring.
 I typically commit key changes separately from version updates.
 
