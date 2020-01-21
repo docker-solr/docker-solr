@@ -8,5 +8,5 @@ if [[ ! -d /tmp/docker-solr-bin ]]; then
 fi
 if [[ ! $PATH == *"docker-solr-bin"* ]]; then
   export PATH=/tmp/docker-solr-bin:$PATH
-  echo "Configuring for macOS - ádding /tmp/docker-solr-bin first in path"
+  echo "Configuring for macOS - adding /tmp/docker-solr-bin first in path"
 fi
