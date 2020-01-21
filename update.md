@@ -97,18 +97,20 @@ sudo adduser $USER docker
 Using [Homebrew](https://brew.sh/), install the necessary dependencies for macOS
 
 Above all you need Docker :) If you don't have it you may install with `brew cask install docker`.
+You also need the GNU version of some tools.
 
 ```bash
-brew install coreutils wget gpg gawk shellcheck git bash parallel
+brew install gpg  # If you don't have GPG already
+brew install git  # If you don't have git already
+brew install coreutils wget gawk shellcheck bash parallel findutils  # Other dependencies
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
-# Make gnu readlink the default. You may wish to undo this after building 
-ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
 ```
 
-NOTE: If you don't want to symlink readlink permanently you may instead
-create a symbolic link to `/path/to/some/bin/readlink` and put that location
-first in your path when working with this build only.
+Before you start running scripts, please run an init script that puts GNU tools first in PATH. The settings only takes effect for the current Terminal window:
+```bash
+source tools/init_macos.sh
+```
 
 ### Setting up envionment on Windows
 
@@ -167,6 +169,16 @@ tools/build_all.sh
 
 This can take a long time, because the builds download the base image, and download the Solr packages again,
 for each image. Subsequent builds can be faster due to Docker's layer caching.
+
+To speed up the build by re-using all the Solr tarballs you have locally in ./downloads already, you can start a local
+webserver serving these binaries and tell the build to use that server instead of the official ASF ones. First, start
+a small webserver in the background, then run the build:
+
+```bash
+tools/serve_local.py &
+SOLR_DOWNLOAD_SERVER="http://host.docker.internal:8083" tools/build_all.sh
+wget -t 1 http://localhost:8083/quit >/dev/null 2>&1
+```
 
 Keep an eye out for "This key is not certified with a trusted signature!"; it would be good to verify the fingerprints with ones you have in your PGP keyring.
 I typically commit key changes separately from version updates.

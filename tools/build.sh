@@ -57,7 +57,7 @@ fi
 if [ "${NOCACHE:-no}" == 'yes' ]; then
   nocache_arg="--no-cache"
 fi
-cmd="docker build --pull --rm=true ${build_arg:-} ${nocache_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
+cmd="docker build --network=host --pull --rm=true ${build_arg:-} ${nocache_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
 echo "running: $cmd"
 $cmd
 extra_tags="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")"
