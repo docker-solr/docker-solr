@@ -101,7 +101,7 @@ RUN set -ex; \
   tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
   mv "/opt/solr-$SOLR_VERSION" /opt/solr; \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
-  rm -Rf /opt/solr/docs/; \
+  rm -Rf /opt/solr/docs/ /opt/solr/dist/{solr-core-$SOLR_VERSION.jar,solr-solrj-$SOLR_VERSION.jar,solrj-lib,solr-test-framework-$SOLR_VERSION.jar,test-framework}; \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
   mkdir -p /opt/solr/server/solr/mycores /opt/solr/server/logs /opt/mysolrhome; \
   sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr; \
