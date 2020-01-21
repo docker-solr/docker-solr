@@ -81,13 +81,13 @@ function write_files {
         exit 1
     elif [[ "$dash_variant" = "-slim" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-slim
+            FROM=openjdk:11-jre-slim
         else
             FROM=openjdk:8-jre-slim
         fi
     elif [[ -z "$dash_variant" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-stretch
+            FROM=openjdk:11-jre-stretch
         else
             FROM=openjdk:8-jre-stretch
         fi
