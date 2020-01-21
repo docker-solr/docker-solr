@@ -51,6 +51,10 @@ jobs:
       script: tools/build_test_push.sh 7.5
     - stage: build, test, deploy
       env:
+      - PROCESS=6.6/slim
+      script: tools/build_test_push.sh 6.6/slim
+    - stage: build, test, deploy
+      env:
       - PROCESS=6.6
       script: tools/build_test_push.sh 6.6
     - stage: build, test, deploy
