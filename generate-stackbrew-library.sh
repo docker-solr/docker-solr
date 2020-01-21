@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Produce https://github.com/docker-library/official-images/blob/master/library/solr
 # Based on https://github.com/docker-library/httpd/blob/master/generate-stackbrew-library.sh

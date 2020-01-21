@@ -106,7 +106,7 @@ RUN set -ex; \
   tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
   (cd /opt; ln -s "solr-$SOLR_VERSION" solr); \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
-  rm -Rf /opt/solr/docs/; \
+  rm -Rf /opt/solr/docs/ /opt/solr/dist/{solr-core-$SOLR_VERSION.jar,solr-solrj-$SOLR_VERSION.jar,solrj-lib,solr-test-framework-$SOLR_VERSION.jar,test-framework}; \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
   chown -R 0:0 "/opt/solr-$SOLR_VERSION"; \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755; \
