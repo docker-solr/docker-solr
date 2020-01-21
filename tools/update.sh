@@ -53,43 +53,32 @@ function write_files {
         dash_variant=""
         target_dir="$short_version"
         template="$template_prefix.template"
-    elif [[ $variant == "slim" ]]; then
-        dash_variant="-$variant"
-        target_dir="$short_version/$variant"
-        # For slim use the non-variant template
-        template="$template_prefix.template"
     else
         dash_variant="-$variant"
         target_dir="$short_version/$variant"
         template="$template_prefix-$variant.template"
     fi
 
-    extra_tags="$short_version$dash_variant"
+    extra_tags="$short_version$dash_variant $short_version$dash_variant-slim"
 
     for v in $latest_major_versions; do
         if [[ $v == "$full_version" ]]; then
             major_version=$(echo "$full_version" | sed -E -e 's/^([0-9]+).*/\1/')
-            extra_tags="$extra_tags $major_version$dash_variant"
+            extra_tags="$extra_tags $major_version$dash_variant $major_version$dash_variant-slim"
         fi
     done
     if [[ $full_version == "$latest_version" ]]; then
-        extra_tags="$extra_tags latest$dash_variant"
+        extra_tags="$extra_tags latest$dash_variant slim"
     fi
 
     if [[ "$dash_variant" = "-alpine" ]]; then
         echo "Alpine is no longer supported"
         exit 1
-    elif [[ "$dash_variant" = "-slim" ]]; then
+    elif [[ -z "$dash_variant" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
             FROM=openjdk:11-jre-slim
         else
             FROM=openjdk:8-jre-slim
-        fi
-    elif [[ -z "$dash_variant" ]]; then
-        if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-jre-stretch
-        else
-            FROM=openjdk:8-jre-stretch
         fi
     else
 	    echo "Unexpected variant: $dash_variant"
@@ -331,7 +320,6 @@ for version in "${versions[@]}"; do
     cd "$TOP_DIR"
 
     write_files "$full_version"
-    write_files "$full_version" 'slim'
     echo
 done
 

@@ -26,12 +26,6 @@ tools/build_latest.sh
 docker run -it -p 8983:8983 dockersolr/docker-solr:latest
 ```
 
-Before checking in, verify the Dockerfile templates look correct:
-
-```
-diff -du Dockerfile.template Dockerfile-slim.template
-```
-
 Then build all again, commit an push:
 
 ```
