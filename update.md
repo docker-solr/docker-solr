@@ -97,19 +97,20 @@ sudo adduser $USER docker
 Using [Homebrew](https://brew.sh/), install the necessary dependencies for macOS
 
 Above all you need Docker :) If you don't have it you may install with `brew cask install docker`.
+You also need the GNU version of some tools.
 
 ```bash
-brew install coreutils wget gpg gawk shellcheck git bash parallel findutils
+brew install gpg  # If you don't have GPG already
+brew install git  # If you don't have git already
+brew install coreutils wget gawk shellcheck bash parallel findutils  # Other dependencies
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-darwin-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
-# Make gnu readlink and find the default. You may wish to undo this after building 
-ln -s /usr/local/bin/greadlink /usr/local/bin/readlink
-ln -s /usr/local/bin/gfind /usr/local/bin/find
 ```
 
-NOTE: If you don't want to symlink readlink and gfind permanently you may instead
-create symbolic links to `/path/to/some/bin/readlink` and `/path/to/some/bin/find` and put that location
-first in your path when working with this build only.
+Before you start running scripts, please run an init script that puts GNU tools first in PATH. The settings only takes effect for the current Terminal window:
+```bash
+source tools/init_macos.sh
+```
 
 ### Setting up envionment on Windows
 
