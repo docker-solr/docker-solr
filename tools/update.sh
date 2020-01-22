@@ -105,7 +105,7 @@ function write_files {
       # The TAGS file will list build_dir:full_version:tags, with lines sorted youngest to oldest
       # Other scripts in ./tools/ will parse the TAGS file.
       # This is only for local/Travis use; the official library does not use the TAGS file.
-      echo "$target_dir:$full_version$dash_variant:$(tr '\n' ' ' <<<"$extra_tags" | sed 's/ $//')" >> "$TOP_DIR/TAGS"
+      echo "$target_dir:$full_version$dash_variant:$full_version$dash_variant-slim:$(tr '\n' ' ' <<<"$extra_tags" | sed 's/ $//')" >> "$TOP_DIR/TAGS"
     fi
 }
 
