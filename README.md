@@ -88,7 +88,7 @@ for an example Docker Compose file that starts up Solr in a simple cluster confi
 The container contains an install of Solr, as installed by the [service installation script](https://lucene.apache.org/solr/guide/7_7/taking-solr-to-production.html#service-installation-script).
 This stores the Solr distribution in `/opt/solr`, and configures Solr to use `/var/solr` to store data and logs, using the `/etc/default/solr` file for configuration.
 If you want to persist the data, mount a volume or directory on `/var/solr`.
-Solr expects some files and directories in `/var/solr`; if you use your own directory or volume you can either pre-populate them, or let docker-solr copy them for you. See [init-var-solr](scripts/init-var-solr.sh).
+Solr expects some files and directories in `/var/solr`; if you use your own directory or volume you can either pre-populate them, or let docker-solr copy them for you. See [init-var-solr](scripts/init-var-solr).
 If you want to use custom configuration, mount it in the appropriate place. See below for examples.
 
 The docker-solr distribution adds [scripts](https://github.com/docker-solr/docker-solr/tree/master/scripts) in `/opt/docker-solr/scripts` to make it easier to use under Docker, for example to create cores on container startup.
