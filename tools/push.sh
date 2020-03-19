@@ -3,7 +3,7 @@
 # push images to Docker hub
 #
 # Usage: push.sh image
-# E.g.: push.sh dockersolr/docker-solr:8.2.0-slim
+# E.g.: push.sh dockersolr/docker-solr:8.2.0
 
 set -euo pipefail
 
