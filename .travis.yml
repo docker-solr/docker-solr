@@ -19,6 +19,14 @@ jobs:
   include:
     - stage: build, test, deploy
       env:
+      - PROCESS=8.5/slim
+      script: tools/build_test_push.sh 8.5/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=8.5
+      script: tools/build_test_push.sh 8.5
+    - stage: build, test, deploy
+      env:
       - PROCESS=8.4/slim
       script: tools/build_test_push.sh 8.4/slim
     - stage: build, test, deploy
