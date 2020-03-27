@@ -87,9 +87,9 @@ function write_files {
         fi
     elif [[ -z "$dash_variant" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-jre-stretch
+            FROM=openjdk:11-jre
         else
-            FROM=openjdk:8-jre-stretch
+            FROM=openjdk:8-jre
         fi
     else
 	    echo "Unexpected variant: $dash_variant"
