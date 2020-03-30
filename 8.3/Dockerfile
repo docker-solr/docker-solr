@@ -1,5 +1,5 @@
 
-FROM openjdk:11-jre-stretch
+FROM openjdk:11-jre
 
 LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
 LABEL repository="https://github.com/docker-solr/docker-solr"
