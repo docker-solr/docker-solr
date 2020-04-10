@@ -23,7 +23,7 @@ Instructions below apply to `solr:8.0.0` and above.
 
 ## Running Solr with host-mounted directories
 
-Typically users first want to run a single standalone Solr server in a container, with a single core fore data, while storing data in a local directory.
+Typically users first want to run a single standalone Solr server in a container, with a single core for data, while storing data in a local directory.
 This is a convenient mechanism for developers, and could be used for single-server production hosts too.
 
 ```console
