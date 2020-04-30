@@ -16,7 +16,7 @@ ARG SOLR_DOWNLOAD_SERVER
 
 RUN set -ex; \
   apt-get update; \
-  apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
+  apt-get -y install acl dirmngr gpg lsof procps wget netcat gosu tini; \
   rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
@@ -28,12 +28,6 @@ ENV SOLR_USER="solr" \
     SOLR_ARCHIVE_URL="https://archive.apache.org/dist/lucene/solr/$SOLR_VERSION/solr-$SOLR_VERSION.tgz" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
-ENV GOSU_VERSION 1.11
-ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
-
-ENV TINI_VERSION v0.18.0
-ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
-
 RUN set -ex; \
   groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP"; \
   useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
@@ -43,7 +37,7 @@ RUN set -ex; \
   mkdir -p "$GNUPGHOME"; \
   chmod 700 "$GNUPGHOME"; \
   echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf"; \
-  for key in $SOLR_KEYS $GOSU_KEY $TINI_KEY; do \
+  for key in $SOLR_KEYS; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
@@ -61,19 +55,6 @@ RUN set -ex; \
 
 RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
-  pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch"; \
-  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch.asc"; \
-  gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-  rm /usr/local/bin/gosu.asc; \
-  chmod +x /usr/local/bin/gosu; \
-  gosu nobody true; \
-  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch"; \
-  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch.asc"; \
-  gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
-  rm /usr/local/bin/tini.asc; \
-  chmod +x /usr/local/bin/tini; \
-  tini --version; \
   MAX_REDIRECTS=1; \
   if [ -n "$SOLR_DOWNLOAD_URL" ]; then \
     # If a custom URL is defined, we download from non-ASF mirror URL and allow more redirects and skip GPG step
