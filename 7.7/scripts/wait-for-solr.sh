@@ -79,7 +79,7 @@ grep -q -E '^https?://' <<<"$solr_url" || usage "--solr-url $solr_url: not a URL
 
 ((attempts_left=max_attempts))
 while (( attempts_left > 0 )); do
-  if wget -q -O - "$solr_url" | grep -q -i solr; then
+  if wget -q -O - "$solr_url" | grep -i solr >/dev/null; then
     break
   fi
   (( attempts_left-- ))
