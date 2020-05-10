@@ -235,8 +235,8 @@ Now we can commit the changes to our repository.
 Make sure your github configuration has your identity configured. For example (substitute your own values!):
 
 ```bash
-git config --global user.email "mak-github@greenhills.co.uk"
-git config --global user.name "Martijn Koster"
+git config --global user.email "john@example.com"
+git config --global user.name "John Doe"
 git config --global push.default simple
 ```
 

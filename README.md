@@ -13,8 +13,6 @@ Apache Solr is highly reliable, scalable and fault tolerant, providing distribut
 
 Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr Reference Guide](https://lucene.apache.org/solr/guide/).
 
-> [wikipedia.org/wiki/Apache_Solr](https://en.wikipedia.org/wiki/Apache_Solr)
-
 ![logo](https://raw.githubusercontent.com/docker-library/docs/master/solr/logo.png)
 
 # Getting started with the Docker image
@@ -266,9 +264,9 @@ This repository is available on [github.com/docker-solr/docker-solr](https://git
 
 Solr is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-This repository is also licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+This repository is licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-Copyright 2015-2019 Martijn Koster
+Copyright 2015-2020 The Apache Software Foundation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
