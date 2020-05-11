@@ -285,3 +285,7 @@ For general questions about Solr, see the [Community information](http://lucene.
 ## Contributing
 
 If you want to contribute to Solr, see the [Solr Resources](http://lucene.apache.org/solr/resources.html#community).
+
+# History
+
+This project was started in 2015 by [Martijn Koster](https://github.com/makuk66). In 2019 maintainership and copyright was transferred to the Apache Lucene/Solr project. Many thanks to Martijn for all your contributions over the years!
