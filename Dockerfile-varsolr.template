@@ -1,7 +1,7 @@
 
 FROM $REPLACE_FROM
 
-LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
+LABEL maintainer="The Apache Lucene/Solr Project"
 LABEL repository="https://github.com/docker-solr/docker-solr"
 
 ARG SOLR_VERSION="$REPLACE_SOLR_VERSION"
