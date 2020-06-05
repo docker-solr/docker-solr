@@ -236,7 +236,26 @@ Other ways of extending the image are to create custom Docker images that inheri
 
 ## Debugging with jattach
 
-The `jcmd` tool is not included in the JRE. But this image includes the [jattach](https://github.com/apangin/jattach) utility which lets you call `jcmd` and also perform thread dumps and more.
+The `jcmd`, `jmap` `jstack` tools can be useful for debugging Solr inside the container. These tools are not included with the JRE, but this image includes the [jattach](https://github.com/apangin/jattach) utility which lets you do much of the same.
+
+    Usage: jattach <pid> <cmd> [args ...]
+    
+      Commands: 
+        load : load agent library
+        properties : print system properties
+        agentProperties : print agent properties
+        datadump : show heap and thread summary
+        threaddump : dump all stack traces (like jstack)
+        dumpheap : dump heap (like jmap)
+        inspectheap : heap histogram (like jmap -histo)
+        setflag : modify manageable VM flag
+        printflag : print VM flag
+        jcmd : execute jcmd command
+    
+Example comands to do a thread dump and get heap info for PID 10:
+
+    jattach 10 threaddump
+    jattach 10 jcmd GC.heap_info
 
 # Updating from Docker-solr5-7 to 8
 
