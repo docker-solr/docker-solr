@@ -234,6 +234,10 @@ Instead of using this mechanism, you can of course create your own script that d
 
 Other ways of extending the image are to create custom Docker images that inherit from this one.
 
+## Debugging with jattach
+
+The `jcmd` tool is not included in the JRE. But this image includes the [jattach](https://github.com/apangin/jattach) utility which lets you call `jcmd` and also perform thread dumps and more.
+
 # Updating from Docker-solr5-7 to 8
 
 For Solr 8, the docker-solr distribution switched from just extracting the Solr tar, to using the [service installation script](https://lucene.apache.org/solr/guide/7_7/taking-solr-to-production.html#service-installation-script). This was done for various reasons: to bring it in line with the recommendations by the Solr Ref Guide, to make it easier to mount volumes, and because we were [asked to](https://github.com/docker-solr/docker-solr/issues/173).
