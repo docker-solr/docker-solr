@@ -137,13 +137,6 @@ Next we run the update script. This will discover any new versions of Solr, and 
 This script will re-generate all the Dockerfiles, using the `Dockerfile*.template` files in the top-level directory.
 So don't ever make manual changes to the Dockerfiles, as they will be overridden.
 
-If you're in Europe, you can optionally override the download file locations for much faster downloads:
-
-```bash
-export SOLR_DOWNLOAD_SERVER="http://www-eu.apache.org/dist/lucene/solr"
-export archiveUrl="https://www-eu.apache.org/dist/lucene/solr"
-```
-
 ```bash
 tools/update.sh
 git status
