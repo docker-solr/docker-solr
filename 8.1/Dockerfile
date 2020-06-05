@@ -1,7 +1,7 @@
 
 FROM openjdk:11-jre
 
-LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
+LABEL maintainer="The Apache Lucene/Solr Project"
 LABEL repository="https://github.com/docker-solr/docker-solr"
 
 ARG SOLR_VERSION="8.1.1"
