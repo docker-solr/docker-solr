@@ -69,7 +69,7 @@ getArches 'solr'
 cat <<-EOH
 # this file is generated via https://github.com/docker-solr/docker-solr/blob/$(fileCommit "$self")/$self
 
-Maintainers: The Apache Lucene/Solr Project <solr-user@lucene.apache.org>,
+Maintainers: The Apache Lucene/Solr Project <solr-user@lucene.apache.org> (@asfbot),
              Shalin Mangar (@shalinmangar),
              David Smiley (@dsmiley),
              Jan Høydahl (@janhoy)
