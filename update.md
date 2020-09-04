@@ -87,7 +87,7 @@ You will also need to install [bashbrew](https://github.com/docker-library/offic
 sudo apt-get update
 sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git parallel
 sudo apt-get -y install docker.io
-sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
 sudo adduser $USER docker
 ```
