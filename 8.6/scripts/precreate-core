@@ -28,7 +28,7 @@ if [[ -z "$CONFIG_SOURCE" ]]; then
     fi
 fi
 
-coresdir=${SOLR_HOME:=/var/solr/data}
+coresdir=/var/solr/data
 
 coredir="$coresdir/$CORE"
 if [[ ! -d $coredir ]]; then

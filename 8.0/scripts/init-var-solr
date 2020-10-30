@@ -14,7 +14,10 @@ if [[ -n "${NO_INIT_VAR_SOLR:-}" ]]; then
     exit 0
 fi
 
-DIR=${1:-/var/solr}
+if [[ -z "$SOLR_HOME" ]]; then
+    SOLR_HOME=/var/solr
+
+DIR=${1:-$(dirname "$SOLR_HOME")}
 
 if [ ! -d "$DIR" ]; then
     echo "Missing $DIR"
