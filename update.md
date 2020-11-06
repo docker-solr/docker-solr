@@ -173,6 +173,7 @@ SOLR_DOWNLOAD_SERVER="http://host.docker.internal:8083" tools/build_all.sh
 wget -t 1 http://localhost:8083/quit >/dev/null 2>&1
 ```
 
+*Note: "host.docker.internal" is supported on macOS & Windows, but perhaps not anywhere else.  Try "localhost".*
 Keep an eye out for "This key is not certified with a trusted signature!"; it would be good to verify the fingerprints with ones you have in your PGP keyring.
 I typically commit key changes separately from version updates.
 
