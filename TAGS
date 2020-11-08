@@ -1,3 +1,5 @@
+8.7:8.7.0:8.7 8 latest
+8.7/slim:8.7.0-slim:8.7-slim 8-slim latest-slim
 8.6:8.6.3:8.6
 8.6/slim:8.6.3-slim:8.6-slim
 8.5:8.5.2:8.5
@@ -18,5 +20,3 @@
 6.6/slim:6.6.6-slim:6.6-slim 6-slim
 5.5:5.5.5:5.5 5
 5.5/slim:5.5.5-slim:5.5-slim 5-slim
-8.7:8.7.0:8.7 8 latest
-8.7/slim:8.7.0-slim:8.7-slim 8-slim latest-slim
