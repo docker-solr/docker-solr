@@ -1,6 +1,7 @@
 downloads
 .gnupg
-upstream_versions
+ownertrust.txt
+upstream-versions
 tests/tests_to_run*
 mycores
 /tests/logs/*.log
