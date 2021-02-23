@@ -26,6 +26,7 @@ This is a convenient mechanism for developers, and could be used for single-serv
 
 ```console
 $ mkdir solrdata
+$ sudo chown 8983:8983 solrdata  # necessary on Linux, not Mac.
 $ docker run -d -v "$PWD/solrdata:/var/solr" -p 8983:8983 --name my_solr solr:8 solr-precreate gettingstarted
 ```
 
