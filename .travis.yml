@@ -20,96 +20,120 @@ jobs:
     - stage: build, test, deploy
       env:
       - PROCESS=8.8/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.8/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.8
+      - DEBUG=true
       script: tools/build_test_push.sh 8.8
     - stage: build, test, deploy
       env:
       - PROCESS=8.7/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.7/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.7
+      - DEBUG=true
       script: tools/build_test_push.sh 8.7
     - stage: build, test, deploy
       env:
       - PROCESS=8.6/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.6/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.6
+      - DEBUG=true
       script: tools/build_test_push.sh 8.6
     - stage: build, test, deploy
       env:
       - PROCESS=8.5/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.5/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.5
+      - DEBUG=true
       script: tools/build_test_push.sh 8.5
     - stage: build, test, deploy
       env:
       - PROCESS=8.4/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.4/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.4
+      - DEBUG=true
       script: tools/build_test_push.sh 8.4
     - stage: build, test, deploy
       env:
       - PROCESS=8.3/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.3/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.3
+      - DEBUG=true
       script: tools/build_test_push.sh 8.3
     - stage: build, test, deploy
       env:
       - PROCESS=8.2/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.2/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.2
+      - DEBUG=true
       script: tools/build_test_push.sh 8.2
     - stage: build, test, deploy
       env:
       - PROCESS=8.1/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.1/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.1
+      - DEBUG=true
       script: tools/build_test_push.sh 8.1
     - stage: build, test, deploy
       env:
       - PROCESS=8.0/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 8.0/slim
     - stage: build, test, deploy
       env:
       - PROCESS=8.0
+      - DEBUG=true
       script: tools/build_test_push.sh 8.0
     - stage: build, test, deploy
       env:
       - PROCESS=7.7/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 7.7/slim
     - stage: build, test, deploy
       env:
       - PROCESS=7.7
+      - DEBUG=true
       script: tools/build_test_push.sh 7.7
     - stage: build, test, deploy
       env:
       - PROCESS=6.6/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 6.6/slim
     - stage: build, test, deploy
       env:
       - PROCESS=6.6
+      - DEBUG=true
       script: tools/build_test_push.sh 6.6
     - stage: build, test, deploy
       env:
       - PROCESS=5.5/slim
+      - DEBUG=true
       script: tools/build_test_push.sh 5.5/slim
     - stage: build, test, deploy
       env:
       - PROCESS=5.5
+      - DEBUG=true
       script: tools/build_test_push.sh 5.5
