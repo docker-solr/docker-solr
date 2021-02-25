@@ -17,6 +17,7 @@ GITHUB_REPO='docker-solr/docker-solr'
 # but currently dashes are not allowed, see https://github.com/docker/hub-feedback/issues/373
 # The hub user is "dockersolrbuilder".
 IMAGE_NAME='dockersolr/docker-solr'
+TOP_DIR="$(readlink -f "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/..")"
 
 function check_master {
   if [[ ${TRAVIS:-} = 'true' ]]; then
@@ -35,19 +36,6 @@ function check_master {
       exit 0
     fi
   fi
-}
-
-function login {
-  # To make it easier to use this script locally, try determine if you are already logged in.
-  # I don't know how supported/permanent this is; I notice that if you use "--format '{{json .}}'"
-  # this does not show up.
-  if docker system info 2>&1 |grep -E '^ *Username: '; then
-      echo "You appear to be already logged in"
-      return
-  fi
-  if [[ -z "$DOCKER_USERNAME" ]]; then echo "DOCKER_USERNAME not set"; exit 1; fi
-  if [[ -z "$DOCKER_PASSWORD" ]]; then echo "DOCKER_PASSWORD not set"; exit 1; fi
-  docker login -u "$DOCKER_USERNAME" --password-stdin <<<"$DOCKER_PASSWORD"
 }
 
 function push {
@@ -82,5 +70,5 @@ if ! grep -E -q "^$IMAGE_NAME:" <<<"$image"; then
   exit 1
 fi
 check_master
-login
+"$TOP_DIR/tools/login.sh"
 push "$1"
