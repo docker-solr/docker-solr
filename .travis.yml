@@ -1,139 +1,137 @@
 dist: xenial
-
 sudo: required
-
 language: generic
-
 services:
 - docker
-
 addons:
   apt:
     packages:
-      - docker-ce
-
+    - docker-ce
 before_install:
 - docker info
-
 jobs:
   include:
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.8/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.8/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.8
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.8
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.7/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.7/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.7
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.7
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.6/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.6/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.6
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.6
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.5/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.5/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.5
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.5
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.4/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.4/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.4
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.4
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.3/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.3/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.3
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.3
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.2/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.2/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.2
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.2
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.1/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.1/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.1
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.1
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.0/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.0/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=8.0
-      - DEBUG=true
-      script: tools/build_test_push.sh 8.0
-    - stage: build, test, deploy
-      env:
-      - PROCESS=7.7/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 7.7/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=7.7
-      - DEBUG=true
-      script: tools/build_test_push.sh 7.7
-    - stage: build, test, deploy
-      env:
-      - PROCESS=6.6/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 6.6/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=6.6
-      - DEBUG=true
-      script: tools/build_test_push.sh 6.6
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5/slim
-      - DEBUG=true
-      script: tools/build_test_push.sh 5.5/slim
-    - stage: build, test, deploy
-      env:
-      - PROCESS=5.5
-      - DEBUG=true
-      script: tools/build_test_push.sh 5.5
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.8/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.8/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.8
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.8
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.7/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.7/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.7
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.7
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.6/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.6/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.6
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.6
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.5/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.5/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.5
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.5
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.4/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.4/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.4
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.4
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.3/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.3/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.3
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.3
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.2/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.2/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.2
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.2
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.1/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.1/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.1
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.1
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.0/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.0/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=8.0
+    - DEBUG=true
+    script: tools/build_test_push.sh 8.0
+  - stage: build, test, deploy
+    env:
+    - PROCESS=7.7/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 7.7/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=7.7
+    - DEBUG=true
+    script: tools/build_test_push.sh 7.7
+  - stage: build, test, deploy
+    env:
+    - PROCESS=6.6/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 6.6/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=6.6
+    - DEBUG=true
+    script: tools/build_test_push.sh 6.6
+  - stage: build, test, deploy
+    env:
+    - PROCESS=5.5/slim
+    - DEBUG=true
+    script: tools/build_test_push.sh 5.5/slim
+  - stage: build, test, deploy
+    env:
+    - PROCESS=5.5
+    - DEBUG=true
+    script: tools/build_test_push.sh 5.5
+env:
+  global:
+  - secure: dB9XF66I9meJW6vk/pR/XWYhfHyxVB6DggeGbRzFtPAizSrKwIPrvz9wNFyDHQP1IoYnozeuagT1kX9utUHz7Hy1kZkjkHIysV3K1nDbeZcCulinBfZRYDhJZicJp5MPvCfAIfSitIHVi+gafc78BApR5MRlAYa3Ji/+OjuVo+Fo3VRIM7xuFppgD+2/gCzgwjF3sGViQ35vur+P+pgese0dJX7F02PRSRVxBPIo1Q1xsULb7cAGy355C0WDb7Mkg1oPwi3EVpyR+PL/lS8y5WXiYeaHWHoTdE+R+/+Io7/jyu2jY4x/UzJLiK5BPMk2bFi69hkQI6JmXwy8CGvBnIO+pY4e7zHuL0KvOzPLH4iSN4GzkStmQ6wokYQCfqCk3lA/3MstE1kNfCKF8djArvCisWB5AGGVSm0aBQhRr6ZJ06lMyeUrDS9UeDdbf1l/vUZSWVDkjLSmfqwDz5dhnmf5C/1r5yvknfCQKPRt2tyiTj8i5YrkXD2SxPBCimll5BhrYLJwvXmD/ULBZjnFMey1h/hsQSm/daEjKr28ZN79UIlG2jqx80ri6l9yl48CKpagq1NvNd7LH/q2SwU4+XHUDREUawJGhq7vnZdWmoIxoLhxsAmP9JeDxLPalMhfFC6o8K8SKdFQCV2w1JCsm84lvefo/giJS2qoXqiYbNA=
+  - secure: W9yq8tuT8FBJVaV7MIMzJIdLRNKSr00f4/7QNxDEUoQFC7zsgrHlEGqqD/sE7/YNg62yzatr0zcdM5HfQOah24KXbSTB8K/a8qNiRDdHJHgWW9eMYdcbX5bar/wC4kcQi6GkIg9Voa5VvVVVHIae7YoSGKinAZ6PLTmd31B01lu+vB5OeLJeEuzNDH1KKFXx3oAN0oGvCCbc0LZH0/7z4dDms6TsydAl819xfrI87pk1GrtPYCkKftd9KZaYES+N7U3INgeUavTBcHY6xA7XoVuXnhyTbkNM6klBZJbZ9rPS26lD+sNB3jVR0xM+Fe6eOB1xNQeCUkC4oXtnqtZfejoMcEs/8+mxXlcINzG0ISQUX/C/tLxdU5dICgPvZ0lal9JMU9ba8hUQWs4RKBwYlloPB47PD+lXM+CpDcsdYrH6xIlhLQ3B+ojE5k9HRIXxhU6Vjrv2UU17Z8M7tbjIS2WttomNUXYNi4MaAyr4B+PMT1ljImcvyTp4AvWHBDg+Rw8IoAlexm8AjzdPEiyUaG6os6xZEN1GAtiUuTsjG4eKfsp9W5auqPeRjy7FAHBSigKQx2vId89dvaiUN5H6bFygMnPE+3sckJ+iwUnHBCMZZPnEE8usLwhD4fbLKh+X653Pi/2on4pjerfP8lAbFK5LT+O/q+hNlp29n1u1gF4=
