@@ -21,8 +21,6 @@ fi
 build_dir="$(readlink -f "$build_dir")"
 relative_dir="$(sed "s,$TOP_DIR/,," <<< "$build_dir")"
 
-"$TOP_DIR/tools/login.sh"
-
 parent="$(grep '^FROM' "$build_dir/Dockerfile" | sed -E 's/^.*FROM *//')"
 echo "pulling $parent"
 docker pull "$parent" >/dev/null 2>&1
