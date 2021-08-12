@@ -11,7 +11,7 @@ For detailed information about the virtual/transfer sizes and individual layers 
 
 Apache Solr is highly reliable, scalable and fault tolerant, providing distributed indexing, replication and load-balanced querying, automated failover and recovery, centralized configuration and more. Solr powers the search and navigation features of many of the world's largest internet sites.
 
-Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr Reference Guide](https://lucene.apache.org/solr/guide/).
+Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr Reference Guide](https://solr.apache.org/guide/).
 
 ![logo](https://raw.githubusercontent.com/docker-library/docs/master/solr/logo.png)
 
@@ -84,7 +84,7 @@ for an example Docker Compose file that starts up Solr in a simple cluster confi
 
 # How the image works
 
-The container contains an install of Solr, as installed by the [service installation script](https://lucene.apache.org/solr/guide/7_7/taking-solr-to-production.html#service-installation-script).
+The container contains an install of Solr, as installed by the [service installation script](https://solr.apache.org/guide/8_9/taking-solr-to-production.html#service-installation-script).
 This stores the Solr distribution in `/opt/solr`, and configures Solr to use `/var/solr` to store data and logs, using the `/etc/default/solr` file for configuration.
 If you want to persist the data, mount a volume or directory on `/var/solr`.
 Solr expects some files and directories in `/var/solr`; if you use your own directory or volume you can either pre-populate them, or let docker-solr copy them for you. See [init-var-solr](scripts/init-var-solr).
@@ -94,7 +94,7 @@ The docker-solr distribution adds [scripts](https://github.com/docker-solr/docke
 
 ## Creating cores
 
-When Solr runs in standalone mode, you create "cores" to store data. On a non-Docker Solr, you would run the server in the background, then use the [Solr control script](https://lucene.apache.org/solr/guide/7_7/solr-control-script-reference.html) to create cores and load data. With Docker-solr you have various options.
+When Solr runs in standalone mode, you create "cores" to store data. On a non-Docker Solr, you would run the server in the background, then use the [Solr control script](https://solr.apache.org/guide/8_9/solr-control-script-reference.html) to create cores and load data. With Docker-solr you have various options.
 
 The first is exactly the same: start Solr running in a container, then execute the control script manually in the same container:
 
@@ -152,7 +152,7 @@ curl 'http://localhost:8983/solr/admin/collections?action=CREATE&name=gettingsta
 ```
 
 If you want to use a custom config for your collection, you first need to upload it, and then refer to it by name when you create the collection.
-See the Ref guide on how to use the [ZooKeeper upload](https://lucene.apache.org/solr/guide/7_7/solr-control-script-reference.html) or the [configset API](https://lucene.apache.org/solr/guide/7_0/configsets-api.html).
+See the Ref guide on how to use the [ZooKeeper upload](https://solr.apache.org/guide/8_9/solr-control-script-reference.html) or the [configset API](https://solr.apache.org/guide/8_9/configsets-api.html).
 
 
 ## Loading your own data
@@ -184,8 +184,8 @@ Alternatively, you can make the data available on a volume at Solr start time, a
 
 ## solr.in.sh configuration
 
-In Solr it is common to configure settings in [solr.in.sh](https://github.com/apache/lucene-solr/blob/master/solr/bin/solr.in.sh),
-as documented in the [Solr Reference Guide](https://cwiki.apache.org/confluence/display/solr/Taking+Solr+to+Production#TakingSolrtoProduction-Environmentoverridesincludefile).
+In Solr it is common to configure settings in [solr.in.sh](https://github.com/apache/solr/blob/HEAD/solr/bin/solr.in.sh),
+as documented in the [Solr Reference Guide](https://solr.apache.org/guide/8_9/taking-solr-to-production.html#environment-overrides-include-file).
 
 The `solr.in.sh` file can be found in `/etc/default`:
 
@@ -260,7 +260,7 @@ Example comands to do a thread dump and get heap info for PID 10:
 
 # Updating from Docker-solr5-7 to 8
 
-For Solr 8, the docker-solr distribution switched from just extracting the Solr tar, to using the [service installation script](https://lucene.apache.org/solr/guide/7_7/taking-solr-to-production.html#service-installation-script). This was done for various reasons: to bring it in line with the recommendations by the Solr Ref Guide, to make it easier to mount volumes, and because we were [asked to](https://github.com/docker-solr/docker-solr/issues/173).
+For Solr 8, the docker-solr distribution switched from just extracting the Solr tar, to using the [service installation script](https://solr.apache.org/guide/8_9/taking-solr-to-production.html#service-installation-script). This was done for various reasons: to bring it in line with the recommendations by the Solr Ref Guide, to make it easier to mount volumes, and because we were [asked to](https://github.com/docker-solr/docker-solr/issues/173).
 
 This is a backwards incompatible change, and means that if you're upgrading from an older version, you will most likely need to make some changes. If you don't want to upgrade at this time, specify `solr:7` as your container image. If you use `solr:8` you will use the new style. If you use just `solr` then you risk being tripped up by backwards incompatible changes; always specify at least a major version.
 
@@ -308,11 +308,11 @@ When a new version of Apache Solr is released, a new docker image can be release
 
 Please report issues with this docker image on this [Github project](https://github.com/docker-solr/docker-solr).
 
-For general questions about Solr, see the [Community information](http://lucene.apache.org/solr/resources.html#community), in particular the solr-user mailing list.
+For general questions about Solr, see the [Community information](http://solr.apache.org/community.html), in particular the solr-user mailing list.
 
 ## Contributing
 
-If you want to contribute to Solr, see the [Solr Resources](http://lucene.apache.org/solr/resources.html#community).
+If you want to contribute to Solr, see the [How To Contribute](http://solr.apache.org/community.html#how-to-contribute).
 
 # History
 
