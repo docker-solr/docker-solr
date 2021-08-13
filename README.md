@@ -115,8 +115,14 @@ So, typically you will use the `solr-precreate` command which prepares the speci
 $ docker run -d -p 8983:8983 --name my_solr solr:8 solr-precreate gettingstarted
 ```
 
-The `solr-precreate` command takes an optional extra argument to specify a configset directory below `/opt/solr/server/solr/configsets/`.
-This allows you to specify your own config. See [this example](https://github.com/docker-solr/docker-solr-examples/tree/master/custom-configset).
+The `solr-precreate` command takes an optional extra argument to specify a configset directory below `/opt/solr/server/solr/configsets/` or you can specify full path to a custom configset 
+inside the container:
+
+```console
+$ docker run -d -p 8983:8983 --name my_solr -v $PWD/config/solr:/my_core_config/conf solr:8 solr-precreate my_core /my_core_config
+```
+
+N.B. When specifying the full path to the configset, the actual core configuration should be located inside that directory in the `conf` directory. See <https://solr.apache.org/guide/8_9/config-sets.html> for details.
 
 ### Using solr-create command
 
