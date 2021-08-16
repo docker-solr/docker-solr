@@ -132,7 +132,7 @@ The third option is to use the `solr-create` command. This runs a Solr in the ba
 $ docker run -d -p 8983:8983 --name my_solr solr:8 solr-create -c gettingstarted
 ```
 
-### Custom set up scripts
+### Custom set-up scripts
 
 Finally, you can run your own command-line and specify what to do, and even invoke mounted scripts. For example:
 
