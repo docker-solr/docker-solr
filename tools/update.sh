@@ -303,7 +303,7 @@ if [[ "$all_dirs" == "true" ]]; then
   :>TAGS
 fi
 for version in "${versions[@]}"; do
-    full_version="$(grep "^$version" "$upstream_versions" | tail -n 1)"
+    full_version="$(grep "^$version\b" "$upstream_versions" | tail -n 1)"
     if [[ -z $full_version ]]; then
         echo "Cannot find $version in $archiveUrl"
         exit 1
