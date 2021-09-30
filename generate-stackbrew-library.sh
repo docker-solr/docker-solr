@@ -114,6 +114,11 @@ for version in "${versions[@]}"; do
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 		variantArches="${parentRepoToArches[$variantParent]}"
 
+    # we don't support the full range of possible archs for these legacy versions...
+    if [[ $version == 6.* ]] || [[ $version == 5.* ]] ; then
+       variantArches="amd64"
+    fi
+    
 		echo
 		cat <<-EOE
 			Tags: $(sed -E 's/ +/, /g' <<<"${variantAliases[@]}")
