@@ -1,5 +1,5 @@
-8.10:8.10.0:8.10 8 latest
-8.10/slim:8.10.0-slim:8.10-slim 8-slim latest-slim
+8.10:8.10.1:8.10 8 latest
+8.10/slim:8.10.1-slim:8.10-slim 8-slim latest-slim
 8.9:8.9.0:8.9
 8.9/slim:8.9.0-slim:8.9-slim
 8.8:8.8.2:8.8
