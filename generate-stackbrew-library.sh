@@ -70,9 +70,9 @@ cat <<-EOH
 # this file is generated via https://github.com/docker-solr/docker-solr/blob/$(fileCommit "$self")/$self
 
 Maintainers: The Apache Lucene/Solr Project <solr-user@lucene.apache.org> (@asfbot),
-             Shalin Mangar (@shalinmangar),
-             David Smiley (@dsmiley),
-             Jan Høydahl (@janhoy)
+			 Shalin Mangar (@shalinmangar),
+			 David Smiley (@dsmiley),
+			 Jan Høydahl (@janhoy)
 GitRepo: https://github.com/docker-solr/docker-solr.git
 EOH
 
@@ -83,42 +83,42 @@ for version in "${versions[@]}"; do
 
 		commit="$(dirCommit "$dir")"
 
-    # grep the full version from the Dockerfile, eg: SOLR_VERSION="6.6.1"
+	# grep the full version from the Dockerfile, eg: SOLR_VERSION="6.6.1"
 		fullVersion="$(git show "$commit:$dir/Dockerfile" | \
-      grep -E 'SOLR_VERSION="[^"]+"' | \
-      sed -E -e 's/.*SOLR_VERSION="([^"]+)".*$/\1/')"
-    if [[ -z $fullVersion ]]; then
-      echo "Cannot determine full version from $dir/Dockerfile"
-      exit 1
-    fi
+			grep -E 'SOLR_VERSION="[^"]+"' | \
+			sed -E -e 's/.*SOLR_VERSION="([^"]+)".*$/\1/')"
+		if [[ -z $fullVersion ]]; then
+			echo "Cannot determine full version from $dir/Dockerfile"
+			exit 1
+		fi
 		versionAliases=(
 			"$fullVersion"
 			"$version"
 		)
 
 		if [[ -n "${aliases[$version]:-}" ]]; then
-            versionAliases=( "${versionAliases[@]}"  "${aliases[$version]:-}" )
+			versionAliases=( "${versionAliases[@]}"  "${aliases[$version]:-}" )
 		fi
 		if [ -z "$variant" ]; then
 			variantAliases=( "${versionAliases[@]}" )
-        	if [[ $version == "$latest_version" ]]; then
-                variantAliases=( "${variantAliases[@]}"  "latest" )
-            fi
+			if [[ $version == "$latest_version" ]]; then
+				variantAliases=( "${variantAliases[@]}"  "latest" )
+			fi
 		else
 			variantAliases=( "${versionAliases[@]/%/-$variant}" )
-            if [[ $version == "$latest_version" ]]; then
-                    variantAliases=( "${variantAliases[@]}"  "$variant" )
-             fi
+			if [[ $version == "$latest_version" ]]; then
+					variantAliases=( "${variantAliases[@]}"  "$variant" )
+			fi
 		fi
 
 		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 		variantArches="${parentRepoToArches[$variantParent]}"
 
-    # we don't support the full range of possible archs for these legacy versions...
-    if [[ $version == 6.* ]] || [[ $version == 5.* ]] ; then
-       variantArches="amd64"
-    fi
-    
+		# we don't support the full range of possible archs for these legacy versions...
+		if [[ $version == 6.* ]] || [[ $version == 5.* ]] ; then
+			variantArches="amd64"
+		fi
+
 		echo
 		cat <<-EOE
 			Tags: $(sed -E 's/ +/, /g' <<<"${variantAliases[@]}")
