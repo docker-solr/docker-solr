@@ -263,7 +263,10 @@ git push
 Next we create the [manifest](https://github.com/docker-solr/official-images/blob/master/library/solr) for the Official Images repository.
 Essentially this is the build artifact our repsitory created. It refers ito the commits in our repository that we pushed previously.
 
-Still in our repository, run:
+First, ensure that the *master* branch of docker/solr is up to date with the remote which ought to have the upgrade now.
+You may have to switch from a feature-branch for a PR to master and then `git pull`.
+
+Then in our repository, run:
 
 ```bash
 git rev-parse HEAD
