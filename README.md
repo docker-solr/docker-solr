@@ -183,7 +183,7 @@ $ docker run --name my_solr -p 8983:8983 solr:8 solr-precreate books
 
 # get data
 $ mkdir mydata
-$ wget -O mydata/books.csv https://raw.githubusercontent.com/apache/lucene-solr/master/solr/example/exampledocs/books.csv
+$ wget -O mydata/books.csv https://raw.githubusercontent.com/apache/solr/main/solr/example/exampledocs/books.csv
 $ docker run --rm -v "$PWD/mydata:/mydata" --network=host solr:8 post -c books /mydata/books.csv
 ```
 
