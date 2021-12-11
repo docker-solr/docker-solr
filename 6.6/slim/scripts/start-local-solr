@@ -13,7 +13,7 @@ MY_SOLR_INCLUDE="${SOLR_INCLUDE:-/opt/solr/bin/solr.in.sh}"
 eval "$( set +e +u +o pipefail; . "$MY_SOLR_INCLUDE"; set -o posix; set | grep -E '^SOLR_(LOGS_DIR|OPTS)=' | sed 's/^SOLR_/MY_SOLR_/')"
 
 MY_SOLR_LOGS_DIR="${MY_SOLR_LOGS_DIR:-/opt/solr/server/logs}"
-MY_SOLR_OPTS="${MY_SOLR_OPTS:-} -Djetty.host=${SOLR_LOCAL_HOST:-localhost}"
+MY_SOLR_OPTS="${MY_SOLR_OPTS:-} -Djetty.host=${SOLR_LOCAL_HOST:-localhost} -Dlog4j2.formatMsgNoLookups=true"
 
 if [ ! -w "$MY_SOLR_LOGS_DIR" ]; then
     echo "Log directory $MY_SOLR_LOGS_DIR is not writable by $(id -u):$(id -g)"
