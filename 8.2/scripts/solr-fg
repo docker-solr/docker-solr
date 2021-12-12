@@ -8,6 +8,7 @@ if [[ "$VERBOSE" == "yes" ]]; then
 fi
 
 EXTRA_ARGS=()
+EXTRA_ARGS+=('-Dlog4j2.formatMsgNoLookups=true')
 
 # Allow easy setting of the OOM behaviour
 # Test with: docker run -p 8983:8983 -it -e OOM=script -e SOLR_JAVA_MEM="-Xms25m -Xmx25m" solr
