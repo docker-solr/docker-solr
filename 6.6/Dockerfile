@@ -16,7 +16,7 @@ ARG SOLR_DOWNLOAD_SERVER
 
 RUN set -ex; \
   apt-get update; \
-  apt-get -y install acl dirmngr gpg lsof procps wget netcat gosu tini; \
+  apt-get -y install acl dirmngr gpg lsof procps wget netcat gosu tini zip; \
   rm -rf /var/lib/apt/lists/*; \
   cd /usr/local/bin; wget -nv https://github.com/apangin/jattach/releases/download/v1.5/jattach; chmod 755 jattach; \
   echo >jattach.sha512 "d8eedbb3e192a8596c08efedff99b9acf1075331e1747107c07cdb1718db2abe259ef168109e46bd4cf80d47d43028ff469f95e6ddcbdda4d7ffa73a20e852f9  jattach"; \
@@ -86,6 +86,10 @@ RUN set -ex; \
   mv "/opt/solr-$SOLR_VERSION" /opt/solr; \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
   rm -Rf /opt/solr/docs/ /opt/solr/dist/{solr-core-$SOLR_VERSION.jar,solr-solrj-$SOLR_VERSION.jar,solrj-lib,solr-test-framework-$SOLR_VERSION.jar,test-framework}; \
+  # https://nvd.nist.gov/vuln/detail/CVE-2021-45046. Remove
+  # JndiLookup.class from all log4j jars. Do not error if it is not in
+  # the jar and zip has nothing do to.
+  find . -name 'log4j-core*.jar' | xargs -I{} sh -c 'zip -q -d "$1" org/apache/logging/log4j/core/lookup/JndiLookup.class || [ "$?" -eq 12 ]' -s {}; \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
   mkdir -p /opt/solr/server/solr/mycores /opt/solr/server/logs /opt/mysolrhome; \
   sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr; \
