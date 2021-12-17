@@ -48,9 +48,9 @@ RUN set -ex; \
   for key in $SOLR_KEYS; do \
     found=''; \
     for server in \
-      ha.pool.sks-keyservers.net \
+      hkps://keyserver.ubuntu.com \
+      hkps://keys.openpgp.org \
       hkp://keyserver.ubuntu.com:80 \
-      hkp://p80.pool.sks-keyservers.net:80 \
       pgp.mit.edu \
     ; do \
       echo "  trying $server for $key"; \

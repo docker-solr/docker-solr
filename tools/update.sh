@@ -18,9 +18,9 @@ cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
 TOP_DIR=$PWD
 OWNERTRUSTFILE="ownertrust.txt"
-KEYSERVERS=(hkp://keyserver.ubuntu.com:80
-      ha.pool.sks-keyservers.net
-      pgp.mit.edu)
+KEYSERVERS=(hkps://keyserver.ubuntu.com
+      hkps://keys.openpgp.org
+      hkp://keyserver.ubuntu.com:80)
 
 if (( $# == 0 )); then
   readarray -t x_y_dirs < <(find . -maxdepth 1 -print | sed 's,^\./,,' | \
