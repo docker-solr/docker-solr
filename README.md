@@ -11,7 +11,7 @@ References:
 # Supported tags and respective `Dockerfile` links
 
 See [Docker Hub](https://hub.docker.com/_/solr?tab=tags) for a list of image tags available to pull.
-The currently supported tags can be found in [./TAGS](https://github.com/docker-solr/docker-solr/blob/389e7844c8405605a930fc30cc8029eb6027798e/TAGS).  Note that the Apache Solr project doesn't actually support any releases older than the current major release series, despite whatever tags are published.
+The currently supported tags can be found in [./TAGS](https://github.com/docker-solr/docker-solr/blob/master/TAGS).  Note that the Apache Solr project doesn't actually support any releases older than the current major release series, despite whatever tags are published.
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 
@@ -21,7 +21,7 @@ For detailed information about the virtual/transfer sizes and individual layers 
 
 Apache Solr is highly reliable, scalable and fault tolerant, providing distributed indexing, replication and load-balanced querying, automated failover and recovery, centralized configuration and more. Solr powers the search and navigation features of many of the world's largest internet sites.
 
-Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr Reference Guide](https://solr.apache.org/guide/).
+Learn more on [Solr's homepage](https://solr.apache.org) and in the [Solr Reference Guide](https://solr.apache.org/guide/).
 
 ![logo](https://raw.githubusercontent.com/docker-library/docs/master/solr/logo.png)
 
