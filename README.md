@@ -1,6 +1,6 @@
 # NOTE: Not vulnerable to Log4J 2 "Log4shell"
 
-The Docker images *were* vulnerable to one of a pair of vulnerabilities in Log4J 2 but they are not vulnerable anymore -- you may need to re-pull the image you are using.  For images prior to 8.11.1, Solr is using a popular technique to do this -- setting `log4j2.formatMsgNoLookups`.  The Solr maintainers have deemed this adequate based specifically on how Solr uses logging.  It won't be adequate for all projects that use Log4J.  Scanning software might alert you to the presence of an older Log4J JAR file, however it can't know if your software (Solr) uses the artifacts in a vulnerable way.
+Some Docker images *were* vulnerable to one of a pair of vulnerabilities in Log4J 2.  But we have mitigated *[supported](https://hub.docker.com/_/solr?tab=tags)* images (and some others) and re-published them.  You may need to re-pull the image you are using.  For those images prior to 8.11.1, Solr is using a popular technique to mitigate the problem -- setting `log4j2.formatMsgNoLookups`.  The Solr maintainers have deemed this adequate based specifically on how Solr uses logging; it won't be adequate for all projects that use Log4J.  Scanning software might alert you to the presence of an older Log4J JAR file, however it can't know if your software (Solr) uses the artifacts in a vulnerable way.  To validate the mitigation being in place, look for `-Dlog4j2.formatMsgNoLookups` in the Args section of Solr's front admin screen.  As of Solr 8.11.1, Solr is using Log4J 2.16.0.
 
 References:
 * [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228): Solr _was_ vulnerable to this.
@@ -11,7 +11,7 @@ References:
 # Supported tags and respective `Dockerfile` links
 
 See [Docker Hub](https://hub.docker.com/_/solr?tab=tags) for a list of image tags available to pull.
-The currently supported tags can be found in [./TAGS](https://github.com/docker-solr/docker-solr/blob/389e7844c8405605a930fc30cc8029eb6027798e/TAGS).  Note that the Apache Solr project doesn't actually support any releases older than the current major release series, despite whatever tags are published.
+The currently supported tags can be found in [./TAGS](https://github.com/docker-solr/docker-solr/blob/master/TAGS).  Note that the Apache Solr project doesn't actually support any releases older than the current major release series, despite whatever tags are published.
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 
@@ -21,7 +21,7 @@ For detailed information about the virtual/transfer sizes and individual layers 
 
 Apache Solr is highly reliable, scalable and fault tolerant, providing distributed indexing, replication and load-balanced querying, automated failover and recovery, centralized configuration and more. Solr powers the search and navigation features of many of the world's largest internet sites.
 
-Learn more on [Solr's homepage](http://lucene.apache.org/solr/) and in the [Solr Reference Guide](https://solr.apache.org/guide/).
+Learn more on [Solr's homepage](https://solr.apache.org) and in the [Solr Reference Guide](https://solr.apache.org/guide/).
 
 ![logo](https://raw.githubusercontent.com/docker-library/docs/master/solr/logo.png)
 
