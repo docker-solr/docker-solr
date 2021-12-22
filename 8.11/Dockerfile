@@ -113,6 +113,17 @@ RUN set -ex; \
   { command -v gpgconf; gpgconf --kill all || :; }; \
   rm -r "$GNUPGHOME"
 
+# This is related to HBase but the project shut down in 2016 and hasn't
+# updated its vendored dependencies. Fortunately it is completely
+# optional for normal use:
+# See https://issues.apache.org/jira/browse/SOLR-15855
+RUN find /opt -name htrace-core4*.jar -ls -delete
+
+# Solr's test framework shouldn't be necessary on a server and the bundled Ant
+# JAR has an XML parser has a known vulnerability
+# See https://issues.apache.org/jira/browse/SOLR-15855
+RUN rm -r /opt/solr/dist/test-framework
+
 COPY --chown=0:0 scripts /opt/docker-solr/scripts
 
 VOLUME /var/solr
