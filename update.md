@@ -102,12 +102,13 @@ You also need the GNU version of some tools.
 ```bash
 brew install gpg  # If you don't have GPG already
 brew install git  # If you don't have git already
-brew install coreutils wget gawk shellcheck bash parallel findutils  # Other dependencies
+brew install coreutils wget gawk shellcheck bash parallel findutils gnu-sed  # Other dependencies
 sudo wget -nv --output-document=/usr/local/bin/bashbrew https://github.com/docker-library/bashbrew/releases/download/v0.1.1/bashbrew-darwin-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
 ```
 
 Before you start running scripts, please run an init script that puts GNU tools first in PATH. The settings only takes effect for the current Terminal window:
+
 ```bash
 source tools/init_macos.sh
 ```
