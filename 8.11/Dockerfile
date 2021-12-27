@@ -90,7 +90,8 @@ RUN set -ex; \
   tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
   (cd /opt; ln -s "solr-$SOLR_VERSION" solr); \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
-  rm -Rf /opt/solr/docs/ /opt/solr/dist/{solr-core-$SOLR_VERSION.jar,solr-solrj-$SOLR_VERSION.jar,solrj-lib,solr-test-framework-$SOLR_VERSION.jar,test-framework}; \
+  rm -R /opt/solr/docs/ /opt/solr/dist/solrj-lib /opt/solr/dist/test-framework; \
+  find /opt/solr/dist/ \( -name "solr-core-$SOLR_VERSION.jar" -o -name "solr-solrj-$SOLR_VERSION.jar" -o -name "solr-test-framework-$SOLR_VERSION.jar" \) -delete; \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
   chown -R 0:0 "/opt/solr-$SOLR_VERSION"; \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755; \
@@ -112,17 +113,6 @@ RUN set -ex; \
   chown -R "$SOLR_USER:0" /var/solr; \
   { command -v gpgconf; gpgconf --kill all || :; }; \
   rm -r "$GNUPGHOME"
-
-# This is related to HBase but the project shut down in 2016 and hasn't
-# updated its vendored dependencies. Fortunately it is completely
-# optional for normal use:
-# See https://issues.apache.org/jira/browse/SOLR-15855
-RUN find /opt -name htrace-core4*.jar -ls -delete
-
-# Solr's test framework shouldn't be necessary on a server and the bundled Ant
-# JAR has an XML parser has a known vulnerability
-# See https://issues.apache.org/jira/browse/SOLR-15855
-RUN rm -r /opt/solr/dist/test-framework
 
 COPY --chown=0:0 scripts /opt/docker-solr/scripts
 

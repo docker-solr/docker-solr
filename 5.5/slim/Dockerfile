@@ -85,7 +85,8 @@ RUN set -ex; \
   tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
   mv "/opt/solr-$SOLR_VERSION" /opt/solr; \
   rm "/opt/solr-$SOLR_VERSION.tgz"*; \
-  rm -Rf /opt/solr/docs/ /opt/solr/dist/{solr-core-$SOLR_VERSION.jar,solr-solrj-$SOLR_VERSION.jar,solrj-lib,solr-test-framework-$SOLR_VERSION.jar,test-framework}; \
+  rm -R /opt/solr/docs/ /opt/solr/dist/solrj-lib /opt/solr/dist/test-framework; \
+  find /opt/solr/dist/ \( -name "solr-core-$SOLR_VERSION.jar" -o -name "solr-solrj-$SOLR_VERSION.jar" -o -name "solr-test-framework-$SOLR_VERSION.jar" \) -delete; \
   mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
   mkdir -p /opt/solr/server/solr/mycores /opt/solr/server/logs /opt/mysolrhome; \
   sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr; \
